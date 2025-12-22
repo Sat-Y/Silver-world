@@ -1,0 +1,1793 @@
+---
+// Albums Management - Simple version
+---
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Albums Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f5f5f5;
+            color: #000000;
+        }
+        .admin-container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #ffffff;
+            border-right: 1px solid #e0e0e0;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+        }
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .sidebar-header h1 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #3b82f6;
+        }
+        .nav-menu {
+            padding: 10px;
+        }
+        .nav-item {
+            margin-bottom: 5px;
+        }
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #000000;
+            transition: all 0.2s ease;
+        }
+        .nav-link:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .header {
+            padding: 16px 24px;
+            background-color: #ffffff;
+            border-bottom: 1px solid #e0e0e0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        .new-album-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background-color: #3b82f6;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        .new-album-btn:hover {
+            background-color: #2563eb;
+        }
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .logout-btn:hover {
+            background-color: #dc2626;
+        }
+        .content {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            background-color: #f5f5f5;
+        }
+        .albums-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        /* Bulk actions */
+        .bulk-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 16px;
+            padding: 12px;
+            background-color: #f9fafb;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .bulk-actions.hidden {
+            display: none;
+        }
+        
+        .action-info {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        
+        .select-all-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .select-all-checkbox {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        
+        .select-all-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            cursor: pointer;
+        }
+        
+        /* Album card with checkbox */
+        .album-card {
+            position: relative;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+        
+        .album-card.selected {
+            border: 2px solid #3b82f6;
+        }
+        
+        .album-checkbox {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            z-index: 10;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        /* Action buttons visibility fix */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .action-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        .edit-btn {
+            color: #3b82f6;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+        
+        .edit-btn:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+        
+        .delete-btn {
+            color: #ef4444;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+        
+        .delete-btn:hover {
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+        
+        /* Ensure buttons are visible */
+        .album-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 5;
+        }
+        
+        /* Add hover effect to show buttons more prominently */
+        .album-card:hover .action-btn {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Edit modal styles */
+        .edit-modal-content {
+            text-align: left;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 6px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .form-textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            resize: vertical;
+            min-height: 80px;
+            transition: all 0.2s ease;
+        }
+        
+        .form-textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .cover-preview {
+            width: 100%;
+            height: 200px;
+            background-color: #f3f4f6;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        
+        .cover-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .add-photos-section {
+            margin-top: 20px;
+            padding: 16px;
+            background-color: #f9fafb;
+            border-radius: 6px;
+            border: 2px dashed #d1d5db;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .add-photos-section:hover {
+            background-color: #f3f4f6;
+            border-color: #3b82f6;
+        }
+        
+        .add-photos-text {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 8px;
+        }
+        
+        .photos-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 8px;
+            margin-top: 16px;
+        }
+        
+        .photo-item {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1;
+            background-color: #f3f4f6;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .remove-photo-btn {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 20px;
+            height: 20px;
+            background-color: rgba(239, 68, 68, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .remove-photo-btn:hover {
+            background-color: rgba(220, 38, 38, 0.9);
+        }
+        .albums-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .album-card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+        .album-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+        .album-cover {
+            position: relative;
+            height: 200px;
+            background-color: #f3f4f6;
+        }
+        .album-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        .album-card:hover .album-cover img {
+            transform: scale(1.05);
+        }
+        .photo-count {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .album-info {
+            padding: 16px;
+        }
+        .album-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .album-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #111827;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+        .edit-btn {
+            color: #3b82f6;
+        }
+        .edit-btn:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+        .delete-btn {
+            color: #ef4444;
+        }
+        .delete-btn:hover {
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+        .album-description {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+        .album-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 0.75rem;
+            color: #9ca3af;
+        }
+        .album-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 48px 24px;
+            color: #6b7280;
+            grid-column: 1 / -1;
+        }
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e5e7eb;
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 16px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .no-albums {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 48px 24px;
+            color: #6b7280;
+            grid-column: 1 / -1;
+        }
+        .no-albums a {
+            color: #3b82f6;
+            text-decoration: none;
+            margin-top: 12px;
+        }
+        .no-albums a:hover {
+            text-decoration: underline;
+        }
+        .error-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 48px 24px;
+            color: #ef4444;
+            grid-column: 1 / -1;
+        }
+        .retry-btn {
+            margin-top: 16px;
+            padding: 8px 16px;
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .retry-btn:hover {
+            background-color: #2563eb;
+        }
+        /* Utility classes */
+        .hidden {
+            display: none !important;
+        }
+        /* Modal styles - Enhanced */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        .modal {
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 95%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 32px;
+            animation: slideUp 0.3s ease-out;
+            /* Hide scrollbar for Chrome, Safari and Opera */
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .modal::-webkit-scrollbar {
+            display: none;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .modal-header {
+            text-align: center;
+            margin-bottom: 32px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #111827;
+        }
+        
+        .modal-content {
+            text-align: center;
+            margin-bottom: 24px;
+            color: #6b7280;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 16px;
+            justify-content: flex-end;
+            margin-top: 32px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .modal-btn {
+            padding: 10px 28px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .modal-btn-secondary {
+            background-color: #f3f4f6;
+            color: #374151;
+        }
+        
+        .modal-btn-secondary:hover {
+            background-color: #e5e7eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .modal-btn-danger {
+            background-color: #ef4444;
+            color: white;
+        }
+        
+        .modal-btn-danger:hover {
+            background-color: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(239, 68, 68, 0.2);
+        }
+        
+        /* Edit modal specific styles */
+        .edit-modal-content {
+            text-align: left;
+        }
+        
+        /* Form styles enhancement */
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+        
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background-color: #ffffff;
+        }
+        
+        .form-input:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        .form-textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        /* Cover image styles */
+        .cover-preview {
+            width: 100%;
+            height: 250px;
+            background-color: #f9fafb;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px dashed #d1d5db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .cover-preview:hover {
+            border-color: #3b82f6;
+            background-color: #f3f4f6;
+        }
+        
+        .cover-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border: none;
+        }
+        
+        /* Button styles enhancement */
+        .new-album-btn {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            padding: 10px 24px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        
+        .new-album-btn:hover {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+        }
+        
+        /* Add photos section styles */
+        .add-photos-section {
+            margin-top: 24px;
+            padding: 32px 24px;
+            background-color: #f9fafb;
+            border-radius: 12px;
+            border: 2px dashed #d1d5db;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .add-photos-section:hover {
+            background-color: #f3f4f6;
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        /* Photos list styles */
+        .photos-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .photo-item {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1;
+            background-color: #f3f4f6;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .photo-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .remove-photo-btn {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 24px;
+            height: 24px;
+            background-color: rgba(239, 68, 68, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .remove-photo-btn:hover {
+            background-color: rgba(220, 38, 38, 0.95);
+            transform: scale(1.1);
+        }
+        svg {
+            width: 20px;
+            height: 20px;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // Prevent swup from handling any clicks on links by stopping propagation before swup's listeners are called
+        document.addEventListener('click', (event) => {
+            let target = event.target;
+            while (target && target.nodeName !== 'A') {
+                target = target.parentElement;
+            }
+            if (target && target.nodeName === 'A') {
+                event.stopImmediatePropagation();
+            }
+        }, true);
+        
+        // Immediately disable swup if it's already initialized
+        if (window.swup) {
+            window.swup.destroy();
+            window.swup = null;
+        }
+    </script>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header"> <h1>Admin Panel</h1> </div>
+            <nav class="nav-menu">
+                <div class="nav-item">
+                    <a href="/admin/" class="nav-link swup-ignore">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                        </svg>
+                        Dashboard
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/admin/posts/" class="nav-link swup-ignore">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
+                        </svg>
+                        Posts
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/admin/albums/" class="nav-link swup-ignore">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        Albums
+                    </a>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <header class="header">
+                <h2>Albums Management</h2>
+                <div class="header-actions">
+                    <a href="/admin/albums/new/" class="new-album-btn swup-ignore">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        New Album
+                    </a>
+                    <button class="logout-btn" id="logoutBtn">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                        </svg>
+                        Logout
+                    </button>
+                </div>
+            </header>
+            <main class="content">
+                <div class="albums-content">
+                    <!-- Bulk actions - Always show for testing -->
+                    <div id="bulkActions" class="bulk-actions">
+                        <div class="action-info">
+                            <span id="selectedCount">0</span> albums selected
+                        </div>
+                        <button 
+                            id="deleteSelectedBtn" 
+                            class="modal-btn modal-btn-danger"
+                        >
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4 mr-2 inline">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                            Delete Selected
+                        </button>
+                    </div>
+                    
+                    <!-- Select all checkbox -->
+                    <div class="select-all-container">
+                        <input 
+                            type="checkbox" 
+                            id="selectAllCheckbox" 
+                            class="select-all-checkbox"
+                            onchange="toggleSelectAll()"
+                        />
+                        <label for="selectAllCheckbox" class="select-all-label">Select all albums</label>
+                    </div>
+                    
+                    <div id="albumsGrid" class="albums-grid">
+                        <!-- Albums will be loaded dynamically -->
+                        <div class="loading-container">
+                            <div class="loading-spinner"></div>
+                            <p>Loading albums...</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal-overlay hidden">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Confirm Delete</h3>
+            </div>
+            <div class="modal-content">
+                <p>Are you sure you want to delete this album? This action will also delete all associated photos and cannot be undone.</p>
+            </div>
+            <div class="modal-actions">
+                <button id="cancelDelete" class="modal-btn modal-btn-secondary">Cancel</button>
+                <button id="confirmDelete" class="modal-btn modal-btn-danger">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Delete Confirmation Modal -->
+    <div id="bulkDeleteModal" class="modal-overlay hidden">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Confirm Bulk Delete</h3>
+            </div>
+            <div class="modal-content">
+                <p>Are you sure you want to delete <span id="bulkDeleteCount">0</span> selected albums? This action will also delete all associated photos and cannot be undone.</p>
+            </div>
+            <div class="modal-actions">
+                <button id="cancelBulkDelete" class="modal-btn modal-btn-secondary">Cancel</button>
+                <button id="confirmBulkDelete" class="modal-btn modal-btn-danger">Delete Selected</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Album Modal -->
+    <div id="editModal" class="modal-overlay hidden">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Edit Album</h3>
+            </div>
+            <div class="modal-content edit-modal-content">
+                <form id="editAlbumForm">
+                    <!-- Basic Information -->
+                    <div class="form-group">
+                        <label for="editAlbumTitle" class="form-label">Album Title</label>
+                        <input 
+                            type="text" 
+                            id="editAlbumTitle" 
+                            name="title" 
+                            class="form-input" 
+                            required 
+                        />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editAlbumDescription" class="form-label">Description</label>
+                        <textarea 
+                            id="editAlbumDescription" 
+                            name="description" 
+                            class="form-textarea"
+                        ></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editAlbumDate" class="form-label">Date</label>
+                        <input 
+                            type="date" 
+                            id="editAlbumDate" 
+                            name="date" 
+                            class="form-input" 
+                            required 
+                        />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editAlbumLocation" class="form-label">Location</label>
+                        <input 
+                            type="text" 
+                            id="editAlbumLocation" 
+                            name="location" 
+                            class="form-input" 
+                        />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editAlbumTags" class="form-label">Tags (comma-separated)</label>
+                        <input 
+                            type="text" 
+                            id="editAlbumTags" 
+                            name="tags" 
+                            class="form-input" 
+                            placeholder="e.g., nature, travel, family"
+                        />
+                    </div>
+
+                    <!-- Cover Image -->
+                    <div class="form-group">
+                        <label class="form-label">Cover Image</label>
+                        <div id="coverPreview" class="cover-preview">
+                            <img id="coverImage" src="" alt="Cover Preview" style="display: none;" />
+                        </div>
+                        <input 
+                            type="file" 
+                            id="coverFile" 
+                            name="cover" 
+                            accept="image/*" 
+                            style="display: none;"
+                        />
+                        <button 
+                            type="button" 
+                            id="changeCoverBtn" 
+                            class="new-album-btn" 
+                            style="margin-top: 8px;"
+                        >
+                            Change Cover
+                        </button>
+                    </div>
+
+                    <!-- Photos Section -->
+                    <div class="form-group">
+                        <label class="form-label">Photos</label>
+                        <div id="photosList" class="photos-list"></div>
+                        
+                        <!-- Add Photos Section -->
+                        <div id="addPhotosSection" class="add-photos-section">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-12 h-12">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            <p class="add-photos-text">Click to add more photos</p>
+                            <input 
+                                type="file" 
+                                id="addPhotosInput" 
+                                name="photos" 
+                                accept="image/*" 
+                                multiple 
+                                style="display: none;"
+                            />
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-actions">
+                <button id="cancelEdit" class="modal-btn modal-btn-secondary">Cancel</button>
+                <button id="saveEdit" class="modal-btn new-album-btn">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State management
+        let albumToDelete = null;
+        let albumsToDelete = [];
+        let albumToEdit = null;
+        let selectedAlbums = new Set();
+        let allAlbums = [];
+        let photosToDelete = []; // Track photos to delete
+
+        // Fetch albums from API
+        async function fetchAlbums() {
+            try {
+                const token = localStorage.getItem('token');
+                const apiBaseUrl = 'http://localhost:3001/api';
+                
+                // Check if token exists
+                if (!token) {
+                    window.location.href = '/admin/login/';
+                    return;
+                }
+                
+                const response = await fetch(`${apiBaseUrl}/admin/albums`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    allAlbums = result.data;
+                    renderAlbums(allAlbums);
+                    updateBulkActions();
+                } else {
+                    console.error('Failed to fetch albums:', result.message);
+                    renderError('Failed to load albums. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error fetching albums:', error);
+                renderError('An error occurred while loading albums.');
+                if (error.message && error.message.includes('401')) {
+                    window.location.href = '/admin/login/';
+                }
+            }
+        }
+
+        // Render albums in grid
+        function renderAlbums(albums) {
+            const albumsGrid = document.getElementById('albumsGrid');
+            
+            if (albums.length === 0) {
+                albumsGrid.innerHTML = `
+                    <div class="no-albums">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-12 h-12 mb-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"></path>
+                        </svg>
+                        <p>No albums found</p>
+                        <a href="/admin/albums/new">Create your first album</a>
+                    </div>
+                `;
+                return;
+            }
+
+            albumsGrid.innerHTML = albums.map(album => `
+                <div class="album-card ${selectedAlbums.has(album.id) ? 'selected' : ''}">
+                    <!-- Album checkbox -->
+                    <input 
+                        type="checkbox" 
+                        class="album-checkbox" 
+                        ${selectedAlbums.has(album.id) ? 'checked' : ''}
+                        onchange="toggleAlbumSelection('${album.id}', this.checked)"
+                    />
+                    
+                    <!-- Album cover -->
+                    <div class="album-cover" onclick="openEditModal('${album.id}')" style="cursor: pointer;">
+                        <img 
+                            src="${album.photos.length > 0 ? `http://localhost:3001${album.photos[0].url}` : 'https://via.placeholder.com/400x300?text=No+Photos'}" 
+                            alt="${album.title}"
+                        />
+                        <span class="photo-count">${album.photos.length} photos</span>
+                    </div>
+                    <div class="album-info">
+                        <!-- Album header -->
+                        <div class="album-header">
+                            <h3 class="album-title" onclick="openEditModal('${album.id}')" style="cursor: pointer;">${escapeHtml(album.title)}</h3>
+                            <!-- Action buttons -->
+                            <div class="action-buttons">
+                                <!-- Delete button -->
+                                <button 
+                                    onclick="openDeleteModal('${album.id}', '${escapeHtml(album.title)}')" 
+                                    class="action-btn delete-btn" 
+                                    title="Delete Album"
+                                >
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <p class="album-description" onclick="openEditModal('${album.id}')" style="cursor: pointer;">${album.description || ''}</p>
+                        <div class="album-meta" onclick="openEditModal('${album.id}')" style="cursor: pointer;">
+                            <span class="album-meta-item">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                ${formatDate(album.date)}
+                            </span>
+                            ${album.location ? `
+                            <span class="album-meta-item">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                ${escapeHtml(album.location)}
+                            </span>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Render error state
+        function renderError(message) {
+            const albumsGrid = document.getElementById('albumsGrid');
+            albumsGrid.innerHTML = `
+                <div class="error-container">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-12 h-12 mb-4" style="color: #ef4444;">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <p>${message}</p>
+                    <button onclick="fetchAlbums()" class="retry-btn">Try Again</button>
+                </div>
+            `;
+        }
+
+        // Toggle album selection
+        function toggleAlbumSelection(albumId, isChecked) {
+            console.log('=== 切换相册选择 ===', albumId, isChecked);
+            
+            if (isChecked) {
+                selectedAlbums.add(albumId);
+                console.log('添加到选中集合:', albumId, '当前选中数量:', selectedAlbums.size);
+            } else {
+                selectedAlbums.delete(albumId);
+                console.log('从选中集合删除:', albumId, '当前选中数量:', selectedAlbums.size);
+            }
+            
+            // 立即更新批量操作区域 - 确保单个选中时显示删除按钮
+            updateBulkActions();
+            
+            // 更新DOM中所有相册卡片的选中状态
+            const albumCards = document.querySelectorAll('.album-card');
+            albumCards.forEach(card => {
+                const checkbox = card.querySelector('.album-checkbox');
+                if (checkbox) {
+                    // 从onchange事件获取相册ID
+                    const cardAlbumId = checkbox.getAttribute('onchange').match(/'([^']+)'/)[1];
+                    if (selectedAlbums.has(cardAlbumId)) {
+                        card.classList.add('selected');
+                        checkbox.checked = true;
+                        console.log('更新DOM - 选中:', cardAlbumId);
+                    } else {
+                        card.classList.remove('selected');
+                        checkbox.checked = false;
+                        console.log('更新DOM - 取消选中:', cardAlbumId);
+                    }
+                }
+            });
+        }
+
+        // Select all albums
+        function toggleSelectAll() {
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            const isChecked = selectAllCheckbox.checked;
+            
+            if (isChecked) {
+                // Select all albums
+                selectedAlbums = new Set(allAlbums.map(album => album.id));
+            } else {
+                // Deselect all albums
+                selectedAlbums.clear();
+            }
+            
+            updateBulkActions();
+            renderAlbums(allAlbums);
+        }
+
+        // Update bulk actions UI
+        function updateBulkActions() {
+            console.log('=== 更新批量操作区域 ===');
+            console.log('选中的相册数量:', selectedAlbums.size);
+            
+            const bulkActions = document.getElementById('bulkActions');
+            const selectedCount = document.getElementById('selectedCount');
+            
+            if (!bulkActions || !selectedCount) {
+                console.error('批量操作元素未找到');
+                return;
+            }
+            
+            // 无论选中多少个相册，只要有选中就显示批量操作区域
+            if (selectedAlbums.size > 0) {
+                console.log('显示批量操作区域');
+                bulkActions.classList.remove('hidden');
+                selectedCount.textContent = selectedAlbums.size;
+            } else {
+                console.log('隐藏批量操作区域');
+                bulkActions.classList.add('hidden');
+            }
+            
+            // Update select all checkbox state
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            if (selectAllCheckbox) {
+                selectAllCheckbox.checked = selectedAlbums.size === allAlbums.length && allAlbums.length > 0;
+            }
+        }
+
+        // Open delete confirmation modal
+        function openDeleteModal(albumId, albumTitle) {
+            albumToDelete = albumId;
+            document.getElementById('deleteModal').classList.remove('hidden');
+        }
+
+        // Close delete confirmation modal
+        function closeDeleteModal() {
+            albumToDelete = null;
+            document.getElementById('deleteModal').classList.add('hidden');
+        }
+
+        // Delete single album
+        async function deleteAlbum(albumId) {
+            try {
+                console.log('=== 开始删除单个相册 ===', albumId);
+                
+                const token = localStorage.getItem('token');
+                const apiBaseUrl = 'http://localhost:3001/api';
+                
+                if (!token) {
+                    window.location.href = '/admin/login/';
+                    return;
+                }
+                
+                // 确认API路径
+                const deleteUrl = `${apiBaseUrl}/admin/albums/${albumId}`;
+                console.log('删除API路径:', deleteUrl);
+                
+                const response = await fetch(deleteUrl, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                console.log('删除API响应状态:', response.status);
+                const result = await response.json();
+                console.log('删除API响应结果:', result);
+
+                if (result.success) {
+                    // Remove from selected albums if present
+                    selectedAlbums.delete(albumId);
+                    fetchAlbums();
+                    closeDeleteModal();
+                    updateBulkActions();
+                    console.log('Album deleted successfully');
+                    alert('相册删除成功');
+                } else {
+                    console.error('Failed to delete album:', result.message);
+                    alert('删除相册失败: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error deleting album:', error);
+                if (error.message && error.message.includes('401')) {
+                    window.location.href = '/admin/login/';
+                } else {
+                    alert('删除相册时发生错误: ' + error.message);
+                }
+            }
+        }
+
+        // Open bulk delete confirmation modal
+        function openBulkDeleteModal() {
+            const bulkDeleteCount = document.getElementById('bulkDeleteCount');
+            bulkDeleteCount.textContent = selectedAlbums.size;
+            document.getElementById('bulkDeleteModal').classList.remove('hidden');
+        }
+
+        // Close bulk delete confirmation modal
+        function closeBulkDeleteModal() {
+            albumsToDelete = [];
+            document.getElementById('bulkDeleteModal').classList.add('hidden');
+        }
+
+        // Delete selected albums
+        async function deleteSelectedAlbums() {
+            try {
+                const token = localStorage.getItem('token');
+                const apiBaseUrl = 'http://localhost:3001/api';
+                
+                if (!token) {
+                    window.location.href = '/admin/login/';
+                    return;
+                }
+                
+                // Convert Set to array
+                const albumsToDelete = Array.from(selectedAlbums);
+                
+                // Delete each album
+                for (const albumId of albumsToDelete) {
+                    await fetch(`${apiBaseUrl}/admin/albums/${albumId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                }
+                
+                // Clear selection and refresh
+                selectedAlbums.clear();
+                fetchAlbums();
+                closeBulkDeleteModal();
+                updateBulkActions();
+                console.log('Selected albums deleted successfully');
+            } catch (error) {
+                console.error('Error deleting selected albums:', error);
+                if (error.message && error.message.includes('401')) {
+                    window.location.href = '/admin/login/';
+                }
+            }
+        }
+
+        // Open edit modal
+        function openEditModal(albumId) {
+            albumToEdit = allAlbums.find(album => album.id === albumId);
+            if (!albumToEdit) return;
+            
+            // Reset photos to delete list when opening edit modal
+            photosToDelete = [];
+            
+            // Fill form with current album data
+            document.getElementById('editAlbumTitle').value = albumToEdit.title;
+            document.getElementById('editAlbumDescription').value = albumToEdit.description || '';
+            document.getElementById('editAlbumLocation').value = albumToEdit.location || '';
+            document.getElementById('editAlbumTags').value = albumToEdit.tags.join(', ') || '';
+            
+            // Format date for input field (YYYY-MM-DD)
+            const formattedDate = new Date(albumToEdit.date).toISOString().split('T')[0];
+            document.getElementById('editAlbumDate').value = formattedDate;
+            
+            // Update cover preview
+            const coverImage = document.getElementById('coverImage');
+            const coverPreview = document.getElementById('coverPreview');
+            if (albumToEdit.photos.length > 0) {
+                coverImage.src = `http://localhost:3001${albumToEdit.photos[0].url}`;
+                coverImage.style.display = 'block';
+            } else {
+                coverImage.style.display = 'none';
+                coverImage.src = '';
+            }
+            
+            // Render photos list
+            renderPhotosList();
+            
+            // Show modal
+            document.getElementById('editModal').classList.remove('hidden');
+        }
+
+        // Close edit modal
+        function closeEditModal() {
+            albumToEdit = null;
+            photosToDelete = []; // Reset photos to delete list
+            document.getElementById('editModal').classList.add('hidden');
+        }
+
+        // Render photos list in edit modal
+        function renderPhotosList() {
+            if (!albumToEdit) return;
+            
+            const photosList = document.getElementById('photosList');
+            
+            if (albumToEdit.photos.length === 0) {
+                photosList.innerHTML = '<p style="text-align: center; color: #6b7280; margin-top: 16px;">No photos in this album</p>';
+                return;
+            }
+            
+            photosList.innerHTML = albumToEdit.photos.map(photo => `
+                <div class="photo-item">
+                    <img src="http://localhost:3001${photo.url}" alt="Photo" />
+                    <button 
+                        class="remove-photo-btn" 
+                        onclick="removePhoto('${photo.id}')"
+                        title="Remove Photo"
+                    >
+                        ×
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // Remove photo from album
+        function removePhoto(photoId) {
+            if (!albumToEdit) return;
+            
+            // Add photo ID to delete list
+            photosToDelete.push(photoId);
+            
+            // Remove photo from album
+            albumToEdit.photos = albumToEdit.photos.filter(photo => photo.id !== photoId);
+            
+            // Update cover if the removed photo was the cover
+            if (albumToEdit.photos.length === 0) {
+                const coverImage = document.getElementById('coverImage');
+                coverImage.style.display = 'none';
+                coverImage.src = '';
+            } else {
+                const coverImage = document.getElementById('coverImage');
+                coverImage.src = `http://localhost:3001${albumToEdit.photos[0].url}`;
+                coverImage.style.display = 'block';
+            }
+            
+            // Re-render photos list
+            renderPhotosList();
+        }
+
+        // Change cover image
+        function changeCover() {
+            document.getElementById('coverFile').click();
+        }
+
+        // Handle cover file selection
+        function handleCoverSelection(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Validate file type - only allow images
+            if (!file.type.startsWith('image/')) {
+                alert('Please select an image file');
+                event.target.value = ''; // Clear the input
+                return;
+            }
+            
+            const coverImage = document.getElementById('coverImage');
+            const coverPreview = document.getElementById('coverPreview');
+            
+            // Create object URL for preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                coverImage.src = e.target.result;
+                coverImage.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Add photos to album
+        function addPhotos() {
+            const addPhotosInput = document.getElementById('addPhotosInput');
+            addPhotosInput.click();
+            
+            // Add event listener for file selection
+            addPhotosInput.onchange = function(event) {
+                const files = event.target.files;
+                if (!files || files.length === 0) return;
+                
+                // Validate all selected files are images
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    if (!file.type.startsWith('image/')) {
+                        alert('Please select only image files');
+                        event.target.value = ''; // Clear the input
+                        return;
+                    }
+                }
+                
+                // If all files are images, continue with upload
+                saveAlbumEdit();
+            };
+        }
+
+        // Save album edits
+        async function saveAlbumEdit() {
+            if (!albumToEdit) return;
+            
+            try {
+                console.log('=== 开始保存相册编辑 ===', albumToEdit.id);
+                
+                const token = localStorage.getItem('token');
+                const apiBaseUrl = 'http://localhost:3001/api';
+                
+                if (!token) {
+                    window.location.href = '/admin/login/';
+                    return;
+                }
+                
+                // 获取表单数据
+                const title = document.getElementById('editAlbumTitle').value;
+                const description = document.getElementById('editAlbumDescription').value;
+                const location = document.getElementById('editAlbumLocation').value;
+                const date = document.getElementById('editAlbumDate').value;
+                
+                // Parse tags
+                const tagsInput = document.getElementById('editAlbumTags').value;
+                const tags = tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag);
+                
+                // 准备数据
+                const formData = new FormData();
+                formData.append('title', title);
+                formData.append('description', description);
+                formData.append('location', location);
+                formData.append('date', date);
+                formData.append('tags', JSON.stringify(tags));
+                
+                // Add cover file if selected
+                const coverFileInput = document.getElementById('coverFile');
+                if (coverFileInput && coverFileInput.files && coverFileInput.files[0]) {
+                    const coverFile = coverFileInput.files[0];
+                    console.log('添加封面文件:', coverFile.name);
+                    formData.append('cover', coverFile);
+                }
+                
+                // Add new photos if selected
+                const addPhotosInput = document.getElementById('addPhotosInput');
+                if (addPhotosInput && addPhotosInput.files && addPhotosInput.files.length > 0) {
+                    const newPhotos = addPhotosInput.files;
+                    console.log('添加新照片:', newPhotos.length);
+                    Array.from(newPhotos).forEach((file, index) => {
+                        console.log('添加照片:', index, file.name);
+                        formData.append('photos', file);
+                    });
+                }
+                
+                // 记录要删除的照片
+                formData.append('photosToDelete', JSON.stringify(photosToDelete));
+                console.log('=== 删除的照片ID列表 ===', photosToDelete);
+                
+                // 发送API请求
+                console.log('发送API请求更新相册:', albumToEdit.id);
+                const response = await fetch(`${apiBaseUrl}/admin/albums/${albumToEdit.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+                
+                console.log('API响应状态:', response.status);
+                
+                const result = await response.json();
+                console.log('API响应结果:', result);
+                
+                if (result.success) {
+                    console.log('相册更新成功');
+                    fetchAlbums();
+                    closeEditModal();
+                    // photosToDelete is reset in closeEditModal
+                } else {
+                    console.error('Failed to update album:', result.message);
+                    alert('更新相册失败: ' + result.message);
+                    // Reset photosToDelete even if save failed
+                    photosToDelete = [];
+                }
+            } catch (error) {
+                console.error('Error updating album:', error);
+                if (error.message && error.message.includes('401')) {
+                    window.location.href = '/admin/login/';
+                } else {
+                    alert('更新相册时发生错误: ' + error.message);
+                }
+            }
+        }
+
+        // Helper functions
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+        }
+
+        // Event listeners setup
+        function setupEventListeners() {
+            console.log('=== Setting up event listeners ===');
+            
+            // Delete modal events - Single delete
+            const cancelDeleteBtn = document.getElementById('cancelDelete');
+            const confirmDeleteBtn = document.getElementById('confirmDelete');
+            const deleteModal = document.getElementById('deleteModal');
+            
+            console.log('Delete modal elements:', {
+                cancelDeleteBtn,
+                confirmDeleteBtn,
+                deleteModal
+            });
+            
+            if (cancelDeleteBtn) {
+                cancelDeleteBtn.addEventListener('click', closeDeleteModal);
+            }
+            
+            if (confirmDeleteBtn) {
+                confirmDeleteBtn.addEventListener('click', () => {
+                    console.log('=== Confirm delete clicked, deleting album:', albumToDelete);
+                    if (albumToDelete) {
+                        deleteAlbum(albumToDelete);
+                    }
+                });
+            }
+            
+            // Bulk delete modal events
+            document.getElementById('cancelBulkDelete')?.addEventListener('click', closeBulkDeleteModal);
+            document.getElementById('confirmBulkDelete')?.addEventListener('click', deleteSelectedAlbums);
+            document.getElementById('deleteSelectedBtn')?.addEventListener('click', openBulkDeleteModal);
+            
+            // Edit modal events
+            const cancelEditBtn = document.getElementById('cancelEdit');
+            const saveEditBtn = document.getElementById('saveEdit');
+            const changeCoverBtn = document.getElementById('changeCoverBtn');
+            const coverFileInput = document.getElementById('coverFile');
+            const addPhotosSection = document.getElementById('addPhotosSection');
+            
+            console.log('Edit modal elements:', {
+                cancelEditBtn,
+                saveEditBtn,
+                changeCoverBtn,
+                coverFileInput,
+                addPhotosSection
+            });
+            
+            if (cancelEditBtn) {
+                cancelEditBtn.addEventListener('click', closeEditModal);
+            }
+            
+            if (saveEditBtn) {
+                saveEditBtn.addEventListener('click', saveAlbumEdit);
+            }
+            
+            if (changeCoverBtn) {
+                changeCoverBtn.addEventListener('click', changeCover);
+            }
+            
+            if (coverFileInput) {
+                coverFileInput.addEventListener('change', handleCoverSelection);
+            }
+            
+            if (addPhotosSection) {
+                addPhotosSection.addEventListener('click', addPhotos);
+            }
+            
+            // Select all checkbox
+            document.getElementById('selectAllCheckbox')?.addEventListener('change', toggleSelectAll);
+            
+            // Close modals when clicking outside
+            document.getElementById('deleteModal')?.addEventListener('click', (e) => {
+                if (e.target.id === 'deleteModal') {
+                    closeDeleteModal();
+                }
+            });
+            
+            document.getElementById('bulkDeleteModal')?.addEventListener('click', (e) => {
+                if (e.target.id === 'bulkDeleteModal') {
+                    closeBulkDeleteModal();
+                }
+            });
+            
+            document.getElementById('editModal')?.addEventListener('click', (e) => {
+                if (e.target.id === 'editModal') {
+                    closeEditModal();
+                }
+            });
+            
+            console.log('=== Event listeners setup complete ===');
+        }
+
+        // Expose functions to global scope for inline event handlers
+        window.toggleAlbumSelection = toggleAlbumSelection;
+        window.openEditModal = openEditModal;
+        window.openDeleteModal = openDeleteModal;
+        window.toggleSelectAll = toggleSelectAll;
+        window.removePhoto = removePhoto;
+
+        // Fetch albums immediately when the script runs
+        fetchAlbums();
+        setupEventListeners();
+
+        // Disable swup on admin pages
+        if (window.swup) {
+            window.swup.destroy();
+            window.swup = null;
+        }
+
+        // Logout functionality
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = '/admin/login/';
+            });
+        }
+    </script>
+</body>
+</html>

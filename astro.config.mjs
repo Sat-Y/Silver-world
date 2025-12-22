@@ -35,17 +35,12 @@ export default defineConfig({
 	server: {
 		port: 3000,  // 前端开发服务器端口
 		proxy: {
-			// 代理 /api 路径到后端 Tomcat
+			// 代理 /api 路径到后端 Node.js 服务器
 			'/api': {
-				target: 'http://localhost:8080',
-				changeOrigin: true,
-				rewrite: (path) => path.replace(/^\/api/, '')
-			},
-			// 代理 /admin 路径到后端管理界面
-			'/admin': {
-				target: 'http://localhost:8080',
+				target: 'http://localhost:3001',
 				changeOrigin: true
-			}
+			},
+			// 不需要代理 /admin 路径到外部服务器，使用前端自己的 admin 页面
 		}
 	},
 	

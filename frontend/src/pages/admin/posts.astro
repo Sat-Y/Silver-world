@@ -1,0 +1,991 @@
+---
+// Posts Management - Simple version
+---
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Posts Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f5f5f5;
+            color: #000000;
+        }
+        .admin-container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #ffffff;
+            border-right: 1px solid #e0e0e0;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+        }
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .sidebar-header h1 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #3b82f6;
+        }
+        .nav-menu {
+            padding: 10px;
+        }
+        .nav-item {
+            margin-bottom: 5px;
+        }
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #000000;
+            transition: all 0.2s ease;
+        }
+        .nav-link:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .header {
+            padding: 16px 24px;
+            background-color: #ffffff;
+            border-bottom: 1px solid #e0e0e0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .logout-btn:hover {
+            background-color: #dc2626;
+        }
+        .content {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            background-color: #f5f5f5;
+        }
+        .posts-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        /* File upload section */
+        .form-container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        .form-container > div {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .form-container h3 {
+            margin: 0;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #111827;
+        }
+        /* Button styles */
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #2563eb;
+        }
+        /* Upload status */
+        #uploadStatus {
+            flex: 1;
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        /* Posts table styles */
+        .posts-table-container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .posts-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .posts-table th,
+        .posts-table td {
+            padding: 16px 16px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .posts-table th {
+            background-color: #f9fafb;
+            font-weight: 600;
+            color: #374151;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .posts-table tbody tr {
+            transition: all 0.2s ease;
+        }
+        .posts-table tbody tr:hover {
+            background-color: #f9fafb;
+        }
+        .posts-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        /* Status badges */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .status-published {
+            background-color: #d1fae5;
+            color: #059669;
+        }
+        .status-draft {
+            background-color: #fef3c7;
+            color: #d97706;
+        }
+        /* Action buttons */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+        .edit-btn {
+            color: #3b82f6;
+        }
+        .edit-btn:hover {
+            background-color: #dbeafe;
+        }
+        .delete-btn {
+            color: #ef4444;
+        }
+        .delete-btn:hover {
+            background-color: #fee2e2;
+        }
+        .action-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 48px 24px;
+            color: #6b7280;
+        }
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e5e7eb;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .no-posts {
+            text-align: center;
+            padding: 48px 24px;
+            color: #6b7280;
+        }
+        .no-posts a {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .no-posts a:hover {
+            text-decoration: underline;
+        }
+        .error-container {
+            text-align: center;
+            padding: 48px 24px;
+            color: #ef4444;
+        }
+        .retry-btn {
+            margin-top: 16px;
+            padding: 8px 16px;
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .retry-btn:hover {
+            background-color: #2563eb;
+        }
+        /* Modal styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+        .modal {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            max-width: 500px;
+            width: 90%;
+            padding: 24px;
+        }
+        .modal-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .modal-content {
+            text-align: center;
+            margin-bottom: 24px;
+            color: #6b7280;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .modal-btn-secondary {
+            background-color: #f3f4f6;
+            color: #374151;
+        }
+        .modal-btn-secondary:hover {
+            background-color: #e5e7eb;
+        }
+        .modal-btn-danger {
+            background-color: #ef4444;
+            color: white;
+        }
+        .modal-btn-danger:hover {
+            background-color: #dc2626;
+        }
+        svg {
+            width: 20px;
+            height: 20px;
+        }
+        /* Utility classes */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // Prevent swup from handling any clicks on links by stopping propagation before swup's listeners are called
+        document.addEventListener('click', (event) => {
+            let target = event.target;
+            while (target && target.nodeName !== 'A') {
+                target = target.parentElement;
+            }
+            if (target && target.nodeName === 'A') {
+                event.stopImmediatePropagation();
+            }
+        }, true);
+        
+        // Immediately disable swup if it's already initialized
+        if (window.swup) {
+            window.swup.destroy();
+            window.swup = null;
+        }
+    </script>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header"> <h1>Admin Panel</h1> </div>
+            <nav class="nav-menu">
+                <div class="nav-item">
+                    <a href="/admin/" class="nav-link swup-ignore">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                        </svg>
+                        Dashboard
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/admin/posts/" class="nav-link swup-ignore">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
+                        </svg>
+                        Posts
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/admin/albums/" class="nav-link swup-ignore">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        Albums
+                    </a>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <header class="header">
+                <h2>Posts Management</h2>
+                <div class="header-actions">
+                    <button class="logout-btn" id="logoutBtn">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                        </svg>
+                        Logout
+                    </button>
+                </div>
+            </header>
+            <main class="content">
+                <div class="posts-content">
+                    <!-- File Upload Section -->
+                    <div class="form-container" style="margin-bottom: 20px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <h3 style="margin: 0;">Upload Markdown File</h3>
+                            <input type="file" id="markdownFile" accept=".md" style="display: none;">
+                            <button id="uploadBtn" class="btn btn-primary">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-5 h-5 mr-2" style="display: inline-block; margin-right: 6px;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                                </svg>
+                                Upload File
+                            </button>
+                            <div id="uploadStatus" style="flex: 1; color: #6b7280; font-size: 0.875rem;"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Posts Table -->
+                    <div class="posts-table-container">
+                        <table class="posts-table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Published</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="postsTableBody">
+                                <!-- Posts will be loaded dynamically -->
+                                <tr>
+                                    <td colspan="3" class="loading-container">
+                                        <div class="loading-spinner"></div>
+                                        <p>Loading posts...</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal-overlay hidden">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Confirm Delete</h3>
+            </div>
+            <div class="modal-content">
+                <p>Are you sure you want to delete this post? This action cannot be undone.</p>
+            </div>
+            <div class="modal-actions">
+                <button id="cancelDelete" class="modal-btn modal-btn-secondary">Cancel</button>
+                <button id="confirmDelete" class="modal-btn modal-btn-danger">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Post Modal -->
+    <div id="editModal" class="modal-overlay hidden">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Edit Post</h3>
+            </div>
+            <div class="modal-content" style="text-align: left;">
+                <form id="editPostForm">
+                    <div style="margin-bottom: 16px;">
+                        <label for="editTitle" style="display: block; margin-bottom: 6px; font-weight: 500; color: #374151;">Title</label>
+                        <input type="text" id="editTitle" name="title" required style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; transition: border-color 0.3s;">
+                    </div>
+                    
+                    <div style="margin-bottom: 16px;">
+                        <label for="editTags" style="display: block; margin-bottom: 6px; font-weight: 500; color: #374151;">Tags (comma-separated)</label>
+                        <input type="text" id="editTags" name="tags" placeholder="e.g., tech, life, travel" style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; transition: border-color 0.3s;">
+                    </div>
+                    
+                    <div style="margin-bottom: 16px;">
+                        <label for="editDescription" style="display: block; margin-bottom: 6px; font-weight: 500; color: #374151;">Description</label>
+                        <textarea id="editDescription" name="description" rows="3" style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; resize: vertical; transition: border-color 0.3s;"></textarea>
+                    </div>
+                    
+                    <div style="margin-bottom: 16px;">
+                        <label for="editImage" style="display: block; margin-bottom: 6px; font-weight: 500; color: #374151;">Image URL</label>
+                        <input type="text" id="editImage" name="image" placeholder="https://example.com/image.jpg" style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; transition: border-color 0.3s;">
+                    </div>
+                    
+                    <div style="margin-bottom: 16px;">
+                        <label for="editCategory" style="display: block; margin-bottom: 6px; font-weight: 500; color: #374151;">Category</label>
+                        <input type="text" id="editCategory" name="category" style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; transition: border-color 0.3s;">
+                    </div>
+                    
+                    <div style="margin-bottom: 16px;">
+                        <label for="editPublished" style="display: block; margin-bottom: 6px; font-weight: 500; color: #374151;">Published Date</label>
+                        <input type="date" id="editPublished" name="published" required style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; transition: border-color 0.3s;">
+                    </div>
+                    
+                    <div style="margin-bottom: 16px;">
+                        <label for="editUpdated" style="display: block; margin-bottom: 6px; font-weight: 500; color: #374151;">Updated Date</label>
+                        <input type="date" id="editUpdated" name="updated" style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; transition: border-color 0.3s;">
+                    </div>
+                    
+                    <div style="margin-bottom: 16px;">
+                        <label for="editDraft" style="display: block; margin-bottom: 6px; font-weight: 500; color: #374151;">Draft</label>
+                        <input type="checkbox" id="editDraft" name="draft" style="margin-right: 8px;">
+                        <span style="color: #6b7280; font-size: 14px;">Mark as draft</span>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-actions">
+                <button id="cancelEdit" class="modal-btn modal-btn-secondary">Cancel</button>
+                <button id="saveEdit" class="modal-btn btn-primary">Save Changes</button>
+            </div>
+        </div>
+    </div>
+    
+
+
+    <script>
+        // State for modals
+        let postToDelete = null;
+        let postToEdit = null;
+
+        // Fetch posts from API
+        async function fetchPosts() {
+            try {
+                const token = localStorage.getItem('token');
+                const apiBaseUrl = 'http://localhost:3001/api';
+                
+                // Check if token exists
+                if (!token) {
+                    window.location.href = '/admin/login/';
+                    return;
+                }
+                
+                console.log('Fetching posts from:', `${apiBaseUrl}/admin/posts`);
+                console.log('Token:', token);
+                
+                const response = await fetch(`${apiBaseUrl}/admin/posts`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                // Check if response is ok
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+
+                // Debug: Log the raw API response to check encoding
+                console.log('Raw API response:', result);
+
+                if (result.success) {
+                    renderPosts(result.data);
+                } else {
+                    renderError('Failed to load posts. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error fetching posts:', error);
+                console.error('Error stack:', error.stack);
+                renderError('An error occurred while loading posts. Error: ' + error.message);
+                if (error.message && error.message.includes('401')) {
+                    window.location.href = '/admin/login/';
+                }
+            }
+        }
+
+        // Render posts in table
+        function renderPosts(posts) {
+            const tbody = document.getElementById('postsTableBody');
+            
+            if (posts.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="3" class="loading-container">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-12 h-12 mb-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"></path>
+                            </svg>
+                            <p>No posts found</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            // Clear tbody first
+            tbody.innerHTML = '';
+            
+            // Create and append rows with proper event listeners
+            posts.forEach(post => {
+                const row = document.createElement('tr');
+                
+                // Title cell with enhanced design
+                const titleCell = document.createElement('td');
+                titleCell.style.fontWeight = '500';
+                titleCell.style.fontSize = '0.9375rem';
+                titleCell.style.color = '#111827';
+                
+                // Create plain text title (no hyperlink)
+                titleCell.textContent = post.title;
+                
+                // Combine title and status (without status badge)
+                titleCell.appendChild(document.createTextNode(''));
+                
+                // Date cell with enhanced design
+                const dateCell = document.createElement('td');
+                dateCell.className = 'date-cell';
+                dateCell.style.fontSize = '0.875rem';
+                dateCell.style.color = '#6b7280';
+                dateCell.style.fontFamily = 'monospace';
+                dateCell.textContent = formatDate(post.publishedDate);
+                
+                // Actions cell with enhanced design
+                const actionsCell = document.createElement('td');
+                const actionButtonsDiv = document.createElement('div');
+                actionButtonsDiv.className = 'action-buttons';
+                
+                // Edit button
+                const editButton = document.createElement('button');
+                editButton.className = 'action-btn edit-btn';
+                editButton.title = 'Edit';
+                editButton.innerHTML = '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>';
+                editButton.addEventListener('click', () => {
+                    openEditModal(post);
+                });
+                
+                // Delete button with proper event listener
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'action-btn delete-btn';
+                deleteButton.title = 'Delete';
+                deleteButton.innerHTML = '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>';
+                deleteButton.addEventListener('click', () => {
+                    // Open delete modal with post ID and title
+                    postToDelete = post.id;
+                    document.getElementById('deleteModal').classList.remove('hidden');
+                });
+                
+                actionButtonsDiv.appendChild(editButton);
+                actionButtonsDiv.appendChild(deleteButton);
+                actionsCell.appendChild(actionButtonsDiv);
+                
+                // Append cells to row
+                row.appendChild(titleCell);
+                row.appendChild(dateCell);
+                row.appendChild(actionsCell);
+                
+                // Append row to tbody
+                tbody.appendChild(row);
+            });
+        }
+
+        // Render error state
+        function renderError(message) {
+            const tbody = document.getElementById('postsTableBody');
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="3" class="loading-container">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-12 h-12 mb-4" style="color: #ef4444;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <p>${message}</p>
+                        <button onclick="fetchPosts()" class="retry-btn">Try Again</button>
+                    </td>
+                </tr>
+            `;
+        }
+
+        // File upload functionality
+        async function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const token = localStorage.getItem('token');
+            const apiBaseUrl = 'http://localhost:3001/api';
+            
+            if (!token) {
+                window.location.href = '/admin/login/';
+                return;
+            }
+            
+            const uploadStatus = document.getElementById('uploadStatus');
+            uploadStatus.textContent = `Uploading ${file.name}...`;
+            uploadStatus.style.color = '#6b7280';
+            
+            const formData = new FormData();
+            formData.append('markdown', file);
+            
+            try {
+                const response = await fetch(`${apiBaseUrl}/admin/posts/upload`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    uploadStatus.textContent = `Successfully uploaded ${file.name}`;
+                    uploadStatus.style.color = '#10b981';
+                    fetchPosts(); // Refresh posts list
+                } else {
+                    uploadStatus.textContent = `Failed to upload ${file.name}: ${result.message || 'Unknown error'}`;
+                    uploadStatus.style.color = '#ef4444';
+                }
+            } catch (error) {
+                console.error('Error uploading file:', error);
+                uploadStatus.textContent = `Failed to upload ${file.name}: ${error.message}`;
+                uploadStatus.style.color = '#ef4444';
+            } finally {
+                // Reset file input
+                event.target.value = '';
+                // Clear status after 3 seconds
+                setTimeout(() => {
+                    uploadStatus.textContent = '';
+                }, 3000);
+            }
+        }
+
+        // Open delete confirmation modal
+        function openDeleteModal(postId, postTitle) {
+            postToDelete = postId;
+            document.getElementById('deleteModal').classList.remove('hidden');
+        }
+
+        // Close delete confirmation modal
+        function closeDeleteModal() {
+            postToDelete = null;
+            document.getElementById('deleteModal').classList.add('hidden');
+        }
+
+        // Delete post
+        async function deletePost(postId) {
+            try {
+                const token = localStorage.getItem('token');
+                const apiBaseUrl = 'http://localhost:3001/api';
+                
+                if (!token) {
+                    window.location.href = '/admin/login/';
+                    return;
+                }
+                
+                const response = await fetch(`${apiBaseUrl}/admin/posts/${postId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    fetchPosts();
+                    closeDeleteModal();
+                    console.log('Post deleted successfully');
+                } else {
+                    console.error('Failed to delete post:', result.message);
+                }
+            } catch (error) {
+                console.error('Error deleting post:', error);
+                if (error.message && error.message.includes('401')) {
+                    window.location.href = '/admin/login/';
+                }
+            }
+        }
+
+        // Open edit modal and populate with post data
+        function openEditModal(post) {
+            postToEdit = post;
+            
+            // Fill form with post data
+            document.getElementById('editTitle').value = post.title;
+            document.getElementById('editTags').value = (post.tags || []).join(', ');
+            document.getElementById('editDescription').value = post.description || '';
+            document.getElementById('editCategory').value = (post.categories || []).join(', ') || '';
+            document.getElementById('editImage').value = post.image || '';
+            document.getElementById('editDraft').checked = post.status === 'draft';
+            
+            // Format date for input fields
+            const formattedPublishedDate = new Date(post.publishedDate).toISOString().split('T')[0];
+            document.getElementById('editPublished').value = formattedPublishedDate;
+            
+            // Set updated date if available
+            if (post.updatedDate) {
+                const formattedUpdatedDate = new Date(post.updatedDate).toISOString().split('T')[0];
+                document.getElementById('editUpdated').value = formattedUpdatedDate;
+            } else {
+                document.getElementById('editUpdated').value = '';
+            }
+            
+            // Show the modal
+            document.getElementById('editModal').classList.remove('hidden');
+        }
+
+        // Close edit modal
+        function closeEditModal() {
+            postToEdit = null;
+            document.getElementById('editModal').classList.add('hidden');
+        }
+
+        // Save edited post
+        async function saveEdit() {
+            try {
+                const token = localStorage.getItem('token');
+                const apiBaseUrl = 'http://localhost:3001/api';
+                
+                if (!token) {
+                    window.location.href = '/admin/login/';
+                    return;
+                }
+                
+                if (!postToEdit) {
+                    console.error('No post to edit');
+                    return;
+                }
+                
+                // Collect form data
+                const formData = {
+                    id: postToEdit.id,
+                    title: document.getElementById('editTitle').value.trim(),
+                    tags: document.getElementById('editTags').value.trim()
+                        ? document.getElementById('editTags').value.trim().split(',').map(tag => tag.trim())
+                        : [],
+                    description: document.getElementById('editDescription').value.trim(),
+                    image: document.getElementById('editImage').value.trim(),
+                    category: document.getElementById('editCategory').value.trim(),
+                    published: document.getElementById('editPublished').value,
+                    updated: document.getElementById('editUpdated').value || undefined,
+                    draft: document.getElementById('editDraft').checked
+                };
+                
+                // Validate form data
+                if (!formData.title) {
+                    alert('Title is required');
+                    return;
+                }
+                
+                if (!formData.published) {
+                    alert('Published date is required');
+                    return;
+                }
+                
+                // Debug: Log the request details
+        console.log('DEBUG: Updating post with ID:', postToEdit.id);
+        console.log('DEBUG: API URL:', `${apiBaseUrl}/admin/posts/${postToEdit.id}`);
+        console.log('DEBUG: Request data:', formData);
+        
+        // Send API request to update post
+        const response = await fetch(`${apiBaseUrl}/admin/posts/${postToEdit.id}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
+
+        const result = await response.json();
+        
+        // Debug: Log the response
+        console.log('DEBUG: Update response:', result);
+
+        if (result.success) {
+            fetchPosts();
+            closeEditModal();
+            console.log('Post updated successfully');
+            alert('Post updated successfully');
+        } else {
+            console.error('Failed to update post:', result.message);
+            alert('Failed to update post: ' + (result.message || 'Unknown error'));
+        }
+            } catch (error) {
+                console.error('Error updating post:', error);
+                if (error.message && error.message.includes('401')) {
+                    window.location.href = '/admin/login/';
+                } else {
+                    alert('Error updating post: ' + error.message);
+                }
+            }
+        }
+
+        // Helper functions
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+        }
+
+        // Fetch posts immediately when the script runs
+        fetchPosts();
+
+        // Delete modal event listeners
+        document.getElementById('cancelDelete')?.addEventListener('click', closeDeleteModal);
+        document.getElementById('confirmDelete')?.addEventListener('click', () => {
+            if (postToDelete) {
+                deletePost(postToDelete);
+            }
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('deleteModal')?.addEventListener('click', (e) => {
+            if (e.target.id === 'deleteModal') {
+                closeDeleteModal();
+            }
+        });
+
+        // Edit modal event listeners
+        document.getElementById('cancelEdit')?.addEventListener('click', closeEditModal);
+        document.getElementById('saveEdit')?.addEventListener('click', saveEdit);
+
+        // Close edit modal when clicking outside
+        document.getElementById('editModal')?.addEventListener('click', (e) => {
+            if (e.target.id === 'editModal') {
+                closeEditModal();
+            }
+        });
+
+        // File upload event listeners
+        const markdownFileInput = document.getElementById('markdownFile');
+        const uploadBtn = document.getElementById('uploadBtn');
+        
+        uploadBtn.addEventListener('click', () => {
+            markdownFileInput.click();
+        });
+        
+        markdownFileInput.addEventListener('change', handleFileUpload);
+
+        // Disable swup on admin pages
+        if (window.swup) {
+            // Remove all swup event listeners
+            window.swup.destroy();
+            // Disable swup functionality completely
+            window.swup = null;
+        }
+
+        // Logout functionality
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = '/admin/login/';
+            });
+        }
+    </script>
+</body>
+</html>

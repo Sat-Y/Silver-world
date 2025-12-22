@@ -1,0 +1,104 @@
+---
+import Layout from "../../layouts/Layout.astro";
+---
+
+<Layout title="Admin Login" description="Login to the admin dashboard">
+  <main class="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800 p-4">
+    <div class="w-full max-w-md bg-white/10 backdrop-blur-lg rounded-xl shadow-2xl p-8 border border-white/20">
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-white mb-2">Admin Dashboard</h1>
+        <p class="text-gray-300">Login to manage your blog</p>
+      </div>
+
+      <form id="loginForm" class="space-y-6">
+        <div>
+          <label for="username" class="block text-sm font-medium text-white mb-1">Username</label>
+          <input 
+            type="text" 
+            id="username" 
+            name="username" 
+            required 
+            class="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+            placeholder="Enter your username"
+          />
+        </div>
+
+        <div>
+          <label for="password" class="block text-sm font-medium text-white mb-1">Password</label>
+          <input 
+            type="password" 
+            id="password" 
+            name="password" 
+            required 
+            class="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+            placeholder="Enter your password"
+          />
+        </div>
+
+        <div>
+          <button 
+            type="submit" 
+            class="w-full bg-primary hover:bg-primary/90 text-white font-medium py-3 px-4 rounded-lg transition-all transform hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-gray-900"
+          >
+            Login
+          </button>
+        </div>
+      </form>
+
+      <div id="errorMessage" class="mt-4 text-red-400 text-sm hidden"></div>
+    </div>
+  </main>
+
+  <script>
+    // 简化的登录处理，不使用模块导入
+    const loginForm = document.getElementById('loginForm');
+    const errorMessage = document.getElementById('errorMessage');
+
+    // 登录函数
+    const handleLogin = (user, token) => {
+      // 保存到localStorage
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+    };
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const formData = new FormData(loginForm);
+      const username = formData.get('username');
+      const password = formData.get('password');
+
+      try {
+        // 使用完整的后端 URL，避免代理问题
+        const response = await fetch('http://localhost:3001/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ username, password })
+        });
+
+        // 检查响应状态
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        if (result.success) {
+          // Save auth state
+          handleLogin(result.data.user, result.data.token);
+          // Redirect to admin dashboard
+          window.location.href = '/admin/';
+        } else {
+          errorMessage.textContent = result.message || 'Login failed';
+          errorMessage.classList.remove('hidden');
+        }
+      } catch (error) {
+        console.error('Login error:', error);
+        errorMessage.textContent = 'An error occurred during login';
+        errorMessage.classList.remove('hidden');
+      }
+    });
+  </script>
+</Layout>

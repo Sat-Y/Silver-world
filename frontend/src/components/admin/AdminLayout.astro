@@ -1,0 +1,120 @@
+---
+// AdminLayout.astro - Main layout for admin pages
+
+// Define props
+const { children, title = "Admin Dashboard" } = Astro.props;
+---
+
+<div class="flex h-screen overflow-hidden">
+            <!-- Sidebar -->
+            <aside class="w-64 bg-[var(--card-bg-transparent)] backdrop-blur-lg border-r border-white/10 overflow-y-auto shadow-lg">
+                <!-- Logo/Brand -->
+                <div class="sidebar-header"> <h1>Admin Panel</h1> </div>
+
+                <!-- Navigation -->
+                <nav class="p-4 space-y-2">
+                    <ul class="space-y-1">
+                        <li>
+                            <a 
+                                href="/admin/" 
+                                class="flex items-center gap-3 px-4 py-3 rounded-[var(--radius-large)] text-[#000000] hover:bg-[var(--primary)]/10 hover:text-[var(--primary)] transition-all duration-200 dark:text-[#ffffff] swup-ignore"
+                            >
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                                </svg>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+
+                        <li>
+                            <a 
+                                href="/admin/posts/" 
+                                class="flex items-center gap-3 px-4 py-3 rounded-[var(--radius-large)] text-[#000000] hover:bg-[var(--primary)]/10 hover:text-[var(--primary)] transition-all duration-200 dark:text-[#ffffff] swup-ignore"
+                            >
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
+                                </svg>
+                                <span>Posts</span>
+                            </a>
+                        </li>
+
+                        <li>
+                            <a 
+                                href="/admin/albums/" 
+                                class="flex items-center gap-3 px-4 py-3 rounded-[var(--radius-large)] text-[#000000] hover:bg-[var(--primary)]/10 hover:text-[var(--primary)] transition-all duration-200 dark:text-[#ffffff] swup-ignore"
+                            >
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                <span>Albums</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <div class="flex-1 flex flex-col overflow-hidden">
+                <!-- Top Navigation -->
+                <header class="bg-[var(--card-bg-transparent)] backdrop-blur-lg border-b border-white/10 px-6 py-4 flex items-center justify-between shadow-sm">
+                    <div class="flex items-center gap-4">
+                        <button id="menuToggle" class="md:hidden p-2 rounded-[var(--radius-large)] hover:bg-[var(--primary)]/10 transition-all">
+                            <svg class="w-6 h-6 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                            </svg>
+                        </button>
+                        <h2 class="text-xl font-semibold text-white">{title}</h2>
+                    </div>
+
+                    <!-- User Menu -->
+                    <div class="flex items-center gap-4">
+                        <button 
+                            id="logoutBtn" 
+                            class="flex items-center gap-2 px-4 py-2 rounded-[var(--radius-large)] bg-red-600 hover:bg-red-700 text-white transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
+                        >
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                            </svg>
+                            <span>Logout</span>
+                        </button>
+                    </div>
+                </header>
+
+                <!-- Content Area -->
+                <main class="flex-1 overflow-y-auto p-6 bg-[#f5f5f5] text-[#000000] dark:bg-[#1a1a1a] dark:text-[#ffffff]">
+                    {children}
+                </main>
+            </div>
+        </div>
+
+    <script>
+        // Logout functionality
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', async () => {
+                // 直接处理登出逻辑
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                // Redirect to login page
+                window.location.href = '/admin/login/';
+            });
+        }
+
+        // Mobile menu toggle (optional, can be implemented with JS if needed)
+        const menuToggle = document.getElementById('menuToggle');
+        if (menuToggle) {
+            menuToggle.addEventListener('click', () => {
+                const sidebar = document.querySelector('aside');
+                if (sidebar) {
+                    sidebar.classList.toggle('hidden');
+                }
+            });
+        }
+
+        // Check if user is authenticated
+        const token = localStorage.getItem('token');
+        if (!token) {
+            // Redirect to login if not authenticated
+            window.location.href = '/admin/login/';
+        }
+    </script>

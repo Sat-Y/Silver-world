@@ -48,7 +48,7 @@ const clientEntryScript = `
 			if (idMatch) {
 				const articleId = parseInt(idMatch[0]);
 				try {
-					const idResponse = await fetch(apiBaseUrl + '/articles/' + articleId);
+					const idResponse = await fetch(apiBaseUrl + '/posts/' + articleId);
 					if (idResponse.ok) {
 						const idResult = await idResponse.json();
 						if (idResult.success && idResult.data) {
@@ -64,14 +64,14 @@ const clientEntryScript = `
 			
 			// 如果通过ID获取失败或slug不是ID，则获取已发布文章列表并查找
 			if (!apiArticle) {
-				const response = await fetch(apiBaseUrl + '/articles/published');
+				const response = await fetch(apiBaseUrl + '/posts');
 				if (response.ok) {
 					const result = await response.json();
 					if (result.success && result.data) {
 						// 查找当前文章
 						apiArticle = result.data.find(article => 
 							article.slug === slug || 
-							article.title.replace(/\s+/g, '-').toLowerCase() === slug
+							article.slug === '${staticEntry.slug}'
 						);
 					}
 				}
@@ -85,7 +85,7 @@ const clientEntryScript = `
 				// 更新文章内容
 				const contentElement = document.querySelector('.markdown-content');
 				if (contentElement) {
-					// 文章内容可能已经是HTML格式，直接使用
+					// 文章内容已经是HTML格式，直接使用
 					contentElement.innerHTML = apiArticle.content;
 				}
 				

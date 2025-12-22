@@ -58,7 +58,7 @@ export async function fetchArticleById(articleId: number): Promise<ApiArticle | 
   try {
     // 从环境变量或配置中获取API基础URL
     const apiBaseUrl = import.meta.env.PUBLIC_API_BASE || '/api';
-    const response = await fetch(`${apiBaseUrl}/articles/${articleId}`);
+    const response = await fetch(`${apiBaseUrl}/posts/${articleId}`);
     
     if (!response.ok) {
       console.warn(`获取文章ID ${articleId} 失败: HTTP ${response.status}`);
@@ -293,7 +293,7 @@ export function transformApiArticleToFrontend(apiArticle: ApiArticle): FrontendA
 export async function fetchPublishedArticles(): Promise<ApiArticle[] | null> {
   try {
     const apiBaseUrl = import.meta.env.PUBLIC_API_BASE || '/api';
-    const response = await fetch(`${apiBaseUrl}/articles/published`);
+    const response = await fetch(`${apiBaseUrl}/posts`);
     
     if (!response.ok) {
       console.warn(`获取已发布文章列表失败: HTTP ${response.status}`);

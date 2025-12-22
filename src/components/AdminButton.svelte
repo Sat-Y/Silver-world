@@ -4,8 +4,8 @@
   // 初始化保持为false，不使用localStorage存储
   let isAdmin = false;
   
-  // ✅ 正确的管理界面URL
-  const adminURL = 'http://localhost:8080/zyh-world/admin/admin.html';
+  // 管理界面URL - 前端admin页面
+  const adminURL = 'http://localhost:3000/admin/posts/';
   
   const openAdminPanel = () => {
     console.log('打开管理界面:', adminURL);

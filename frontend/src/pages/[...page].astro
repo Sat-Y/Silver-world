@@ -1,0 +1,44 @@
+---
+import type { GetStaticPaths } from "astro";
+import Pagination from "../components/control/Pagination.astro";
+import PostPage from "../components/PostPage.astro";
+import { apiConfig } from "../config";
+import { PAGE_SIZE } from "../constants/constants";
+import MainGridLayout from "../layouts/MainGridLayout.astro";
+import { getSortedPosts } from "../utils/content-utils";
+
+export const getStaticPaths = (async ({ paginate }) => {
+	// 在构建时生成静态路径
+	const allBlogPosts = await getSortedPosts();
+	return paginate(allBlogPosts, { pageSize: PAGE_SIZE });
+}) satisfies GetStaticPaths;
+
+const { page } = Astro.props;
+
+const len = page.data.length;
+const apiBaseUrl = apiConfig.baseUrl;
+---
+
+<MainGridLayout>
+    <PostPage page={page}></PostPage>
+    <Pagination class="mx-auto onload-animation" page={page} style={`animation-delay: calc(var(--content-delay) + ${(len)*50}ms)`}></Pagination>
+</MainGridLayout>
+
+<script is:inline define:vars={{ debugMode: apiConfig.debug }}>
+    // 客户端动态获取已发布文章列表 - 仅在调试模式下启用
+    (async function() {
+        try {
+            // 只有在调试模式下才调用API，避免生产环境报错
+            if (debugMode) {
+                console.log('调试模式：尝试从API获取已发布文章列表');
+                // 注意：当前后端没有公开的文章列表API，只有受保护的/admin/posts路由
+                // 这里仅作为调试示例，实际生产环境应使用静态生成的文章
+            }
+        } catch (error) {
+            if (debugMode) {
+                console.warn('获取已发布文章列表失败:', error);
+            }
+            // 忽略错误，使用静态生成的文章列表
+        }
+    })();
+</script>
