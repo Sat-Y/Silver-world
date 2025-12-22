@@ -1,313 +1,185 @@
-# 🌸 Mizuki  
-![Node.js >= 20](https://img.shields.io/badge/node.js-%3E%3D20-brightgreen) 
-![pnpm >= 9](https://img.shields.io/badge/pnpm-%3E%3D9-blue) 
-![Astro](https://img.shields.io/badge/Astro-5.12.8-orange)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.9.2-blue)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+# 🌸 Silver.Z Blog
 
-![Mizuki Preview](./README.png)
+![Node.js >= 18](https://img.shields.io/badge/node.js-%3E%3D18-brightgreen) ![pnpm >= 9](https://img.shields.io/badge/pnpm-%3E%3D9-blue) ![Astro 5.13.7](https://img.shields.io/badge/Astro-5.13.7-orange) ![TypeScript 5.9.2](https://img.shields.io/badge/TypeScript-5.9.2-blue) ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-<table>
-  <tr>
-    <td><img alt="" src="docs/image/1.png"></td>
-    <td><img alt="" src="docs/image/2.png"></td>
-    <td><img alt="" src="docs/image/3.png"></td>
-  <tr>
-  <tr>
-    <td><img alt="" src="docs/image/4.png"></td>
-    <td><img alt="" src="docs/image/5.png"></td>
-    <td><img alt="" src="docs/image/6.png"></td>
-  <tr>
-</table>
+一个现代化的个人博客系统，采用前后端分离架构，具有美观的界面和丰富的功能。该系统支持博客文章管理、相册管理、标签分类等核心功能，并提供了友好的管理后台。
 
+## ✨ 核心特性
 
-A modern, feature-rich static blog template built with [Astro](https://astro.build), featuring advanced functionality and beautiful design.
+- **现代化技术栈**：采用前沿技术，确保系统性能和可维护性
+- **前后端分离**：前端负责展示，后端提供API，便于独立开发和部署
+- **响应式设计**：适配桌面端、平板和手机等多种设备
+- **丰富的管理功能**：博客文章管理、相册管理、标签管理等
+- **安全认证**：基于JWT的身份验证，保障系统安全
+- **Markdown支持**：支持使用Markdown编辑博客文章
+- **照片上传功能**：支持相册照片的批量上传和管理
 
-[**🖥️ Live Demo**](https://mizuki.mysqil.com/)
-[**📝 Documentation**](https://docs.mizuki.mysqil.com/)
+## 🛠️ 技术栈
 
-🌏 README Languages
-[**English**](./README.md) /
-[**中文**](./README.zh.md) /
-[**日本語**](./docs/README.ja.md) /
-[**中文繁体**](./docs/README.tw.md) /
+### 前端技术栈
 
-## 🆕 v4.9 Update
-- **Pio Live2D Integration**: Added Pio Live2D character, providing a cute interactive companion to enhance user engagement.
-- **Highly Configurable**: Supports detailed configuration in `src/config.ts`, including model path, position, size, dialogue content, etc., to meet personalized needs.
-- **Seamless Navigation**: The "Back to Home" feature now uses the theme's built-in Swup for smooth, no-refresh page transitions.
+| 技术 | 版本 | 用途 |
+|------|------|------|
+| Astro | 5.13.7 | 现代前端框架，用于构建快速的静态网站 |
+| Svelte | 5.38.10 | 轻量级JavaScript框架，用于构建交互式组件 |
+| Tailwind CSS | 3.4.17 | 实用优先的CSS框架，用于样式设计 |
+| TypeScript | 5.9.2 | 类型安全的JavaScript超集 |
+| Swup | 1.7.0 | 页面过渡库，实现流畅的页面切换 |
+| Photoswipe | 5.4.4 | 图片画廊插件，用于照片预览 |
 
-## 🆕 v4.3 Update
-- **Anime Page:** Redesigned a cuter and more attractive anime page, including anime list, details, and timeline.
-- **Album Page:** Restructured the album page using pagination + folder data indexing solution.
+### 后端技术栈
 
-## 🆕 v3.4 Update
-- **New Pages:** Added project showcase, skills showcase, and timeline pages to display your work, professional skills, and growth journey.
-- **Dropdown Menu Fix:** Resolved the issue of border outlines appearing when clicking dropdown menus, improving interface consistency.
-- **Search Optimization:** Enhanced search functionality performance and accuracy.
-- **Footer HTML Injection:** Introduced a new feature allowing custom HTML content injection at the bottom of pages, providing greater flexibility.
+| 技术 | 版本 | 用途 |
+|------|------|------|
+| Express | 4.21.2 | Node.js Web框架 |
+| Node.js | 18.x | 后端开发语言和运行时 |
+| JSON 文件存储 | - | 简单的数据存储方式 |
+| JWT | 9.0.2 | 用于用户身份验证的令牌 |
+| bcryptjs | 2.4.3 | 密码哈希库 |
+| multer | 1.4.5-lts.1 | 文件上传中间件 |
+| express-validator | 7.2.0 | 请求验证中间件 |
+| cors | 2.8.5 | 跨域资源共享中间件 |
+| dotenv | 16.4.5 | 环境变量管理 |
 
-## 🆕 v3.3 Update
-- **Mermaid Syntax Support:** Added support for Mermaid chart syntax, now you can embed flowcharts, sequence diagrams, Gantt charts, etc. directly in Markdown.
-- **Umami Analytics:** Added support for Umami analytics, making it easy to integrate website visit data analysis.
+## 📁 项目结构
 
-![Configuration](configuration.svg)
+```
+├── frontend/             # 前端代码目录
+│   ├── src/              # 前端源代码
+│   │   ├── components/   # 可复用组件
+│   │   ├── layouts/      # 页面布局
+│   │   ├── pages/        # 页面文件
+│   │   └── utils/        # 工具函数
+│   ├── public/           # 静态资源
+│   └── astro.config.mjs  # Astro配置文件
+├── backend/              # 后端代码目录
+│   ├── controllers/      # 控制器，处理请求逻辑
+│   ├── database/         # 数据存储目录
+│   ├── middleware/       # 中间件
+│   ├── routes/           # 路由定义
+│   └── server.js         # 后端入口文件
+└── README.md             # 项目说明文档
+```
 
-### 🔧 Component Configuration System Restructuring
-- **Unified Configuration Architecture:** Brand new modular component configuration system, supporting dynamic component management and order configuration
-- **Configuration-Driven Component Loading:** Restructured SideBar component, implementing fully configuration-based component loading mechanism
-- **Unified Control Switches:** Removed independent enable switches for music player and announcement components, unified control through sidebarLayoutConfig
-- **Responsive Layout Adaptation:** Components support responsive layouts, automatically adjusting display based on device type
+## 🚀 快速开始
 
-### 📐 Layout System Optimization
-- **Dynamic Sidebar Position Adjustment:** Support for left/right sidebar switching, with automatic layout adaptation
-- **Intelligent Article Directory Positioning:** When sidebar is on the right, article navigation automatically moves to the left, providing a better reading experience
-- **Grid Layout Improvements:** Optimized CSS Grid layout, resolving container width anomaly issues
+### 环境准备
 
-### 🎛️ Configuration File Format Standardization
-- **Standardized Configuration Format:** Created unified component configuration file format specifications
-- **Type Safety:** Comprehensive TypeScript type definitions ensuring configuration type safety
-- **Extensibility:** Support for custom component types and configuration options
+1. **安装Node.js**
+   - 访问 [Node.js官网](https://nodejs.org/) 下载并安装LTS版本
+   - 验证安装：`node -v` 和 `npm -v`
 
-### 🧹 Code Optimization
-- **Test File Cleanup:** Removed unused test configurations and dependencies, reducing project size
-- **Code Structure Optimization:** Improved component architecture, enhancing code maintainability
-- **Performance Improvement:** Optimized component loading logic, improving page rendering performance
-
----
-
-## ✨ Features
-
-### 🎨 Design & Interface
-- [x] Built with [Astro](https://astro.build) and [Tailwind CSS](https://tailwindcss.com)
-- [x] Smooth animations and page transitions using [Swup](https://swup.js.org/)
-- [x] Light/dark theme switching with system preference detection
-- [x] Customizable theme colors and dynamic banner carousel
-- [x] Fullscreen background images with carousel, opacity, and blur effects
-- [x] Fully responsive design for all devices
-- [x] Beautiful typography with JetBrains Mono font
-
-### 🔍 Content & Search
-- [x] Advanced search functionality based on [Pagefind](https://pagefind.app/)
-- [x] [Enhanced Markdown features](#-markdown-extensions) with syntax highlighting
-- [x] Interactive table of contents with auto-scrolling
-- [x] RSS feed generation
-- [x] Reading time estimation
-- [x] Article categorization and tagging system
-
-### 🌐 Internationalization
-- [x] **Multi-language support** with real-time translation
-- [x] **Automatic language detection** based on user preferences
-- [x] **Client-side translation** powered by Edge Translate
-- [x] Support for 10+ languages (Chinese, English, Japanese, Korean, Spanish, etc.)
-
-### 📱 Special Pages
-- [x] **Anime Tracking Page** - Track anime watching progress and ratings
-- [x] **Friends Page** - Beautiful cards showcasing friend websites
-- [x] **Diary Page** - Share life moments, similar to social media
-- [x] **Archive Page** - Organized timeline view of articles
-- [x] **About Page** - Customizable personal introduction
-
-### 🛠 Technical Features
-- [x] **Enhanced code blocks** based on [Expressive Code](https://expressive-code.com/)
-- [x] **Math formula support** with KaTeX rendering
-- [x] **Image optimization** with PhotoSwipe gallery integration
-- [x] **SEO optimization** including sitemaps and meta tags
-- [x] **Performance optimization** with lazy loading and caching
-- [x] **Comment system** with Twikoo integration
-
-## 🚀 Quick Start
-
-### 📦 Installation
-
-1. **Clone the repository:**
+2. **安装pnpm**
    ```bash
-   git clone https://github.com/matsuzaka-yuki/mizuki.git
-   cd mizuki
+   npm install -g pnpm
+   ```
+   - 验证安装：`pnpm -v`
+
+### 后端部署（Express）
+
+1. **安装后端依赖**
+   ```bash
+   cd backend
+   npm install
    ```
 
-2. **Install dependencies:**
+2. **配置环境变量**
    ```bash
-   # Install pnpm if not already installed
-   npm install -g pnpm
+   cp .env.example .env
+   # 编辑.env文件，根据需要修改配置项
+   ```
+
+3. **启动后端服务**
+   ```bash
+   # 开发模式
+   npm run dev
    
-   # Install project dependencies
+   # 生产模式
+   npm start
+   ```
+
+### 前端部署
+
+1. **安装前端依赖**
+   ```bash
+   cd frontend
    pnpm install
    ```
 
-3. **Configure your blog:**
-   - Edit `src/config.ts` to customize blog settings
-   - Update site information, theme colors, banner images, and social links
-   - Configure translation settings and feature page functionality
-
-4. **Start the development server:**
+2. **启动开发服务器**
    ```bash
    pnpm dev
    ```
-   Your blog will be available at `http://localhost:4321`
 
-### 📝 Content Management
+3. **构建生产版本**
+   ```bash
+   pnpm build
+   ```
 
-- **Create new posts:** `pnpm new-post <filename>`
-- **Edit posts:** Modify files in `src/content/posts/`
-- **Customize special pages:** Edit files in `src/content/spec/`
-- **Add images:** Place images in `src/assets/` or `public/`
+## 📖 使用指南
 
-### 🚀 Deployment
+### 登录管理后台
 
-Deploy your blog to any static hosting platform:
+1. 打开浏览器访问 `http://localhost:3000/admin/login/`
+2. 输入默认管理员账号密码：
+   - 用户名：`admin`
+   - 密码：`admin123`
+3. 点击登录按钮进入管理后台
 
-- **Vercel:** Connect your GitHub repository to Vercel
-- **Netlify:** Deploy directly from GitHub
-- **GitHub Pages:** Use the included GitHub Actions workflow
-- **Cloudflare Pages:** Connect your repository
+### 博客文章管理
 
-Before deployment, update the `site` URL in `astro.config.mjs`.
+- **创建文章**：登录管理后台，点击"Posts" -> "New Post"，使用Markdown编辑文章
+- **编辑文章**：在文章列表中找到要编辑的文章，点击编辑图标进行修改
+- **删除文章**：在文章列表中勾选文章，点击删除按钮
 
-## 📝 Post Frontmatter Format
+### 相册管理
 
-```yaml
----
-title: My First Blog Post
-published: 2023-09-09
-description: This is the first post of my new blog.
-image: ./cover.jpg
-tags: [tag1, tag2]
-category: Frontend
-draft: false
-pinned: false
-lang: en      # Only set when article language differs from site language in config.ts
----
-```
+- **创建相册**：登录管理后台，点击"Albums" -> "New Album"，填写相册信息
+- **上传照片**：进入相册详情，点击"Upload Photos"，选择要上传的照片
+- **编辑相册**：在相册列表中找到要编辑的相册，点击编辑图标进行修改
 
-### Frontmatter Field Descriptions
+## 📝 API接口说明
 
-- **title**: Article title (required)
-- **published**: Publication date (required)
-- **description**: Article description for SEO and previews
-- **image**: Cover image path (relative to article file)
-- **tags**: Array of tags for categorization
-- **category**: Article category
-- **draft**: Set to `true` to hide article in production
-- **pinned**: Set to `true` to pin article to top
-- **lang**: Article language (only set when different from site default)
+### 认证相关接口
 
-### Pinned Articles Feature
+- **管理员登录**：`POST /api/admin/login`
 
-The `pinned` field allows you to pin important articles to the top of your blog list. Pinned articles will always appear before regular articles regardless of their publication date.
+### 博客文章接口
 
-**Usage:**
-```yaml
-pinned: true  # Pin this article to the top
-pinned: false # Regular article (default)
-```
+- **获取文章列表**：`GET /api/posts`
+- **创建文章**：`POST /api/admin/posts`
+- **获取文章详情**：`GET /api/posts/:id`
+- **更新文章**：`PUT /api/admin/posts/:id`
+- **删除文章**：`DELETE /api/admin/posts/:id`
 
-**Sorting Rules:**
-1. Pinned articles appear first, sorted by publication date (newest first)
-2. Regular articles follow, sorted by publication date (newest first)
+### 相册接口
 
-## 🧩 Markdown Extensions
+- **获取相册列表**：`GET /api/albums`
+- **创建相册**：`POST /api/admin/albums`
+- **获取相册详情**：`GET /api/albums/:id`
+- **上传照片**：`POST /api/admin/albums/:id/photos`
 
-Mizuki supports enhanced features beyond standard GitHub Flavored Markdown:
+## 🔧 配置说明
 
-### 📝 Enhanced Writing
-- **Callouts:** Create beautiful annotation boxes using `> [!NOTE]`, `> [!TIP]`, `> [!WARNING]`, etc.
-- **Math Formulas:** Write LaTeX math formulas using `$inline$` and `$$block$$` syntax
-- **Code Highlighting:** Advanced syntax highlighting with line numbers and copy buttons
-- **GitHub Cards:** Embed repository cards using `::github{repo="user/repo"}`
+### 前端配置
 
-### 🎨 Visual Elements
-- **Image Gallery:** Automatic PhotoSwipe integration for image viewing
-- **Collapsible Sections:** Create expandable content blocks
-- **Custom Components:** Enhance content with special directives
+编辑 `frontend/src/config.ts` 文件，自定义博客标题、副标题、语言等基本信息。
 
-### 📊 Content Organization
-- **Table of Contents:** Automatically generated from headings with smooth scrolling
-- **Reading Time:** Automatically calculated and displayed
-- **Article Metadata:** Rich frontmatter support with categories and tags
+### 后端配置
 
-## ⚡ Commands
+编辑 `backend/.env` 文件，配置端口、JWT密钥等信息。
 
-All commands are run from the project root:
+## 📄 许可证
 
-| Command                    | Action                                   |
-|:---------------------------|:-----------------------------------------|
-| `pnpm install`             | Install dependencies                     |
-| `pnpm dev`                 | Start local dev server at `localhost:4321` |
-| `pnpm build`               | Build production site to `./dist/`       |
-| `pnpm preview`             | Preview build locally before deployment  |
-| `pnpm check`               | Run Astro error checking                 |
-| `pnpm format`              | Format code with Biome                   |
-| `pnpm lint`                | Check and fix code issues                |
-| `pnpm new-post <filename>` | Create a new blog post                   |
-| `pnpm astro ...`           | Run Astro CLI commands                   |
+本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情
 
-## 🎯 Configuration Guide
+## 🙏 致谢
 
-### 🔧 Basic Configuration
-
-Edit `src/config.ts` to customize your blog:
-
-```typescript
-export const siteConfig: SiteConfig = {
-  title: "Your Blog Name",
-  subtitle: "Your Blog Description",
-  lang: "en", // or "zh-CN", "ja", etc.
-  themeColor: {
-    hue: 210, // 0-360, theme hue
-    fixed: false, // Hide theme color picker
-  },
-  translate: {
-    enable: true, // Enable translation
-    service: "client.edge", // Translation service
-    defaultLanguage: "english",
-  },
-  banner: {
-    enable: true,
-    src: ["assets/banner/1.webp"], // Banner images
-    carousel: {
-      enable: true,
-      interval: 0.8, // seconds
-    },
-  },
-};
-```
-
-### 📱 Feature Page Configuration
-
-- **Anime Page:** Edit anime list in `src/pages/anime.astro`
-- **Friends Page:** Edit friend data in `src/content/spec/friends.md`
-- **Diary Page:** Edit moments in `src/pages/diary.astro`
-- **About Page:** Edit content in `src/content/spec/about.md`
-
-## ✏️ Contributing
-
-Contributions are welcome! Feel free to submit issues and pull requests.
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgements
-
-- Based on the original [Fuwari](https://github.com/saicaca/fuwari) template
-- Built with [Astro](https://astro.build) and [Tailwind CSS](https://tailwindcss.com)
-- Inspired by [Yukina](https://github.com/WhitePaper233/yukina) - a beautiful and elegant blog template
-- Translation functionality powered by [translate](https://gitee.com/mail_osc/translate) - AI i18n automatic HTML translation solution
-- Icons from [Iconify](https://iconify.design/)
-
-### Special Thanks
-
-- **[Yukina](https://github.com/WhitePaper233/yukina)** - Thanks for providing design inspiration and creativity that helped shape this project. Yukina is an elegant blog template that demonstrates excellent design principles and user experience.
-- **[translate](https://gitee.com/mail_osc/translate)** - Thanks for providing an innovative AI-driven i18n solution that enables automatic HTML translation with just two lines of JavaScript code. This open-source tool makes multilingual support extremely simple and efficient.
+- 基于 [Mizuki Blog](https://github.com/matsuzaka-yuki/mizuki) 模板开发
+- 感谢所有开源项目的贡献者
 
 ---
 
-⭐ If you find this project helpful, please consider giving it a star!#   M Y - B L O G  
- 
+**文档版本**：v2.0.0
+**更新日期**：2025-12-22
+**编写者**：Silver.Z
