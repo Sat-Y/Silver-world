@@ -96,32 +96,23 @@ exports.login = async (req, res) => {
 		}
 
 		// Find user in memory
-		let user = users.find((user) => user.username === username);
+		const user = users.find((user) => user.username === username);
 
-		// If user not found, create a default user for testing
+		// If user not found, return error
 		if (!user) {
-			// Create a default user with the provided username and password
-			const hashedPassword = await hashPassword(password);
-			user = {
-				id: Date.now(),
-				username,
-				email: `${username}@example.com`,
-				password: hashedPassword,
-				role: "admin",
-				createdAt: new Date().toISOString(),
-				updatedAt: new Date().toISOString(),
-			};
-			users.push(user);
-			console.log(`Created new user: ${username}`);
-		} else {
-			// Compare passwords
-			const isMatch = await comparePassword(password, user.password);
-			if (!isMatch) {
-				return res.status(401).json({
-					success: false,
-					message: "Invalid credentials",
-				});
-			}
+			return res.status(401).json({
+				success: false,
+				message: "Invalid credentials",
+			});
+		}
+
+		// Compare passwords
+		const isMatch = await comparePassword(password, user.password);
+		if (!isMatch) {
+			return res.status(401).json({
+				success: false,
+				message: "Invalid credentials",
+			});
 		}
 
 		// Generate token
