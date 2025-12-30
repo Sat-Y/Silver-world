@@ -33,14 +33,7 @@ export default defineConfig({
 	trailingSlash: "always",
 
 	server: {
-		port: 3000, // 前端开发服务器端口
-		proxy: {
-			// 代理 /api 路径到后端 Express 服务
-			"/api": {
-				target: "http://localhost:3001",
-				changeOrigin: true,
-			},
-		},
+		port: 3000,
 	},
 
 	devToolbar: {
@@ -69,7 +62,10 @@ export default defineConfig({
 			animateHistoryBrowsing: false,
 			skipPopStateHandling: (event) => {
 				// 跳过锚点链接的处理，让浏览器原生处理
-				return event.state?.url?.includes("#") || event.state?.url?.startsWith("/admin/");
+				return (
+					event.state?.url?.includes("#") ||
+					event.state?.url?.startsWith("/admin/")
+				);
 			},
 			// 跳过admin路径的处理，让浏览器原生处理
 			skipVisit: (url) => {

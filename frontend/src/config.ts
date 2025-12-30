@@ -476,9 +476,9 @@ export const pioConfig: import("./types/config").PioConfig = {
 	},
 };
 
-// API配置
+// API配置 - 纯前端模式，不使用后端API
 export const apiConfig = {
-	baseUrl: import.meta.env.PUBLIC_API_BASE || "/api", // API基础URL
+	baseUrl: "", // 空字符串表示不使用后端API
 	debug: import.meta.env.DEV || false, // 调试模式
 };
 

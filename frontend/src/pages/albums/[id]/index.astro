@@ -138,18 +138,22 @@ const albumId = currentUrl.pathname.split("/").filter(Boolean).pop();
 </MainGridLayout>
 
 <script>
-  // 客户端动态获取最新相册数据
+  const ALBUMS_STORAGE_KEY = 'mizuki_albums';
+
+  function getStoredAlbums() {
+    const stored = localStorage.getItem(ALBUMS_STORAGE_KEY);
+    return stored ? JSON.parse(stored) : [];
+  }
+
   document.addEventListener('DOMContentLoaded', async () => {
     console.log('=== 相册详情页加载完成，开始获取最新相册数据 ===');
     
-    // 从隐藏input元素获取当前相册ID
     const albumIdElement = document.getElementById('current-album-id');
     let albumId = '';
     if (albumIdElement) {
       albumId = albumIdElement.value;
     }
     
-    // 如果隐藏input元素不存在，从URL获取
     if (!albumId) {
       const currentUrl = new URL(window.location.href);
       albumId = currentUrl.pathname.split('/').filter(Boolean).pop() || '';
@@ -158,132 +162,94 @@ const albumId = currentUrl.pathname.split("/").filter(Boolean).pop();
     console.log('当前相册ID:', albumId);
     
     try {
-      // 从API获取最新相册数据
-      const response = await fetch(`/api/albums/${albumId}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const albums = getStoredAlbums();
+      const latestAlbum = albums.find(a => a.id === albumId);
       
-      console.log('API请求状态:', response.status);
-      
-      if (response.ok) {
-        const result = await response.json();
-        console.log('API响应结果:', result);
+      if (latestAlbum) {
+        console.log('最新相册数据:', latestAlbum);
         
-        if (result.success && result.data) {
-          const latestAlbum = result.data;
-          console.log('最新相册数据:', latestAlbum);
+        const pageTitle = document.querySelector('title');
+        if (pageTitle) {
+          pageTitle.textContent = latestAlbum.title;
+        }
+        
+        const albumContent = document.getElementById('album-content');
+        if (albumContent) {
+          const processedPhotos = latestAlbum.photos.map(photo => {
+            console.log('原始照片URL:', photo.url || photo.src);
+            let photoUrl = photo.url || photo.src;
+            console.log('修复后的照片URL:', photoUrl);
+            return {
+              ...photo,
+              src: photoUrl
+            };
+          }).filter(photo => photo.src);
           
-          // 更新页面标题
-          const pageTitle = document.querySelector('title');
-          if (pageTitle) {
-            pageTitle.textContent = latestAlbum.title;
-          }
-          
-          // 更新相册内容
-          const albumContent = document.getElementById('album-content');
-          if (albumContent) {
-            // 处理照片URL，确保它们是完整的
-                const processedPhotos = latestAlbum.photos.map(photo => {
-                  console.log('原始照片URL:', photo.url || photo.src);
-                  
-                  let photoUrl = photo.url || photo.src;
-                  if (photoUrl && !photoUrl.startsWith('http')) {
-                    if (photoUrl.startsWith('/')) {
-                      photoUrl = `http://localhost:3001${photoUrl}`;
-                    } else {
-                      photoUrl = `http://localhost:3001/uploads/${photoUrl}`;
-                    }
-                  }
-                  
-                  console.log('修复后的照片URL:', photoUrl);
-                  
-                  return {
-                    ...photo,
-                    src: photoUrl
-                  };
-                }).filter(photo => photo.src); // 过滤掉无效照片
-                
-                // 处理标签，过滤掉null值
-                const validTags = latestAlbum.tags ? latestAlbum.tags.filter(tag => tag !== null && tag !== undefined && tag !== '') : [];
-            
-            // 渲染最新相册内容
-            albumContent.innerHTML = `
-              <!-- 相册标题信息 -->
-              <header class="mb-8">
-                <h1 class="text-3xl font-bold text-neutral-900 dark:text-neutral-100 mb-3">
-                  ${latestAlbum.title}
-                </h1>
-                
-                ${latestAlbum.description ? `
-                  <p class="text-neutral-600 dark:text-neutral-400 mb-4">
-                    ${latestAlbum.description}
-                  </p>
+          const validTags = latestAlbum.tags ? latestAlbum.tags.filter(tag => tag !== null && tag !== undefined && tag !== '') : [];
+      
+          albumContent.innerHTML = `
+            <header class="mb-8">
+              <h1 class="text-3xl font-bold text-neutral-900 dark:text-neutral-100 mb-3">
+                ${latestAlbum.title}
+              </h1>
+              
+              ${latestAlbum.description ? `
+                <p class="text-neutral-600 dark:text-neutral-400 mb-4">
+                  ${latestAlbum.description}
+                </p>
+              ` : ''}
+              
+              <div class="flex flex-wrap items-center gap-4 text-sm text-neutral-500 dark:text-neutral-500">
+                <span>${processedPhotos.length} ${processedPhotos.length > 1 ? '照片' : '照片'}</span>
+                <time>${new Date(latestAlbum.date).getFullYear()}</time>
+                ${latestAlbum.location ? `
+                  <span class="flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                    </svg>
+                    ${latestAlbum.location}
+                  </span>
                 ` : ''}
-                
-                <!-- 相册元数据 -->
-                <div class="flex flex-wrap items-center gap-4 text-sm text-neutral-500 dark:text-neutral-500">
-                  <span>${processedPhotos.length} ${processedPhotos.length > 1 ? '照片' : '照片'}</span>
-                  <time>${new Date(latestAlbum.date).getFullYear()}</time>
-                  ${latestAlbum.location ? `
-                    <span class="flex items-center gap-1">
-                      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
-                      </svg>
-                      ${latestAlbum.location}
-                    </span>
-                  ` : ''}
-                </div>
-                
-                <!-- 标签 -->
-                ${validTags.length > 0 ? `
-                  <div class="flex flex-wrap gap-2 mt-4">
-                    ${validTags.map(tag => `<span class="btn-regular h-8 text-sm px-3 rounded-lg">${tag}</span>`).join('')}
-                  </div>
-                ` : ''}
-              </header>
-
-              <!-- 照片网格 -->
-              <div 
-                class="photo-gallery moment-images grid-layout"
-                data-layout="grid"
-                data-columns="3"
-              >
-                ${processedPhotos.map((photo, index) => `
-                  <figure class="photo-item group relative overflow-hidden rounded-lg">
-                    <a 
-                      href="${photo.src}"
-                      data-pswp-width="${photo.width || 1200}"
-                      data-pswp-height="${photo.height || 800}"
-                      target="_blank"
-                      class="block"
-                    >
-                      <img 
-                        src="${photo.src}"
-                        alt="${photo.originalName || `Photo ${index + 1}`}"
-                        class="photo-image w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 cursor-pointer"
-                        loading="lazy"
-                      />
-                    </a>
-                  </figure>
-                `).join('')}
               </div>
-            `;
-            
-            console.log('=== 相册详情已更新 ===');
-            
-            // 确保PhotoSwipe正确处理相册图片
-            initPhotoSwipe();
-          }
+              
+              ${validTags.length > 0 ? `
+                <div class="flex flex-wrap gap-2 mt-4">
+                  ${validTags.map(tag => `<span class="btn-regular h-8 text-sm px-3 rounded-lg">${tag}</span>`).join('')}
+                </div>
+              ` : ''}
+            </header>
+
+            <div 
+              class="photo-gallery moment-images grid-layout"
+              data-layout="grid"
+              data-columns="3"
+            >
+              ${processedPhotos.map((photo, index) => `
+                <figure class="photo-item group relative overflow-hidden rounded-lg">
+                  <a 
+                    href="${photo.src}"
+                    data-pswp-width="${photo.width || 1200}"
+                    data-pswp-height="${photo.height || 800}"
+                    target="_blank"
+                    class="block"
+                  >
+                    <img 
+                      src="${photo.src}"
+                      alt="${photo.originalName || `Photo ${index + 1}`}"
+                      class="photo-image w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 cursor-pointer"
+                      loading="lazy"
+                    />
+                  </a>
+                </figure>
+              `).join('')}
+            </div>
+          `;
+          
+          console.log('=== 相册详情已更新 ===');
+          initPhotoSwipe();
         }
       } else {
-        console.error('获取最新相册数据失败:', response.status);
-        const errorText = await response.text();
-        console.error('错误响应内容:', errorText);
-        
-        // 显示错误信息
+        console.error('相册不存在');
         const albumContent = document.getElementById('album-content');
         if (albumContent) {
           albumContent.innerHTML = `
@@ -311,8 +277,6 @@ const albumId = currentUrl.pathname.split("/").filter(Boolean).pop();
       }
     } catch (error) {
       console.error('获取最新相册数据出错:', error);
-      
-      // 显示错误信息
       const albumContent = document.getElementById('album-content');
       if (albumContent) {
         albumContent.innerHTML = `
@@ -340,15 +304,11 @@ const albumId = currentUrl.pathname.split("/").filter(Boolean).pop();
     }
   });
   
-  // 初始化PhotoSwipe
   function initPhotoSwipe() {
     console.log('=== 初始化PhotoSwipe ===');
-    
-    // 检查页面中的图片元素
     const albumImages = document.querySelectorAll('.moment-images img, .photo-gallery img');
     console.log('相册图片数量:', albumImages.length);
     
-    // 预加载图片以确保正确显示
     albumImages.forEach((img) => {
       if (img instanceof HTMLImageElement) {
         const preloadImg = new Image();
@@ -356,13 +316,10 @@ const albumId = currentUrl.pathname.split("/").filter(Boolean).pop();
       }
     });
     
-    // 修复相册图片链接，确保它们可以被PhotoSwipe正确处理
     document.querySelectorAll('.photo-gallery a').forEach(link => {
       if (link instanceof HTMLAnchorElement) {
-        // 阻止默认的新窗口打开行为
         link.addEventListener('click', (e) => {
           e.preventDefault();
-          // 不需要额外操作，PhotoSwipe会处理点击事件
         });
       }
     });

@@ -23,7 +23,6 @@ import type { Favicon, SakuraConfig } from "../types/config";
 import { pathsEqual, url } from "../utils/url-utils";
 
 import { umamiConfig } from '../config.ts';
-import AdminButton from '../components/AdminButton.svelte';
 
 
 import "katex/dist/katex.css";
@@ -234,7 +233,6 @@ const umamiScripts = umamiConfig.scripts || ""; // 获取Umami scripts配置
 		<Pio client:load />
 
 		<!-- ✅ 添加管理员按钮（放在这里，在所有内容之后） -->
-		<AdminButton client:load />
 
 		<!-- increase the page height during page transition to prevent the scrolling animation from jumping -->
 		<div id="page-height-extend" class="hidden h-[300vh]"></div>

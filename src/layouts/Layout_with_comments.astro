@@ -7,7 +7,6 @@ import "@fontsource/roboto/700.css"; // 导入Roboto字体的700权重（粗体�
 import ConfigCarrier from "@components/ConfigCarrier.astro"; // 配置载体组件
 import MusicPlayer from "@components/widget/MusicPlayer.svelte"; // 音乐播放器组件（Svelte实现）
 import Pio from "@components/widget/Pio.svelte"; // Pio看板娘组件（Svelte实现）
-import AdminButton from '../components/AdminButton.svelte'; // 管理员按钮组件
 
 // 导入配置
 import { profileConfig, siteConfig, widgetConfigs, umamiConfig } from "@/config"; // 导入站点、个人资料和小部件配置
@@ -267,7 +266,6 @@ const umamiScripts = umamiConfig.scripts || ""; // 获取Umami脚本配置
     <Pio client:load />
 
     <!-- 管理员按钮（放在这里，在所有内容之后） -->
-    <AdminButton client:load />
 
     <!-- 页面过渡时增加页面高度，防止滚动动画跳动 -->
     <div id="page-height-extend" class="hidden h-[300vh]"></div>

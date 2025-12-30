@@ -41,8 +41,10 @@ export function navigateToPage(
 	}
 
 	// 检查当前是否在admin页面或目标是否为admin页面
-	const currentPath = typeof window !== "undefined" ? window.location.pathname : "";
-	const isAdminPath = currentPath.startsWith("/admin/") || url.startsWith("/admin/");
+	const currentPath =
+		typeof window !== "undefined" ? window.location.pathname : "";
+	const isAdminPath =
+		currentPath.startsWith("/admin/") || url.startsWith("/admin/");
 
 	// 如果是admin页面，直接使用普通跳转，不使用Swup
 	if (isAdminPath) {

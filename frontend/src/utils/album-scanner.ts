@@ -4,96 +4,66 @@ import type { AlbumGroup, Photo } from "../types/album";
 
 export async function scanAlbums(): Promise<AlbumGroup[]> {
 	try {
-		// 从后端 API 获取相册数据
-		const apiUrl = "http://localhost:3001/api/albums"; // 修改 API 路径，移除 /admin 前缀
-		console.log(`=== Attempting to fetch albums from API: ${apiUrl} ===`);
-		const response = await fetch(apiUrl, {
-			method: "GET",
-			headers: {
-				"Content-Type": "application/json",
-			},
+		console.log("=== Attempting to fetch albums from localStorage ===");
+		
+		if (typeof window === 'undefined') {
+			console.log("=== Running in server environment, returning empty array ===");
+			return [];
+		}
+		
+		const ALBUMS_STORAGE_KEY = 'mizuki_albums';
+		const stored = localStorage.getItem(ALBUMS_STORAGE_KEY);
+		
+		if (!stored) {
+			console.log("=== No albums found in localStorage ===");
+			return [];
+		}
+		
+		const albums = JSON.parse(stored);
+		console.log(`=== Found ${albums.length} albums in localStorage ===`);
+		
+		const apiAlbums: AlbumGroup[] = albums.map((apiAlbum: any) => {
+			console.log("Processing album:", apiAlbum);
+			const photos: Photo[] = apiAlbum.photos.map((photo: any) => {
+				console.log("Processing photo:", photo);
+				let photoUrl = photo.url || photo.src;
+				return {
+					id: photo.id,
+					src: photoUrl,
+					alt: photo.originalName || `Photo ${photo.id}`,
+					title: photo.originalName || `Photo ${photo.id}`,
+					tags: [],
+					date: photo.uploadedAt || new Date().toISOString().split("T")[0],
+				};
+			});
+
+			let coverUrl = photos.length > 0 ? photos[0].src : "/images/albums/cover.jpg";
+			console.log(`Final cover URL: ${coverUrl}`);
+
+			const album: AlbumGroup = {
+				id: apiAlbum.id,
+				title: apiAlbum.title,
+				description: apiAlbum.description,
+				cover: coverUrl,
+				date: apiAlbum.date,
+				location: apiAlbum.location,
+				tags: apiAlbum.tags ? apiAlbum.tags.filter((tag: any) => tag !== null && tag !== undefined && tag !== '') : [],
+				layout: "grid",
+				columns: 3,
+				photos: photos,
+			};
+			console.log("Processed album:", album);
+			return album;
 		});
 
-		console.log(`API Response status: ${response.status}`);
-		if (response.ok) {
-			const result = await response.json();
-			console.log("API Response body:", result);
-			if (result.success && Array.isArray(result.data)) {
-				console.log(`API returned ${result.data.length} albums`);
-				// 转换 API 返回的数据格式为前端所需的 AlbumGroup 格式
-				const apiAlbums: AlbumGroup[] = result.data.map((apiAlbum: any) => {
-					console.log("Processing album:", apiAlbum);
-					// 将后端返回的 photos 转换为前端所需的 Photo 格式
-					const photos: Photo[] = apiAlbum.photos.map((photo: any) => {
-						console.log("Processing photo:", photo);
-						// 确保图片 URL 是完整的，包含 http:// 或 https://
-						let photoUrl = photo.url || photo.src;
-						if (
-							photoUrl &&
-							!photoUrl.startsWith("http") &&
-							!photoUrl.startsWith("/")
-						) {
-							// 如果是相对路径，添加完整的域名
-							photoUrl = `http://localhost:3001/uploads/${photoUrl}`;
-						} else if (photoUrl && photoUrl.startsWith("/")) {
-							// 如果是根路径，添加完整的域名
-							photoUrl = `http://localhost:3001${photoUrl}`;
-						}
-						return {
-							id: photo.id,
-							src: photoUrl, // 使用完整的图片 URL
-							alt: photo.originalName || `Photo ${photo.id}`,
-							title: photo.originalName || `Photo ${photo.id}`,
-							tags: [],
-							date: photo.uploadedAt || new Date().toISOString().split("T")[0],
-						};
-					});
-
-					// 确保封面图片 URL 是完整的
-					let coverUrl =
-						photos.length > 0 ? photos[0].src : "/images/albums/cover.jpg";
-					if (coverUrl && !coverUrl.startsWith("http")) {
-						if (coverUrl.startsWith("/")) {
-							coverUrl = `http://localhost:3001${coverUrl}`;
-						} else {
-							coverUrl = `http://localhost:3001/uploads/${coverUrl}`;
-						}
-					}
-					console.log(`Final cover URL: ${coverUrl}`);
-
-					const album: AlbumGroup = {
-						id: apiAlbum.id,
-						title: apiAlbum.title,
-						description: apiAlbum.description,
-						cover: coverUrl,
-						date: apiAlbum.date,
-						location: apiAlbum.location,
-						tags: apiAlbum.tags ? apiAlbum.tags.filter(tag => tag !== null && tag !== undefined && tag !== '') : [],
-						layout: "grid", // 默认布局
-						columns: 3, // 默认列数
-						photos: photos,
-					};
-					console.log("Processed album:", album);
-					return album;
-				});
-
-				console.log(`=== Final API albums: ${apiAlbums.length} albums ===`);
-				// 不管 API 返回的数据是否为空，都返回 API 返回的结果，不再回退到本地扫描
-				return apiAlbums;
-			}
-		} else {
-			console.error(`API request failed with status: ${response.status}`);
-			const errorText = await response.text();
-			console.error(`API error response: ${errorText}`);
-		}
+		console.log(`=== Final localStorage albums: ${apiAlbums.length} albums ===`);
+		return apiAlbums;
 	} catch (error) {
-		console.error("=== Exception when fetching albums from API ===");
+		console.error("=== Exception when fetching albums from localStorage ===");
 		console.error(error);
 	}
 
-	// 不再回退到本地扫描，只使用 API 返回的数据
-	// 这样可以更清楚地看到 API 请求的问题
-	console.log("=== Returning empty array, no local fallback ===");
+	console.log("=== Returning empty array ===");
 	return [];
 }
 

@@ -33,17 +33,20 @@ export default defineConfig({
 	trailingSlash: "always",
 
 	server: {
-		port: 3000,  // 前端开发服务器端口
+		port: 3000, // 前端开发服务器端口
 		proxy: {
-			// 代理 /api 路径到后端 Node.js 服务器
-			'/api': {
-				target: 'http://localhost:3001',
-				changeOrigin: true
+			// 代理 /api 路径到后端 Express 服务
+			"/api": {
+				target: "http://localhost:3001",
+				changeOrigin: true,
 			},
-			// 不需要代理 /admin 路径到外部服务器，使用前端自己的 admin 页面
-		}
+		},
 	},
-	
+
+	devToolbar: {
+		enabled: false,
+	},
+
 	integrations: [
 		tailwind({
 			nesting: true,
@@ -66,7 +69,18 @@ export default defineConfig({
 			animateHistoryBrowsing: false,
 			skipPopStateHandling: (event) => {
 				// 跳过锚点链接的处理，让浏览器原生处理
-				return event.state && event.state.url && event.state.url.includes("#");
+				return (
+					event.state?.url?.includes("#") ||
+					event.state?.url?.startsWith("/admin/")
+				);
+			},
+			// 跳过admin路径的处理，让浏览器原生处理
+			skipVisit: (url) => {
+				return url.pathname.startsWith("/admin/");
+			},
+			// 只在非admin页面初始化swup
+			shouldReplacePage: (url) => {
+				return !url.pathname.startsWith("/admin/");
 			},
 		}),
 		icon({
