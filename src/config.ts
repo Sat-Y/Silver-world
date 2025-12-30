@@ -21,8 +21,8 @@ import { getTranslateLanguageFromConfig } from "./utils/language-utils";
 const SITE_LANG = "zh_CN"; // 语言代码，例如：'en', 'zh_CN', 'ja' 等。
 
 export const siteConfig: SiteConfig = {
-	title: "zyh",
-	subtitle: "一个简单的个人网站",
+	title: "Silver.Z",
+	subtitle: "Silver.Z‘World",
 
 	lang: SITE_LANG,
 
@@ -86,10 +86,10 @@ export const siteConfig: SiteConfig = {
 
 		homeText: {
 			enable: true, // 在主页显示自定义文本
-			title: "Zyh World!", // 主页横幅主标题
+			title: "Silver.Z World!", // 主页横幅主标题
 
 			subtitle: [
-				"Welcome to Zyh World!",
+				"Welcome to Silver.Z World!",
 				"A Showcase Demo Site",
 				"星座: 水瓶座",
 				"MBTI: ENTP",
@@ -256,7 +256,7 @@ export const navBarConfig: NavBarConfig = {
 
 export const profileConfig: ProfileConfig = {
 	avatar: "assets/images/zyh2.jpg", // 相对于 /src 目录。如果以 '/' 开头，则相对于 /public 目录
-	name: "Zyh",
+	name: "Silver.Z",
 	bio: "Time is the most fundamental currency",
 	links: [
 		{
