@@ -53,6 +53,7 @@ export const siteConfig: SiteConfig = {
 				"/assets/desktop-banner/d5.png",
 				"/assets/desktop-banner/d6.png",
 				"/assets/desktop-banner/d7.png",
+				"/assets/desktop-banner/d8.png",
 			], // 桌面横幅图片
 			mobile: [
 				"/assets/desktop-banner/d1.png",
@@ -62,6 +63,7 @@ export const siteConfig: SiteConfig = {
 				"/assets/desktop-banner/d5.png",
 				"/assets/desktop-banner/d6.png",
 				"/assets/desktop-banner/d7.png",
+				"/assets/desktop-banner/d8.png",
 			], // 移动横幅图片
 		}, // 使用本地横幅图片
 
@@ -147,6 +149,7 @@ export const fullscreenWallpaperConfig: FullscreenWallpaperConfig = {
 			"/assets/desktop-banner/d5.png",
 			"/assets/desktop-banner/d6.png",
 			"/assets/desktop-banner/d7.png",
+			"/assets/desktop-banner/d8.png",
 		], // 桌面横幅图片
 		mobile: [
 			"/assets/desktop-banner/d1.png",
@@ -156,6 +159,7 @@ export const fullscreenWallpaperConfig: FullscreenWallpaperConfig = {
 			"/assets/desktop-banner/d5.png",
 			"/assets/desktop-banner/d6.png",
 			"/assets/desktop-banner/d7.png",
+			"/assets/desktop-banner/d8.png",
 		], // 移动横幅图片
 	}, // 使用本地横幅图片
 	position: "center", // 壁纸位置，等同于 object-position
