@@ -311,6 +311,11 @@ export const announcementConfig: AnnouncementConfig = {
 
 export const musicPlayerConfig: MusicPlayerConfig = {
 	enable: true, // 启用音乐播放器功能
+	mode: "meting", // 使用meting模式，连接网易云音乐歌单
+	meting_api: "https://www.bilibili.uno/api?server=:server&type=:type&id=:id&auth=:auth&r=:r", // Meting API 地址
+	id: "13557789977", // 网易云音乐歌单ID
+	server: "netease", // 使用网易云音乐服务器
+	type: "playlist", // 类型为歌单
 };
 
 export const footerConfig: FooterConfig = {
