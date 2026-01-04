@@ -27,7 +27,8 @@ export const timelineData: TimelineItem[] = [
 	{
 		id: "current-study",
 		title: "正在学习人工智能专业",
-		description: "正在学习计算机科学与技术相关知识，什么都学了一点点，就很尴尬。",
+		description:
+			"正在学习计算机科学与技术相关知识，什么都学了一点点，就很尴尬。",
 		type: "education",
 		startDate: "2023-09-01",
 		location: "温州",
@@ -59,13 +60,8 @@ export const timelineData: TimelineItem[] = [
 		],
 		links: [
 			{
-				name: "GitHub Repository",
-				url: "https://github.com/Sat-Y/Silver-world",
-				type: "project",
-			},
-			{
 				name: "Live Demo",
-				url: "https://silver-z.netlify.app",
+				url: "https://www.bilibili.com/video/BV15fi7BYEWk/?spm_id_from=333.1387.homepage.video_card.click&vd_source=fa004aba8368fbc5159db1a594b9cf52",
 				type: "website",
 			},
 		],
@@ -76,7 +72,8 @@ export const timelineData: TimelineItem[] = [
 	{
 		id: "2D-adventure-game",
 		title: "2D像素风冒险游戏",
-		description: "使用Python和Godot引擎开发的2D像素风冒险游戏，包含角色移动、敌人AI、碰撞检测等功能。",
+		description:
+			"使用Python和Godot引擎开发的2D像素风冒险游戏，包含角色移动、敌人AI、碰撞检测等功能。",
 		type: "project",
 		startDate: "2025-07-01",
 		endDate: "2025-09-01",
@@ -85,6 +82,18 @@ export const timelineData: TimelineItem[] = [
 			"完成了角色状态机设计",
 			"完成了敌人行为设计",
 			"完成了对话存档等交互功能",
+		],
+		links: [
+			{
+				name: "GitHub Repository",
+				url: "https://github.com/Sat-Y/Silver-world",
+				type: "project",
+			},
+			{
+				name: "Live Demo",
+				url: "https://silver-z.netlify.app",
+				type: "website",
+			},
 		],
 		icon: "material-symbols:game",
 		color: "#0c74eaff",
