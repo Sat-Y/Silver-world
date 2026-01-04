@@ -26,8 +26,8 @@ export interface TimelineItem {
 export const timelineData: TimelineItem[] = [
 	{
 		id: "current-study",
-		title: "正在学习计算机科学与技术",
-		description: "正在学习计算机科学与技术，什么都学了一点点，就很尴尬。",
+		title: "正在学习人工智能专业",
+		description: "正在学习计算机科学与技术相关知识，什么都学了一点点，就很尴尬。",
 		type: "education",
 		startDate: "2023-09-01",
 		location: "温州",
@@ -60,18 +60,34 @@ export const timelineData: TimelineItem[] = [
 		links: [
 			{
 				name: "GitHub Repository",
-				url: "https://github.com/example/mizuki-blog",
+				url: "https://github.com/Sat-Y/Silver-world",
 				type: "project",
 			},
 			{
 				name: "Live Demo",
-				url: "https://mizuki-demo.example.com",
+				url: "https://silver-z.netlify.app",
 				type: "website",
 			},
 		],
 		icon: "material-symbols:code",
 		color: "#7C3AED",
 		featured: true,
+	},
+	{
+		id: "2D-adventure-game",
+		title: "2D像素风冒险游戏",
+		description: "使用Python和Godot引擎开发的2D像素风冒险游戏，包含角色移动、敌人AI、碰撞检测等功能。",
+		type: "project",
+		startDate: "2025-07-01",
+		endDate: "2025-09-01",
+		skills: ["Python", "Godot", "GDscript"],
+		achievements: [
+			"完成了角色状态机设计",
+			"完成了敌人行为设计",
+			"完成了对话存档等交互功能",
+		],
+		icon: "material-symbols:game",
+		color: "#0c74eaff",
 	},
 	{
 		id: "student-management-system",
