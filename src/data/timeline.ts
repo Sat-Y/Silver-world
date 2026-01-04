@@ -60,11 +60,17 @@ export const timelineData: TimelineItem[] = [
 		],
 		links: [
 			{
+				name: "GitHub Repository",
+				url: "https://github.com/Sat-Y/Silver-world",
+				type: "project",
+			},
+			{
 				name: "Live Demo",
-				url: "https://www.bilibili.com/video/BV15fi7BYEWk/?spm_id_from=333.1387.homepage.video_card.click&vd_source=fa004aba8368fbc5159db1a594b9cf52",
+				url: "https://silver-z.netlify.app",
 				type: "website",
 			},
 		],
+
 		icon: "material-symbols:code",
 		color: "#7C3AED",
 		featured: true,
@@ -85,13 +91,8 @@ export const timelineData: TimelineItem[] = [
 		],
 		links: [
 			{
-				name: "GitHub Repository",
-				url: "https://github.com/Sat-Y/Silver-world",
-				type: "project",
-			},
-			{
 				name: "Live Demo",
-				url: "https://silver-z.netlify.app",
+				url: "https://www.bilibili.com/video/BV15fi7BYEWk/?spm_id_from=333.1387.homepage.video_card.click&vd_source=fa004aba8368fbc5159db1a594b9cf52",
 				type: "website",
 			},
 		],
