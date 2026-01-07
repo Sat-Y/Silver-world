@@ -56,6 +56,23 @@ export const projectsData: Project[] = [
 		featured: true,
 		tags: ["Game", "GoDot", "GDscript"],
 	},
+	{
+		id: "Electronic-Diary-Course-Project",
+		title: "电子日记课程项目",
+		description: "我因课设要求制作了一个简单的电子日记系统，实现日记的增删改和好友分享",
+		image: "",
+		category: "web",
+		techStack: [
+			"Spring Boot",
+			"MySQL",
+			"MVC",
+		],
+		status: "completed",
+		startDate: "2026-01-01",
+		endDate: "2026-01-07",
+		featured: true,
+		tags: ["Web", "Spring Boot", "MySQL", "MVC"],
+	},
 ];
 
 // Get project statistics
