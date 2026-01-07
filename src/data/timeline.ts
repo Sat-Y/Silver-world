@@ -100,6 +100,38 @@ export const timelineData: TimelineItem[] = [
 		color: "#0c74eaff",
 	},
 	{
+		id: "Electronic-Diary-Course-Project",
+		title: "电子日记课程项目",
+		description:
+			"spring boot项目，开发了一个电子日记网站，用于巩固学习的框架。",
+		type: "project",
+		startDate: "2026-01-01",
+		endDate: "2026-01-07",
+		skills: ["Spring Boot", "Java", "MySQL", "mvc"],
+		achievements: [
+			"熟悉了现代后端开发技术栈",
+			"学习了数据库设计与优化",
+			"完成了从设计到部署的全流程",
+			"完成了后端管理页面的实现",
+		],
+		links: [
+			{
+				name: "GitHub Repository",
+				url: "https://github.com/Sat-Y/Electronic-Diary-Course-Project",
+				type: "project",
+			},
+			{
+				name: "Live Demo",
+				url: "https://www.bilibili.com/video/BV1c3iyBnEUt/?spm_id_from=333.1387.homepage.video_card.click&vd_source=fa004aba8368fbc5159db1a594b9cf52",
+				type: "website",
+			},
+		],
+
+		icon: "material-symbols:code",
+		color: "#5d2ab4ff",
+		featured: true,
+	},
+	{
 		id: "student-management-system",
 		title: "校园外卖管理系统课程项目",
 		description: "数据库课程的最终项目，开发了一个完整的校园外卖管理系统。",
