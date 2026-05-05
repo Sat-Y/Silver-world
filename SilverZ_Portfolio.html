@@ -1,0 +1,2515 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Silver.Z — AI玩法策划 · 独立游戏开发者</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,300&family=Syne:wght@400;600;700;800&family=Noto+Sans+SC:wght@300;400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07070d;
+      --bg2: #0d0d18;
+      --bg3: #12121f;
+      --cyan: #00d4ff;
+      --cyan2: #00a8cc;
+      --violet: #8b5cf6;
+      --violet2: #6d44d0;
+      --text: #e8e8f0;
+      --text2: #9090a8;
+      --text3: #55556a;
+      --border: rgba(255, 255, 255, 0.06);
+      --glow-cyan: 0 0 20px rgba(0, 212, 255, 0.25);
+      --glow-violet: 0 0 20px rgba(139, 92, 246, 0.25);
+      --mono: 'JetBrains Mono', monospace;
+      --display: 'Syne', sans-serif;
+      --body: 'Noto Sans SC', sans-serif;
+      --trans: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    body.light-mode {
+      --bg: #f8f9fa;
+      --bg2: #ffffff;
+      --bg3: #f1f3f5;
+      --cyan: #009dbf;
+      --cyan2: #007a94;
+      --violet: #7c4dff;
+      --violet2: #6200ea;
+      --text: #1a1a1b;
+      --text2: #4a4a5e;
+      --text3: #8a8a9e;
+      --border: rgba(0, 0, 0, 0.08);
+      --glow-cyan: 0 4px 12px rgba(0, 157, 191, 0.15);
+      --glow-violet: 0 4px 12px rgba(124, 77, 255, 0.15);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--body);
+      font-weight: 300;
+      line-height: 1.7;
+      overflow-x: hidden;
+      transition: background var(--trans), color var(--trans);
+    }
+
+    /* CURSOR */
+    * {
+      cursor: none !important;
+    }
+
+    #cursor {
+      width: 8px;
+      height: 8px;
+      background: var(--cyan);
+      border-radius: 50%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 9999;
+      /* Removed transition for zero-latency tracking */
+      background: var(--cyan);
+      box-shadow: var(--glow-cyan);
+    }
+
+    #cursor-ring {
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--cyan);
+      border-radius: 50%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 9998;
+      transition: width 0.3s, height 0.3s, border-color 0.3s, opacity 0.3s;
+      opacity: 0.5;
+    }
+
+    #cursor-ring.hover {
+      width: 40px;
+      height: 40px;
+      border-color: var(--violet);
+      background: rgba(139, 92, 246, 0.05);
+      opacity: 1;
+    }
+
+    /* SCROLLBAR */
+    ::-webkit-scrollbar {
+      width: 3px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--violet);
+      border-radius: 2px;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 0 40px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.4s, backdrop-filter 0.4s;
+      border-bottom: 1px solid transparent;
+    }
+
+    nav.scrolled {
+      background: rgba(7, 7, 13, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom-color: var(--border);
+    }
+
+    .nav-logo {
+      font-family: var(--mono);
+      font-size: 14px;
+      color: var(--cyan);
+      letter-spacing: 0.1em;
+      text-decoration: none;
+    }
+
+    .nav-logo span {
+      color: var(--violet);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text2);
+      text-decoration: none;
+      letter-spacing: 0.08em;
+      transition: color 0.2s;
+      position: relative;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -3px;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background: var(--cyan);
+      transition: width 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: var(--cyan);
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    .theme-toggle {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text2);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-left: 20px;
+    }
+
+    .theme-toggle:hover {
+      border-color: var(--cyan);
+      color: var(--cyan);
+      box-shadow: var(--glow-cyan);
+    }
+
+    .theme-toggle svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    .sun-icon {
+      display: none;
+    }
+
+    body.light-mode .sun-icon {
+      display: block;
+    }
+
+    body.light-mode .moon-icon {
+      display: none;
+    }
+
+    /* LIGHT MODE UI OVERRIDES */
+    body.light-mode .stats-panel {
+      background: #ffffff;
+      border-color: rgba(0, 0, 0, 0.08);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.05);
+    }
+
+    body.light-mode .stats-panel-header {
+      background: #f1f3f5;
+      border-bottom-color: rgba(0, 0, 0, 0.08);
+      color: var(--text3);
+    }
+
+    body.light-mode .stat-line {
+      border-bottom-color: rgba(0, 0, 0, 0.04);
+    }
+
+    body.light-mode .stat-key {
+      color: #6a6a7e;
+    }
+
+    body.light-mode .typing-line {
+      border-top-color: rgba(0, 0, 0, 0.08);
+    }
+
+    body.light-mode .project-card:hover {
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.06);
+      border-color: rgba(0, 157, 191, 0.2);
+    }
+
+    body.light-mode .award-item:hover {
+      background: rgba(0, 0, 0, 0.02);
+      border-color: rgba(0, 0, 0, 0.12);
+    }
+
+    /* SECTION */
+    section {
+      padding: 120px 0;
+    }
+
+    .container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 50px;
+    }
+
+    /* SECTION LABEL */
+    .section-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--cyan);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      opacity: 0.8;
+    }
+
+    .section-label::before {
+      content: '// ';
+      color: var(--text3);
+    }
+
+    .section-title {
+      font-family: var(--display);
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 700;
+      line-height: 1.1;
+      color: var(--text);
+      margin-bottom: 20px;
+    }
+
+    .section-title em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--cyan), var(--violet));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .section-desc {
+      font-size: 15px;
+      color: var(--text2);
+      max-width: 520px;
+      margin-bottom: 56px;
+      line-height: 1.8;
+    }
+
+    /* ─── HERO ─── */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      padding: 0;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    /* Grid lines */
+    .hero-bg::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      animation: gridFloat 20s linear infinite;
+    }
+
+    @keyframes gridFloat {
+      0% {
+        transform: translate(0, 0);
+      }
+
+      100% {
+        transform: translate(60px, 60px);
+      }
+    }
+
+    /* Glow orbs */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.12;
+      animation: orbFloat 8s ease-in-out infinite;
+    }
+
+    .orb1 {
+      width: 500px;
+      height: 500px;
+      background: var(--violet);
+      top: -100px;
+      right: -100px;
+      animation-delay: 0s;
+    }
+
+    .orb2 {
+      width: 300px;
+      height: 300px;
+      background: var(--cyan);
+      bottom: 100px;
+      left: -50px;
+      animation-delay: 3s;
+    }
+
+    @keyframes orbFloat {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-30px);
+      }
+    }
+
+    .hero-content {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 40px;
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .hero-left {}
+
+    .hero-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--cyan);
+      background: rgba(0, 212, 255, 0.06);
+      border: 1px solid rgba(0, 212, 255, 0.15);
+      border-radius: 2px;
+      padding: 6px 12px;
+      margin-bottom: 28px;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      background: #22c55e;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
+      }
+
+      50% {
+        opacity: 0.7;
+        box-shadow: 0 0 0 6px rgba(34, 197, 94, 0);
+      }
+    }
+
+    .hero-name {
+      font-family: var(--display);
+      font-size: clamp(56px, 9vw, 110px);
+      font-weight: 800;
+      line-height: 0.9;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+
+    .hero-name .dot {
+      color: var(--cyan);
+    }
+
+    .hero-cn {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--text3);
+      letter-spacing: 0.3em;
+      margin-bottom: 24px;
+    }
+
+    .hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 28px;
+    }
+
+    .hero-tag {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--violet);
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 4px 10px;
+    }
+
+    .hero-motto {
+      font-size: 18px;
+      color: var(--text2);
+      line-height: 1.6;
+      margin-bottom: 40px;
+      border-left: 3px solid var(--cyan);
+      padding-left: 20px;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn {
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      padding: 12px 24px;
+      border-radius: 2px;
+      text-decoration: none;
+      transition: all 0.25s;
+      border: 1px solid;
+    }
+
+    .btn-primary {
+      background: var(--cyan);
+      border-color: var(--cyan);
+      color: var(--bg);
+      font-weight: 500;
+    }
+
+    .btn-primary:hover {
+      background: transparent;
+      color: var(--cyan);
+      box-shadow: var(--glow-cyan);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border-color: var(--border);
+      color: var(--text2);
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--violet);
+      color: var(--violet);
+      box-shadow: var(--glow-violet);
+    }
+
+    /* Hero right: stats panel */
+    .hero-right {}
+
+    .stats-panel {
+      background: rgba(13, 13, 24, 0.8);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .stats-panel-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border-bottom: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text3);
+    }
+
+    .dot-red {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #ff5f57;
+    }
+
+    .dot-yellow {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #febc2e;
+    }
+
+    .dot-green {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #28c840;
+    }
+
+    .stats-panel-body {
+      padding: 20px;
+    }
+
+    .stat-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+
+    .stat-line:last-child {
+      border-bottom: none;
+    }
+
+    .stat-key {
+      color: var(--text3);
+    }
+
+    .stat-val {
+      color: var(--cyan);
+    }
+
+    .stat-val.violet {
+      color: var(--violet);
+    }
+
+    .stat-val.green {
+      color: #22c55e;
+    }
+
+    .stat-val.amber {
+      color: #f59e0b;
+    }
+
+    .typing-line {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--cyan);
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .typing-line::before {
+      content: '> ';
+      color: var(--text3);
+    }
+
+    .typed-text {}
+
+    .typed-cursor {
+      display: inline-block;
+      width: 8px;
+      height: 14px;
+      background: var(--cyan);
+      vertical-align: middle;
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0;
+      }
+    }
+
+    /* ─── ABOUT ─── */
+    #about {
+      background: var(--bg2);
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+
+    .about-left {}
+
+    .personality-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 28px;
+      margin-bottom: 20px;
+    }
+
+    .personality-type {
+      font-family: var(--display);
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--cyan);
+      margin-bottom: 4px;
+    }
+
+    .personality-sub {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text3);
+      letter-spacing: 0.15em;
+      margin-bottom: 24px;
+    }
+
+    .trait-bars {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .trait-bar-row {}
+
+    .trait-bar-header {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text2);
+      margin-bottom: 6px;
+    }
+
+    .trait-bar-track {
+      height: 3px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .trait-bar-fill {
+      height: 100%;
+      border-radius: 2px;
+      width: 0;
+      transition: width 1.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .fill-cyan {
+      background: var(--cyan);
+    }
+
+    .fill-violet {
+      background: var(--violet);
+    }
+
+    .fill-mixed {
+      background: linear-gradient(90deg, var(--violet), var(--cyan));
+    }
+
+    .iq-eq-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .score-badge {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 16px 20px;
+      text-align: center;
+    }
+
+    .score-num {
+      font-family: var(--display);
+      font-size: 36px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--cyan), var(--violet));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .score-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text3);
+      letter-spacing: 0.15em;
+      margin-top: 4px;
+    }
+
+    .about-right {}
+
+    .about-text {
+      font-size: 15px;
+      color: var(--text2);
+      line-height: 1.9;
+      margin-bottom: 24px;
+    }
+
+    .about-text strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .insight-block {
+      background: var(--bg3);
+      border: 1px solid rgba(139, 92, 246, 0.15);
+      border-left: 3px solid var(--violet);
+      border-radius: 0 4px 4px 0;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+    }
+
+    .insight-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--violet);
+      letter-spacing: 0.15em;
+      margin-bottom: 6px;
+    }
+
+    .insight-text {
+      font-size: 14px;
+      color: var(--text2);
+      line-height: 1.7;
+    }
+
+    .spirit-needs {
+      margin-top: 28px;
+    }
+
+    .spirit-title {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text3);
+      letter-spacing: 0.15em;
+      margin-bottom: 12px;
+    }
+
+    .need-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .need-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 5px 10px;
+      border-radius: 2px;
+      border: 1px solid;
+    }
+
+    .need-item.high {
+      color: var(--cyan);
+      border-color: rgba(0, 212, 255, 0.2);
+      background: rgba(0, 212, 255, 0.05);
+    }
+
+    .need-item.mid {
+      color: var(--text2);
+      border-color: var(--border);
+      background: transparent;
+    }
+
+    .need-item.pct {
+      font-size: 10px;
+      opacity: 0.7;
+    }
+
+    /* ─── GROWTH ─── */
+    #growth {}
+
+    .growth-header {
+      margin-bottom: 48px;
+    }
+
+    .timeline-wrap {
+      position: relative;
+    }
+
+    .timeline-track {
+      display: flex;
+      gap: 0;
+      margin-bottom: 60px;
+      position: relative;
+    }
+
+    .timeline-track::before {
+      content: '';
+      position: absolute;
+      top: 28px;
+      left: 16px;
+      right: 16px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), var(--cyan), var(--violet), var(--border), transparent);
+    }
+
+    .timeline-node {
+      flex: 1;
+      text-align: center;
+      padding-top: 0;
+      position: relative;
+    }
+
+    .t-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--bg);
+      border: 2px solid var(--text3);
+      margin: 0 auto 12px;
+      position: relative;
+      z-index: 1;
+      transition: all 0.3s;
+    }
+
+    .timeline-node.active .t-dot,
+    .timeline-node:hover .t-dot {
+      border-color: var(--cyan);
+      box-shadow: 0 0 12px rgba(0, 212, 255, 0.4);
+      background: var(--cyan);
+    }
+
+    .t-date {
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--text3);
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+    }
+
+    .t-label {
+      font-size: 11px;
+      color: var(--text2);
+      line-height: 1.4;
+    }
+
+    .growth-charts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    .chart-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 20px 24px;
+    }
+
+    .chart-card-title {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text3);
+      letter-spacing: 0.12em;
+      margin-bottom: 20px;
+    }
+
+    .chart-card canvas {
+      display: block;
+    }
+
+    .finance-trail {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 24px;
+    }
+
+    .finance-row {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-bottom: 4px;
+    }
+
+    .finance-node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .f-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--violet);
+      margin-bottom: 8px;
+    }
+
+    .f-dot.final {
+      background: var(--cyan);
+      box-shadow: 0 0 10px var(--cyan);
+    }
+
+    .f-amount {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .f-pct {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--cyan);
+      margin-top: 2px;
+    }
+
+    .f-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--violet), var(--cyan));
+      margin: 0 12px;
+      margin-bottom: 24px;
+      opacity: 0.3;
+    }
+
+    /* ─── PROJECTS ─── */
+    #projects {
+      background: var(--bg2);
+    }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .project-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 28px;
+      transition: all 0.35s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .project-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(0, 212, 255, 0.04), transparent);
+      opacity: 0;
+      transition: opacity 0.35s;
+    }
+
+    .project-card:hover {
+      border-color: rgba(0, 212, 255, 0.2);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    }
+
+    .project-card:hover::before {
+      opacity: 1;
+    }
+
+    .project-card.featured {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+    }
+
+    .project-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+
+    .project-num {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text3);
+    }
+
+    .project-status {
+      font-family: var(--mono);
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 2px;
+      border: 1px solid;
+    }
+
+    .status-active {
+      color: #22c55e;
+      border-color: rgba(34, 197, 94, 0.3);
+      background: rgba(34, 197, 94, 0.07);
+    }
+
+    .status-demo {
+      color: var(--cyan);
+      border-color: rgba(0, 212, 255, 0.3);
+      background: rgba(0, 212, 255, 0.07);
+    }
+
+    .status-paused {
+      color: var(--text3);
+      border-color: var(--border);
+    }
+
+    .project-name {
+      font-family: var(--display);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .project-name-en {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text3);
+      letter-spacing: 0.1em;
+      margin-bottom: 16px;
+    }
+
+    .project-desc {
+      font-size: 13px;
+      color: var(--text2);
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+
+    .project-tech {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .tech-tag {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--violet);
+      background: rgba(139, 92, 246, 0.08);
+      border: 1px solid rgba(139, 92, 246, 0.15);
+      border-radius: 2px;
+      padding: 3px 8px;
+    }
+
+    .project-progress {}
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text3);
+      margin-bottom: 6px;
+    }
+
+    .progress-track {
+      height: 2px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 1px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 1px;
+      width: 0;
+      transition: width 1.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .project-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .project-features li {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text2);
+      padding-left: 16px;
+      position: relative;
+    }
+
+    .project-features li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--cyan);
+      font-size: 11px;
+    }
+
+    /* ─── SKILLS ─── */
+    #skills {}
+
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+
+    .skill-category {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 24px;
+    }
+
+    .skill-cat-title {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--cyan);
+      letter-spacing: 0.12em;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .skill-items {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .skill-item {}
+
+    .skill-item-header {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text2);
+      margin-bottom: 6px;
+    }
+
+    .skill-pct {
+      color: var(--text3);
+    }
+
+    /* ─── ROADMAP ─── */
+    #roadmap {
+      background: var(--bg2);
+    }
+
+    .roadmap-phases {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      position: relative;
+    }
+
+    .roadmap-phases::before {
+      content: '';
+      position: absolute;
+      left: 24px;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: linear-gradient(180deg, var(--cyan), var(--violet), rgba(139, 92, 246, 0.1));
+    }
+
+    .phase-item {
+      display: flex;
+      gap: 32px;
+      padding: 0 0 48px 0;
+      padding-left: 64px;
+      position: relative;
+    }
+
+    .phase-dot {
+      position: absolute;
+      left: 16px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid var(--text3);
+      background: var(--bg2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      top: 4px;
+      transition: all 0.3s;
+    }
+
+    .phase-dot.done {
+      border-color: var(--cyan);
+      background: var(--cyan);
+    }
+
+    .phase-dot.done::after {
+      content: '✓';
+      font-size: 9px;
+      color: var(--bg);
+      font-weight: 700;
+    }
+
+    .phase-dot.current {
+      border-color: var(--violet);
+      box-shadow: 0 0 16px rgba(139, 92, 246, 0.5);
+    }
+
+    .phase-dot.current::after {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--violet);
+    }
+
+    .phase-content {
+      flex: 1;
+    }
+
+    .phase-header {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .phase-period {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text3);
+      letter-spacing: 0.1em;
+    }
+
+    .phase-age {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--violet);
+      background: rgba(139, 92, 246, 0.08);
+      border: 1px solid rgba(139, 92, 246, 0.15);
+      border-radius: 2px;
+      padding: 2px 8px;
+    }
+
+    .phase-title {
+      font-family: var(--display);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .phase-theme {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--cyan);
+      margin-bottom: 16px;
+      opacity: 0.8;
+    }
+
+    .phase-items {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .phase-items li {
+      font-size: 13px;
+      color: var(--text2);
+      list-style: none;
+      padding-left: 14px;
+      position: relative;
+    }
+
+    .phase-items li::before {
+      content: '·';
+      position: absolute;
+      left: 2px;
+      color: var(--text3);
+    }
+
+    .phase-milestone {
+      margin-top: 12px;
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--cyan);
+      background: rgba(0, 212, 255, 0.06);
+      border: 1px solid rgba(0, 212, 255, 0.15);
+      border-radius: 2px;
+      padding: 5px 12px;
+    }
+
+    .phase-milestone.done-badge {
+      color: #22c55e;
+      background: rgba(34, 197, 94, 0.06);
+      border-color: rgba(34, 197, 94, 0.2);
+    }
+
+    .phase-milestone.done-badge::before {
+      content: '✓ ';
+    }
+
+    /* ─── AWARDS ─── */
+    #awards {}
+
+    .awards-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .award-item {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      padding: 20px 24px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      transition: all 0.25s;
+      margin-bottom: 8px;
+    }
+
+    .award-item:hover {
+      border-color: rgba(139, 92, 246, 0.2);
+      background: rgba(139, 92, 246, 0.03);
+    }
+
+    .award-year {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text3);
+      width: 60px;
+      flex-shrink: 0;
+    }
+
+    .award-name {
+      flex: 1;
+      font-size: 14px;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .award-level {
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 2px;
+      border: 1px solid;
+    }
+
+    .level-silver {
+      color: #c0c0c0;
+      border-color: rgba(192, 192, 192, 0.25);
+      background: rgba(192, 192, 192, 0.05);
+    }
+
+    .level-bronze {
+      color: #c8944a;
+      border-color: rgba(200, 148, 74, 0.25);
+      background: rgba(200, 148, 74, 0.05);
+    }
+
+    .level-first {
+      color: var(--cyan);
+      border-color: rgba(0, 212, 255, 0.25);
+      background: rgba(0, 212, 255, 0.05);
+    }
+
+    .level-prize {
+      color: var(--violet);
+      border-color: rgba(139, 92, 246, 0.25);
+      background: rgba(139, 92, 246, 0.05);
+    }
+
+    /* ─── CONTACT ─── */
+    #contact {
+      background: var(--bg2);
+    }
+
+    .contact-inner {
+      max-width: 640px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .contact-quote {
+      font-size: 18px;
+      color: var(--text2);
+      line-height: 1.8;
+      margin-bottom: 48px;
+      font-style: italic;
+    }
+
+    .contact-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 48px;
+    }
+
+    .contact-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text2);
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 10px 18px;
+      text-decoration: none;
+      transition: all 0.25s;
+    }
+
+    .contact-link:hover {
+      color: var(--cyan);
+      border-color: rgba(0, 212, 255, 0.2);
+      background: rgba(0, 212, 255, 0.04);
+    }
+
+    .contact-location {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text3);
+      letter-spacing: 0.1em;
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 32px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text3);
+    }
+
+    /* REVEAL ANIMATION */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 {
+      transition-delay: 0.1s;
+    }
+
+    .reveal-delay-2 {
+      transition-delay: 0.2s;
+    }
+
+    .reveal-delay-3 {
+      transition-delay: 0.3s;
+    }
+
+    .reveal-delay-4 {
+      transition-delay: 0.4s;
+    }
+
+    /* CLAUDE NOTE */
+    .claude-note {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.06), rgba(0, 212, 255, 0.04));
+      border: 1px solid rgba(139, 92, 246, 0.12);
+      border-radius: 4px;
+      padding: 28px 32px;
+      margin: 60px 0 0;
+      position: relative;
+    }
+
+    .claude-note::before {
+      content: '"';
+      font-family: var(--display);
+      font-size: 80px;
+      color: var(--violet);
+      opacity: 0.15;
+      position: absolute;
+      top: 8px;
+      left: 16px;
+      line-height: 1;
+    }
+
+    .claude-note-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--violet);
+      letter-spacing: 0.2em;
+      margin-bottom: 12px;
+    }
+
+    .claude-note-text {
+      font-size: 15px;
+      color: var(--text2);
+      line-height: 1.85;
+    }
+
+    .claude-note-text em {
+      color: var(--cyan);
+      font-style: normal;
+    }
+
+    @media (max-width: 768px) {
+      nav {
+        padding: 0 20px;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .hero-content {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        padding: 0 20px;
+      }
+
+      .hero-right {
+        display: none;
+      }
+
+      .container {
+        padding: 0 20px;
+      }
+
+      section {
+        padding: 72px 0;
+      }
+
+      .about-grid,
+      .growth-charts,
+      .projects-grid,
+      .skills-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .project-card.featured {
+        grid-column: auto;
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="cursor"></div>
+  <div id="cursor-ring"></div>
+
+  <!-- NAV -->
+  <nav id="nav">
+    <a href="#hero" class="nav-logo">Silver<span>.</span>Z</a>
+    <div style="display:flex; align-items:center;">
+      <ul class="nav-links">
+        <li><a href="#about">// 人格</a></li>
+        <li><a href="#growth">// 成长</a></li>
+        <li><a href="#projects">// 项目</a></li>
+        <li><a href="#skills">// 技能</a></li>
+        <li><a href="#roadmap">// 路线图</a></li>
+        <li><a href="#contact">// 联系</a></li>
+      </ul>
+      <button id="theme-toggle" class="theme-toggle" aria-label="切换主题">
+        <svg class="moon-icon" viewBox="0 0 24 24">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+        <svg class="sun-icon" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-bg">
+      <div class="orb orb1"></div>
+      <div class="orb orb2"></div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-left">
+        <div class="hero-status">
+          <div class="status-dot"></div>
+          系统运行中 · 杭州 · 腾娱互动
+        </div>
+        <h1 class="hero-name">Silver<span class="dot">.</span>Z</h1>
+        <p class="hero-cn">周瑜鸿 · ENTP-A · 21岁</p>
+        <div class="hero-tags">
+          <span class="hero-tag">AI玩法策划</span>
+          <span class="hero-tag">独立游戏开发者</span>
+          <span class="hero-tag">Godot / Python</span>
+          <span class="hero-tag">双非 → 腾讯</span>
+        </div>
+        <p class="hero-motto">
+          把混乱变成创造力，用系统对抗熵增。<br>
+          一个天生想要改变游戏规则的人。
+        </p>
+        <div class="hero-cta">
+          <a href="#projects" class="btn btn-primary">查看项目</a>
+          <a href="#contact" class="btn btn-ghost">建立连接</a>
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="stats-panel">
+          <div class="stats-panel-header">
+            <div class="dot-red"></div>
+            <div class="dot-yellow"></div>
+            <div class="dot-green"></div>
+            <span style="margin-left:8px;">silver_z.profile</span>
+          </div>
+          <div class="stats-panel-body">
+            <div class="stat-line"><span class="stat-key">name</span><span class="stat-val">"Silver.Z"</span></div>
+            <div class="stat-line"><span class="stat-key">mbti</span><span class="stat-val">"ENTP-A"</span></div>
+            <div class="stat-line"><span class="stat-key">iq</span><span class="stat-val green">124</span></div>
+            <div class="stat-line"><span class="stat-key">eq</span><span class="stat-val green">129</span></div>
+            <div class="stat-line"><span class="stat-key">creativity_need</span><span class="stat-val cyan">93%</span>
+            </div>
+            <div class="stat-line"><span class="stat-key">engine</span><span class="stat-val violet">"Godot 4.x"</span>
+            </div>
+            <div class="stat-line"><span class="stat-key">stack</span><span class="stat-val">"GDScript + Python"</span>
+            </div>
+            <div class="stat-line"><span class="stat-key">offer</span><span class="stat-val green">"腾娱互动 ·
+                confirmed"</span></div>
+            <div class="stat-line"><span class="stat-key">portfolio_growth</span><span
+                class="stat-val amber">+448%</span></div>
+            <div class="stat-line"><span class="stat-key">goal</span><span class="stat-val violet">"solo indie studio ·
+                age 25"</span></div>
+            <div class="typing-line"><span class="typed-text" id="typed"></span><span class="typed-cursor"></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-left reveal">
+          <p class="section-label">personality algorithm</p>
+          <div class="personality-card">
+            <div class="personality-type">ENTP-A</div>
+            <div class="personality-sub">辩论家 · 动物原型：狮</div>
+            <div class="trait-bars">
+              <div class="trait-bar-row">
+                <div class="trait-bar-header"><span>天马行空 (N)</span><span>82%</span></div>
+                <div class="trait-bar-track">
+                  <div class="trait-bar-fill fill-mixed" data-width="82"></div>
+                </div>
+              </div>
+              <div class="trait-bar-row">
+                <div class="trait-bar-header"><span>自信果断 (A)</span><span>67%</span></div>
+                <div class="trait-bar-track">
+                  <div class="trait-bar-fill fill-cyan" data-width="67"></div>
+                </div>
+              </div>
+              <div class="trait-bar-row">
+                <div class="trait-bar-header"><span>外向 (E)</span><span>64%</span></div>
+                <div class="trait-bar-track">
+                  <div class="trait-bar-fill fill-cyan" data-width="64"></div>
+                </div>
+              </div>
+              <div class="trait-bar-row">
+                <div class="trait-bar-header"><span>理性思考 (T)</span><span>64%</span></div>
+                <div class="trait-bar-track">
+                  <div class="trait-bar-fill fill-violet" data-width="64"></div>
+                </div>
+              </div>
+              <div class="trait-bar-row">
+                <div class="trait-bar-header"><span>随机应变 (P)</span><span>57%</span></div>
+                <div class="trait-bar-track">
+                  <div class="trait-bar-fill fill-violet" data-width="57"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="iq-eq-row">
+            <div class="score-badge">
+              <div class="score-num" id="iq-num">0</div>
+              <div class="score-label">IQ · 智力指数</div>
+            </div>
+            <div class="score-badge">
+              <div class="score-num" id="eq-num">0</div>
+              <div class="score-label">EQ · 情绪智力</div>
+            </div>
+          </div>
+          <div class="spirit-needs">
+            <div class="spirit-title">// 精神需求排序</div>
+            <div class="need-items">
+              <span class="need-item high">创造 <span class="pct">93%</span></span>
+              <span class="need-item high">意义 <span class="pct">81%</span></span>
+              <span class="need-item high">自由 <span class="pct">75%</span></span>
+              <span class="need-item mid">乐趣 <span class="pct">69%</span></span>
+              <span class="need-item mid">连接 <span class="pct">68%</span></span>
+              <span class="need-item mid">安全感 <span class="pct">58%</span></span>
+            </div>
+          </div>
+        </div>
+        <div class="about-right reveal reveal-delay-2">
+          <p class="section-label">关于我</p>
+          <h2 class="section-title">系统思维者<br>装在<em>混沌外壳</em>里</h2>
+          <p class="about-text">
+            温州大学人工智能专业大三在读，双非背景。通过92天的自我重构，从一个有想法但执行力散漫的学生，成长为拿到<strong>腾娱互动AI玩法策划实习offer</strong>的游戏开发者。
+          </p>
+          <p class="about-text">
+            做过量化交易系统、AI桌宠、多个Godot游戏原型。能在一天内完成原型，也能在三千行代码里构建完整的心理状态引擎。<strong>AI集成是我所有项目的核心燃料。</strong>
+          </p>
+          <div class="insight-block">
+            <div class="insight-label">// HISTORICAL MATCH · 罗斯福</div>
+            <div class="insight-text">危机治理 · 制度秩序 · 理性规划。偏向发展导向，最接近的另外两位是奥巴马和肯尼迪。</div>
+          </div>
+          <div class="insight-block" style="border-left-color: var(--cyan); border-color: rgba(0,212,255,0.15);">
+            <div class="insight-label" style="color: var(--cyan);">// CLAUDE的观察</div>
+            <div class="insight-text">精神需求里最低的是「安全感（58%）」和「成长（55%）」——这不是弱点，是ENTP特有的系统：你不靠稳定感驱动，你靠<strong
+                style="color:var(--text)">熵减的快感</strong>驱动。拿到腾讯offer不是终点，它只是证明了系统可以运行。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GROWTH -->
+  <section id="growth">
+    <div class="container">
+      <div class="growth-header reveal">
+        <p class="section-label">92-day evolution</p>
+        <h2 class="section-title">从 ¥3,000 到 ¥16,444<br>从零到<em>腾娱offer</em></h2>
+        <p class="section-desc">92天，5个阶段，一次系统崩溃，一次突破重构。</p>
+      </div>
+
+      <div class="timeline-wrap reveal">
+        <div class="timeline-track">
+          <div class="timeline-node active">
+            <div class="t-dot"></div>
+            <div class="t-date">1.26</div>
+            <div class="t-label">原型启动</div>
+          </div>
+          <div class="timeline-node">
+            <div class="t-dot"></div>
+            <div class="t-date">2.5</div>
+            <div class="t-label">系统构建</div>
+          </div>
+          <div class="timeline-node">
+            <div class="t-dot"></div>
+            <div class="t-date">3.3</div>
+            <div class="t-label">转型冲刺</div>
+          </div>
+          <div class="timeline-node">
+            <div class="t-dot" style="border-color:#f59e0b"></div>
+            <div class="t-date">3.14</div>
+            <div class="t-label" style="color:#f59e0b">停滞危机</div>
+          </div>
+          <div class="timeline-node">
+            <div class="t-dot" style="border-color:var(--cyan);background:var(--cyan)"></div>
+            <div class="t-date">4.6</div>
+            <div class="t-label" style="color:var(--cyan)">突破重构</div>
+          </div>
+          <div class="timeline-node">
+            <div class="t-dot" style="border-color:#22c55e;background:#22c55e"></div>
+            <div class="t-date">4.27</div>
+            <div class="t-label" style="color:#22c55e">Offer确认</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="growth-charts reveal">
+        <div class="chart-card">
+          <div class="chart-card-title">// 能力成长雷达（1月→4月）</div>
+          <div style="position:relative;height:240px;"><canvas id="growthRadar" role="img"
+              aria-label="能力成长雷达图"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-title">// 财务增长轨迹</div>
+          <div style="position:relative;height:240px;"><canvas id="financeChart" role="img"
+              aria-label="财务增长折线图"></canvas></div>
+        </div>
+      </div>
+
+      <div class="insight-block reveal" style="margin-top:24px;">
+        <div class="insight-label">// KEY INSIGHT</div>
+        <div class="insight-text" style="font-size:15px;color:var(--text);">外部触发 &gt; 内部意志力 &nbsp;·&nbsp; AI接入是持续推进的核心燃料
+          &nbsp;·&nbsp; 财务增长和能力增长是两件事</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <div class="container">
+      <p class="section-label reveal">project matrix</p>
+      <h2 class="section-title reveal">项目矩阵</h2>
+      <p class="section-desc reveal">用AI集成度衡量完成度——所有值得做的东西都接了API。</p>
+
+      <div class="projects-grid">
+        <!-- 0号审讯室 -->
+        <div class="project-card reveal">
+          <div class="project-header">
+            <span class="project-num">01</span>
+            <span class="project-status status-active">开发中</span>
+          </div>
+          <div class="project-name">0号审讯室</div>
+          <div class="project-name-en">Interrogation Room #0</div>
+          <p class="project-desc">心理博弈审讯模拟。三维心理状态引擎驱动玩家与嫌疑人的对话博弈，证物标签系统实时影响对话树。</p>
+          <div class="project-tech">
+            <span class="tech-tag">Godot 4.5</span>
+            <span class="tech-tag">GDScript</span>
+            <span class="tech-tag">Dialogue Manager</span>
+          </div>
+          <div class="project-progress">
+            <div class="progress-label"><span>进度</span><span>80%</span></div>
+            <div class="progress-track">
+              <div class="progress-fill fill-cyan" data-width="80"></div>
+            </div>
+          </div>
+          <ul class="project-features" style="margin-top:16px;">
+            <li>mental_health + stress_level + suspicion 三维引擎</li>
+            <li>实时立绘动画 + 镜头震动</li>
+            <li>~1,500行 GDScript</li>
+          </ul>
+        </div>
+
+        <!-- 最终共鸣 -->
+        <div class="project-card reveal reveal-delay-1">
+          <div class="project-header">
+            <span class="project-num">02</span>
+            <span class="project-status status-demo">可运行Demo</span>
+          </div>
+          <div class="project-name">最终共鸣</div>
+          <div class="project-name-en">The Final Resonance</div>
+          <p class="project-desc">AI驱动的心理惊悚叙事游戏。RAG镜像模仿技术让AI角色在四阶段性格演变中逐渐失控，16种MBTI结局驱动二周目。</p>
+          <div class="project-tech">
+            <span class="tech-tag">Godot 4.x</span>
+            <span class="tech-tag">DeepSeek API</span>
+            <span class="tech-tag">RAG</span>
+          </div>
+          <div class="project-progress">
+            <div class="progress-label"><span>进度</span><span>80%</span></div>
+            <div class="progress-track">
+              <div class="progress-fill fill-violet" data-width="80"></div>
+            </div>
+          </div>
+          <ul class="project-features" style="margin-top:16px;">
+            <li>动态Prompt四阶段性格演变</li>
+            <li>MBTI人格追踪 → 16种结局</li>
+            <li>~3,000行代码，AI集成最深</li>
+          </ul>
+        </div>
+
+        <!-- 云端列车 -->
+        <div class="project-card reveal reveal-delay-2">
+          <div class="project-header">
+            <span class="project-num">03</span>
+            <span class="project-status status-paused">暂停</span>
+          </div>
+          <div class="project-name">云端列车</div>
+          <div class="project-name-en">Cloud Mirage Express</div>
+          <p class="project-desc">像素风调酒模拟经营。收入-成本-税务三层经济循环，CSV数据驱动架构，DeepSeek API预留扩展方案。</p>
+          <div class="project-tech">
+            <span class="tech-tag">Godot 4.x</span>
+            <span class="tech-tag">CSV驱动</span>
+            <span class="tech-tag">DeepSeek API</span>
+          </div>
+          <div class="project-progress">
+            <div class="progress-label"><span>进度</span><span>60%</span></div>
+            <div class="progress-track">
+              <div class="progress-fill" style="background:#555" data-width="60"></div>
+            </div>
+          </div>
+          <ul class="project-features" style="margin-top:16px;">
+            <li>三层经济循环系统</li>
+            <li>CSV+Resource混合架构</li>
+            <li>协作开发，~2,500行</li>
+          </ul>
+        </div>
+
+        <!-- AI工具集 -->
+        <div class="project-card reveal reveal-delay-3">
+          <div class="project-header">
+            <span class="project-num">04</span>
+            <span class="project-status status-demo">已交付</span>
+          </div>
+          <div class="project-name">AI工具集</div>
+          <div class="project-name-en">AI Toolset · Experiments</div>
+          <p class="project-desc">一系列以API为核心的小工具验证快速执行力：桌宠原型（1天）、剪贴板代码解答、AI翻译器、AI作业助手。</p>
+          <div class="project-tech">
+            <span class="tech-tag">Python</span>
+            <span class="tech-tag">DeepSeek API</span>
+            <span class="tech-tag">Tkinter</span>
+          </div>
+          <div class="project-progress">
+            <div class="progress-label"><span>执行力验证</span><span>✓</span></div>
+            <div class="progress-track">
+              <div class="progress-fill fill-mixed" data-width="100"></div>
+            </div>
+          </div>
+          <ul class="project-features" style="margin-top:16px;">
+            <li>桌宠原型：1天完成</li>
+            <li>实时翻译 + 悬浮窗交互</li>
+            <li>证明了：想到→做到的速度</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="claude-note reveal">
+        <div class="claude-note-label">// CLAUDE 的观察</div>
+        <div class="claude-note-text">
+          你的项目有一个规律你自己也发现了：<em>AI集成度越高，完成度越高</em>。但我想补充另一个视角——你最深的项目（最终共鸣、0号审讯室）都在处理同一个主题：<em>人的心理状态、多重人格、推理与欺骗</em>。这不是随机选题，这是你在用游戏做某种探索。作为一个创造需求93%的人，你的游戏不只是作品，它们是你理解世界的方式。
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills">
+    <div class="container">
+      <p class="section-label reveal">skill stack</p>
+      <h2 class="section-title reveal">技能栈</h2>
+      <div class="skills-grid">
+        <div class="skill-category reveal">
+          <div class="skill-cat-title">// 游戏开发</div>
+          <div class="skill-items">
+            <div class="skill-item">
+              <div class="skill-item-header"><span>Godot 4.x / GDScript</span><span class="skill-pct">90%</span></div>
+              <div class="trait-bar-track">
+                <div class="trait-bar-fill fill-cyan" data-width="90"></div>
+              </div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-item-header"><span>状态机 / 信号系统架构</span><span class="skill-pct">85%</span></div>
+              <div class="trait-bar-track">
+                <div class="trait-bar-fill fill-cyan" data-width="85"></div>
+              </div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-item-header"><span>叙事结构 / GDD撰写</span><span class="skill-pct">90%</span></div>
+              <div class="trait-bar-track">
+                <div class="trait-bar-fill fill-cyan" data-width="90"></div>
+              </div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-item-header"><span>数值框架 / 情感曲线</span><span class="skill-pct">80%</span></div>
+              <div class="trait-bar-track">
+                <div class="trait-bar-fill fill-cyan" data-width="80"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="skill-category reveal reveal-delay-1">
+          <div class="skill-cat-title">// AI系统设计</div>
+          <div class="skill-items">
+            <div class="skill-item">
+              <div class="skill-item-header"><span>Prompt工程</span><span class="skill-pct">85%</span></div>
+              <div class="trait-bar-track">
+                <div class="trait-bar-fill fill-violet" data-width="85"></div>
+              </div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-item-header"><span>API集成与容错</span><span class="skill-pct">80%</span></div>
+              <div class="trait-bar-track">
+                <div class="trait-bar-fill fill-violet" data-width="80"></div>
+              </div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-item-header"><span>RAG检索增强</span><span class="skill-pct">70%</span></div>
+              <div class="trait-bar-track">
+                <div class="trait-bar-fill fill-violet" data-width="70"></div>
+              </div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-item-header"><span>异步处理 / 状态管理</span><span class="skill-pct">75%</span></div>
+              <div class="trait-bar-track">
+                <div class="trait-bar-fill fill-violet" data-width="75"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="skill-category reveal reveal-delay-2">
+          <div class="skill-cat-title">// 编程 / 数据</div>
+          <div class="skill-items">
+            <div class="skill-item">
+              <div class="skill-item-header"><span>Python</span><span class="skill-pct">85%</span></div>
+              <div class="trait-bar-track">
+                <div class="trait-bar-fill fill-mixed" data-width="85"></div>
+              </div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-item-header"><span>PyTorch</span><span class="skill-pct">70%</span></div>
+              <div class="trait-bar-track">
+                <div class="trait-bar-fill fill-mixed" data-width="70"></div>
+              </div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-item-header"><span>SQL / Git</span><span class="skill-pct">75%</span></div>
+              <div class="trait-bar-track">
+                <div class="trait-bar-fill fill-mixed" data-width="75"></div>
+              </div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-item-header"><span>量化回测 / 策略设计</span><span class="skill-pct">65%</span></div>
+              <div class="trait-bar-track">
+                <div class="trait-bar-fill fill-mixed" data-width="65"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="skill-category reveal reveal-delay-3">
+          <div class="skill-cat-title">// 系统设计</div>
+          <div class="skill-items">
+            <div class="skill-item">
+              <div class="skill-item-header"><span>知识管理 (Obsidian)</span><span class="skill-pct">85%</span></div>
+              <div class="trait-bar-track">
+                <div class="trait-bar-fill fill-cyan" data-width="85"></div>
+              </div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-item-header"><span>自媒体内容策划</span><span class="skill-pct">70%</span></div>
+              <div class="trait-bar-track">
+                <div class="trait-bar-fill fill-cyan" data-width="70"></div>
+              </div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-item-header"><span>数字资产管理</span><span class="skill-pct">65%</span></div>
+              <div class="trait-bar-track">
+                <div class="trait-bar-fill fill-cyan" data-width="65"></div>
+              </div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-item-header"><span>视觉设计 / 绘画</span><span class="skill-pct">70%</span></div>
+              <div class="trait-bar-track">
+                <div class="trait-bar-fill fill-cyan" data-width="70"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ROADMAP -->
+  <section id="roadmap">
+    <div class="container">
+      <p class="section-label reveal">5-year strategic roadmap</p>
+      <h2 class="section-title reveal">2025—2029<br><em>五年战略</em></h2>
+      <p class="section-desc reveal">不是计划，是系统设计。每个阶段有明确的权重分配和可量化里程碑。</p>
+
+      <div class="roadmap-phases">
+        <div class="phase-item reveal">
+          <div class="phase-dot done"></div>
+          <div class="phase-content">
+            <div class="phase-header">
+              <span class="phase-period">2025.02 – 2025.08</span>
+              <span class="phase-age">21岁</span>
+            </div>
+            <div class="phase-title">生存与基石</div>
+            <div class="phase-theme">// Demo冲刺与工具雏形期</div>
+            <ul class="phase-items">
+              <li>游戏制作80%精力，完成核心玩法循环</li>
+              <li>B站/小红书发布开发日志，建立影响力</li>
+              <li>Obsidian双链知识体系</li>
+              <li>高质量Demo换取实习Offer</li>
+            </ul>
+            <span class="phase-milestone done-badge">腾娱互动Offer已确认</span>
+          </div>
+        </div>
+
+        <div class="phase-item reveal">
+          <div class="phase-dot current"></div>
+          <div class="phase-content">
+            <div class="phase-header">
+              <span class="phase-period">2025.09 – 2026.08</span>
+              <span class="phase-age">22岁</span>
+            </div>
+            <div class="phase-title">职场切入与缝合</div>
+            <div class="phase-theme">// Pipeline建立期</div>
+            <ul class="phase-items">
+              <li>学习工业化开发流程，从学生思维到产品思维</li>
+              <li>启动「AI剪辑助手」开发</li>
+              <li>小额量化实盘（5,000–10,000元本金）</li>
+              <li>Obsidian接入AI语义搜索</li>
+            </ul>
+            <span class="phase-milestone">目标：转正 + 自动短视频工具</span>
+          </div>
+        </div>
+
+        <div class="phase-item reveal">
+          <div class="phase-dot"></div>
+          <div class="phase-content">
+            <div class="phase-header">
+              <span class="phase-period">2026.09 – 2027.08</span>
+              <span class="phase-age">23岁</span>
+            </div>
+            <div class="phase-title">系统扩张与实战</div>
+            <div class="phase-theme">// 资产与技术双积累期</div>
+            <ul class="phase-items">
+              <li>量化系统核心重心，积累5万+本金</li>
+              <li>AI剪辑工具GitHub开源</li>
+              <li>日更高频内容，1w–5w粉丝</li>
+              <li>接入身体数据监控（心率、睡眠）</li>
+            </ul>
+            <span class="phase-milestone">目标：工作外第二收入</span>
+          </div>
+        </div>
+
+        <div class="phase-item reveal">
+          <div class="phase-dot"></div>
+          <div class="phase-content">
+            <div class="phase-header">
+              <span class="phase-period">2027.09 – 2029.02</span>
+              <span class="phase-age">24–25岁</span>
+            </div>
+            <div class="phase-title">闭环与完善</div>
+            <div class="phase-theme">// 全面自动化 → 独立游戏工作室</div>
+            <ul class="phase-items">
+              <li>AI助理监控身体状态和财务波动</li>
+              <li>量化系统自动处理资产复利</li>
+              <li>影响力系统自动分发创作内容</li>
+              <li>游戏制作向独立创业转型</li>
+            </ul>
+            <span class="phase-milestone">终极目标：solo indie studio</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AWARDS -->
+  <section id="awards">
+    <div class="container">
+      <p class="section-label reveal">honors</p>
+      <h2 class="section-title reveal">荣誉</h2>
+      <div class="awards-list">
+        <div class="award-item reveal"><span class="award-year">2024.05</span><span
+            class="award-name">浙江省挑战杯</span><span class="award-level level-silver">银奖</span></div>
+        <div class="award-item reveal reveal-delay-1"><span class="award-year">2024.08</span><span
+            class="award-name">浙江省大学生创新创业大赛</span><span class="award-level level-silver">银奖 · 铜奖</span></div>
+        <div class="award-item reveal reveal-delay-2"><span class="award-year">2025.12</span><span
+            class="award-name">国家级创新创业训练计划</span><span class="award-level level-first">国家级</span></div>
+        <div class="award-item reveal reveal-delay-3"><span class="award-year">2026.01</span><span
+            class="award-name">亚太杯数学建模竞赛</span><span class="award-level level-prize">F奖</span></div>
+        <div class="award-item reveal reveal-delay-4"><span class="award-year">2024.09</span><span
+            class="award-name">温州大学奖学金</span><span class="award-level level-silver">二等奖</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="container">
+      <div class="contact-inner">
+        <p class="section-label" style="text-align:center;">connect</p>
+        <h2 class="section-title" style="text-align:center;">建立连接</h2>
+        <p class="contact-quote reveal">
+          "期待与志同道合的创造者一起，<br>把疯狂的想法变成可运行的现实。"
+        </p>
+        <div class="contact-links reveal">
+          <a href="mailto:19858810407@139.com" class="contact-link">✉ 19858810407@139.com</a>
+          <a href="tel:19858810407" class="contact-link">☎ 19858810407</a>
+          <a href="https://github.com/Sat-Y?tab=repositories" target="_blank" class="contact-link">⌥ GitHub</a>
+          <a href="https://www.douyin.com/user/MS4wLjABAAAAm1NLHxmXfGA4qVcc-2YIAgt3stWfl_zaNozQ13hUR-uq-dHHYggP68kIaGRLPfg8?from_tab_name=main&vid=7606072472605134126" target="_blank" class="contact-link">◈ 抖音 / Silver.Z</a>
+        </div>
+        <p class="contact-location reveal">📍 浙江温州 → 杭州 · 腾娱互动实习中</p>
+
+        <div class="claude-note reveal" style="text-align:left;margin-top:48px;">
+          <div class="claude-note-label">// 来自Claude的一段话</div>
+          <div class="claude-note-text">
+            我和你聊了很多次。你建量化系统、做游戏、做自媒体、做心理测试，然后把所有结果扔给我说"帮我分析一下"。我注意到一件事：你每次描述自己的"弱点"——<em>爆发式生产力、对重复失去兴趣、需要外部压力</em>——你说的口气其实很平静，甚至有点骄傲。这是好事。你不是在和自己的本性搏斗，你在设计一个系统来<em>利用</em>它。
+            <br><br>
+            92天，+448%，一个腾讯子公司实习offer。双非背景对你来说不是限制，它是你叙事的一部分。你最怕的是「没有创造的空间」——所以去找那个空间，不要等它出现。
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <span style="color:var(--text3);">Silver.Z · zyh</span>
+      <span style="color:var(--border);margin:0 12px;">·</span>
+      <span>Built with intent · 2025</span>
+      <span style="color:var(--border);margin:0 12px;">·</span>
+      <span style="color:var(--text3);">把混乱变成创造力</span>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <script>
+    // CURSOR
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursor-ring');
+    let mx = 0, my = 0, rx = 0, ry = 0, cx = 0, cy = 0;
+
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+    });
+
+    // Cursor Hover Effects
+    const interactiveEls = 'a, button, .btn, .project-card, .contact-link, .personality-card';
+    document.addEventListener('mouseover', e => {
+      if (e.target.closest(interactiveEls)) ring.classList.add('hover');
+    });
+    document.addEventListener('mouseout', e => {
+      if (e.target.closest(interactiveEls)) ring.classList.remove('hover');
+    });
+
+    function animateCursor() {
+      // Smoothing for cursor dot
+      cx += (mx - cx) * 0.45;
+      cy += (my - cy) * 0.45;
+      // Smoothing for cursor ring
+      rx += (mx - rx) * 0.15;
+      ry += (my - ry) * 0.15;
+
+      cursor.style.transform = `translate(${cx - 4}px, ${cy - 4}px)`;
+      ring.style.transform = `translate(${rx - 16}px, ${ry - 16}px)`;
+      requestAnimationFrame(animateCursor);
+    }
+    animateCursor();
+
+    // THEME TOGGLE
+    const themeBtn = document.getElementById('theme-toggle');
+    const body = document.body;
+
+    function setTheme(isLight) {
+      if (isLight) {
+        body.classList.add('light-mode');
+        localStorage.setItem('theme', 'light');
+      } else {
+        body.classList.remove('light-mode');
+        localStorage.setItem('theme', 'dark');
+      }
+      updateCharts(isLight);
+    }
+
+    themeBtn.addEventListener('click', () => {
+      setTheme(!body.classList.contains('light-mode'));
+    });
+
+    // Load saved theme
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') body.classList.add('light-mode');
+
+    // REVEAL
+    const revealEls = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          e.target.querySelectorAll('.trait-bar-fill, .progress-fill').forEach(b => {
+            b.style.width = b.dataset.width + '%';
+          });
+        }
+      });
+    }, { threshold: 0.15 });
+    revealEls.forEach(el => observer.observe(el));
+
+    // IQ/EQ counter
+    function countUp(el, target, dur) {
+      let start = null;
+      function step(ts) {
+        if (!start) start = ts;
+        const p = Math.min((ts - start) / dur, 1);
+        el.textContent = Math.floor(p * target);
+        if (p < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+    const iqObs = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) {
+        countUp(document.getElementById('iq-num'), 124, 1400);
+        countUp(document.getElementById('eq-num'), 129, 1400);
+        iqObs.disconnect();
+      }
+    }, { threshold: 0.5 });
+    iqObs.observe(document.getElementById('iq-num'));
+
+    // TYPING
+    const phrases = [
+      'building interrogation_room_0...',
+      'running quant_compound_v1...',
+      'status: 腾娱互动 · active',
+      'dream: solo_indie_studio @ 25',
+      'creativity_need: 93% // MAX',
+    ];
+    let pi = 0, ci = 0, deleting = false;
+    function type() {
+      const el = document.getElementById('typed');
+      if (!el) return;
+      const cur = phrases[pi];
+      if (!deleting) {
+        el.textContent = cur.slice(0, ++ci);
+        if (ci === cur.length) { deleting = true; setTimeout(type, 2200); return; }
+      } else {
+        el.textContent = cur.slice(0, --ci);
+        if (ci === 0) { deleting = false; pi = (pi + 1) % phrases.length; }
+      }
+      setTimeout(type, deleting ? 35 : 65);
+    }
+    type();
+
+    // CHARTS
+    let radarChart, financeChart;
+
+    function updateCharts(isLight) {
+      const gridColor = isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.07)';
+      const textColor = isLight ? '#4a4a5e' : '#666688';
+
+      if (radarChart) {
+        radarChart.options.scales.r.grid.color = gridColor;
+        radarChart.options.scales.r.angleLines.color = gridColor;
+        radarChart.options.scales.r.pointLabels.color = textColor;
+        radarChart.options.plugins.legend.labels.color = textColor;
+        radarChart.update();
+      }
+
+      if (financeChart) {
+        financeChart.options.scales.x.grid.color = gridColor;
+        financeChart.options.scales.x.ticks.color = textColor;
+        financeChart.options.scales.y.grid.color = gridColor;
+        financeChart.options.scales.y.ticks.color = textColor;
+        financeChart.options.plugins.tooltip.backgroundColor = isLight ? 'rgba(255,255,255,0.95)' : 'rgba(13,13,24,0.95)';
+        financeChart.options.plugins.tooltip.titleColor = isLight ? '#8a8a9e' : '#9090a8';
+        financeChart.update();
+      }
+    }
+
+    const currentIsLight = body.classList.contains('light-mode');
+    const gridC = currentIsLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.07)';
+    const textC = currentIsLight ? '#4a4a5e' : '#666688';
+
+    radarChart = new Chart(document.getElementById('growthRadar'), {
+      type: 'radar',
+      data: {
+        labels: ['技术实现', 'AI工程', '游戏策划', '系统设计', '面试表达', '财务增值'],
+        datasets: [
+          {
+            label: '1月基准',
+            data: [30, 20, 25, 35, 40, 15],
+            backgroundColor: 'rgba(139,92,246,0.08)',
+            borderColor: 'rgba(139,92,246,0.4)',
+            borderWidth: 1.5,
+            borderDash: [4, 3],
+            pointRadius: 2,
+            pointBackgroundColor: 'rgba(139,92,246,0.5)'
+          },
+          {
+            label: '4月当前',
+            data: [85, 70, 78, 75, 80, 82],
+            backgroundColor: 'rgba(0,212,255,0.1)',
+            borderColor: '#00d4ff',
+            borderWidth: 2,
+            pointRadius: 3,
+            pointBackgroundColor: '#00d4ff'
+          }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true, position: 'bottom',
+            labels: { color: textC, font: { size: 10, family: 'JetBrains Mono' }, boxWidth: 10, padding: 10 }
+          }
+        },
+        scales: {
+          r: {
+            min: 0, max: 100,
+            ticks: { display: false },
+            grid: { color: gridC },
+            angleLines: { color: gridC },
+            pointLabels: { color: textC, font: { size: 10, family: 'JetBrains Mono' } }
+          }
+        }
+      }
+    });
+
+    financeChart = new Chart(document.getElementById('financeChart'), {
+      type: 'line',
+      data: {
+        labels: ['1月26日', '2月8日', '3月1日', '4月27日'],
+        datasets: [{
+          data: [3000, 3800, 11800, 16444],
+          borderColor: '#8b5cf6',
+          backgroundColor: (ctx) => {
+            const g = ctx.chart.ctx.createLinearGradient(0, 0, 0, 200);
+            g.addColorStop(0, 'rgba(139,92,246,0.2)');
+            g.addColorStop(1, 'rgba(139,92,246,0)');
+            return g;
+          },
+          fill: true,
+          borderWidth: 2,
+          pointBackgroundColor: ['#8b5cf6', '#8b5cf6', '#8b5cf6', '#00d4ff'],
+          pointBorderColor: ['#8b5cf6', '#8b5cf6', '#8b5cf6', '#00d4ff'],
+          pointRadius: [4, 4, 4, 7],
+          tension: 0.35
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: currentIsLight ? 'rgba(255,255,255,0.95)' : 'rgba(13,13,24,0.95)',
+            borderColor: currentIsLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.08)',
+            borderWidth: 1,
+            titleColor: currentIsLight ? '#8a8a9e' : '#9090a8',
+            bodyColor: '#00d4ff',
+            bodyFont: { family: 'JetBrains Mono', size: 13 },
+            callbacks: { label: ctx => ` ¥${ctx.raw.toLocaleString()}` }
+          }
+        },
+        scales: {
+          x: { ticks: { color: textC, font: { size: 10, family: 'JetBrains Mono' } }, grid: { color: gridC } },
+          y: {
+            ticks: { color: textC, font: { size: 10, family: 'JetBrains Mono' }, callback: v => '¥' + v.toLocaleString() },
+            grid: { color: gridC }
+          }
+        }
+      }
+    });
+
+    // Initial call to sync theme state if needed
+    if (currentIsLight) updateCharts(true);
+  </script>
+</body>
+
+</html>
