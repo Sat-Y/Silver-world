@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Silver.Z 的个人数据观测站：AI 游戏策划、系统设计与独立开发项目档案。">
+  <meta name="theme-color" content="#0b0d0f">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%230b0d0f'/%3E%3Cpath d='M14 18h18L18 46h18' fill='none' stroke='%23a9d8df' stroke-width='5'/%3E%3C/svg%3E">
+  <title>Silver OS — Personal Data Observatory</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script>document.documentElement.dataset.theme=localStorage.getItem('silver-manga-theme')||'light';</script>
+</head>
+<body class="os-body">
+  <a class="skip-link" href="#view">跳至当前页面</a>
+  <div class="grain" aria-hidden="true"></div>
+
+  <div class="os-shell">
+    <aside class="os-sidebar">
+      <a class="os-brand route-link" href="?view=overview" data-route="overview" aria-label="Silver OS 总览">
+        <span class="brand-symbol">S/Z</span>
+        <span><strong>SILVER OS</strong><small>PERSONAL DATA<br>OBSERVATORY</small></span>
+      </a>
+
+      <nav class="os-nav" aria-label="系统模块">
+        <a class="route-link" href="?view=overview" data-route="overview"><span>00</span><b>Overview</b><small>系统总览</small></a>
+        <a class="route-link" href="?view=projects" data-route="projects"><span>01</span><b>Projects</b><small>项目档案</small></a>
+        <a class="route-link" href="?view=capabilities" data-route="capabilities"><span>02</span><b>Capabilities</b><small>能力系统</small></a>
+        <a class="route-link" href="?view=journey" data-route="journey"><span>03</span><b>Journey</b><small>人生章节</small></a>
+        <a class="route-link" href="?view=changelog" data-route="changelog"><span>04</span><b>Changelog</b><small>版本记录</small></a>
+        <a class="route-link" href="?view=connect" data-route="connect"><span>05</span><b>Connect</b><small>建立连接</small></a>
+      </nav>
+
+      <div class="sidebar-status mono">
+        <span><i class="signal"></i>SYSTEM ONLINE</span>
+        <span>PUBLIC MODE</span>
+        <span id="sidebar-version"></span>
+      </div>
+    </aside>
+
+    <div class="os-workspace">
+      <header class="os-topbar">
+        <button class="mobile-menu" id="mobile-menu" type="button" aria-expanded="false" aria-controls="mobile-drawer">MENU</button>
+        <div class="breadcrumbs mono"><span>SILVER OS</span><i>/</i><strong id="route-label">OVERVIEW</strong></div>
+        <div class="topbar-actions">
+          <span class="topbar-location mono">HANGZHOU · CN</span>
+          <button class="icon-button" id="theme-toggle" type="button" aria-label="切换明暗主题">◐</button>
+        </div>
+      </header>
+
+      <div class="mobile-drawer" id="mobile-drawer" hidden>
+        <nav aria-label="移动端系统模块">
+          <a class="route-link" href="?view=overview" data-route="overview"><span>00</span>系统总览</a>
+          <a class="route-link" href="?view=projects" data-route="projects"><span>01</span>项目档案</a>
+          <a class="route-link" href="?view=capabilities" data-route="capabilities"><span>02</span>能力系统</a>
+          <a class="route-link" href="?view=journey" data-route="journey"><span>03</span>人生章节</a>
+          <a class="route-link" href="?view=changelog" data-route="changelog"><span>04</span>版本记录</a>
+          <a class="route-link" href="?view=connect" data-route="connect"><span>05</span>建立连接</a>
+        </nav>
+      </div>
+
+      <main class="os-view" id="view" tabindex="-1" aria-live="polite"></main>
+
+      <nav class="mobile-tabs" aria-label="常用模块">
+        <a class="route-link" href="?view=overview" data-route="overview"><span>⌂</span>总览</a>
+        <a class="route-link" href="?view=projects" data-route="projects"><span>◇</span>项目</a>
+        <a class="route-link" href="?view=journey" data-route="journey"><span>↗</span>旅程</a>
+        <a class="route-link" href="?view=changelog" data-route="changelog"><span>±</span>版本</a>
+      </nav>
+    </div>
+  </div>
+
+  <div class="route-transition" id="route-transition" aria-hidden="true">
+    <div class="ink-swipe"></div>
+    <span class="mono" id="transition-copy">OPENING MODULE...</span>
+  </div>
+
+  <script src="content.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
