@@ -1,0 +1,5 @@
+# Silver Content Studio is intentionally local-only.
+.local-studio/
+
+# Local verification artifacts.
+.artifacts/
