@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" as="image" href="assets/hero-coding-room.webp" type="image/webp" fetchpriority="high">
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=20260815-6">
   <script>document.documentElement.dataset.theme=localStorage.getItem('silver-manga-theme')||'light';</script>
 </head>
 <body class="os-body">
@@ -40,6 +40,7 @@
         <a class="route-link" href="?view=journey" data-route="journey"><span>03</span><b>Footprints</b><small>人生足迹</small></a>
         <a class="route-link" href="?view=changelog" data-route="changelog"><span>04</span><b>Changelog</b><small>版本记录</small></a>
         <a class="route-link" href="?view=connect" data-route="connect"><span>05</span><b>Connect</b><small>建立连接</small></a>
+        <a class="route-link" href="?view=fitness" data-route="fitness"><span>06</span><b>Fitness</b><small>健身计划</small></a>
       </nav>
 
       <div class="sidebar-status mono">
@@ -67,6 +68,7 @@
           <a class="route-link" href="?view=journey" data-route="journey"><span>03</span>人生足迹</a>
           <a class="route-link" href="?view=changelog" data-route="changelog"><span>04</span>版本记录</a>
           <a class="route-link" href="?view=connect" data-route="connect"><span>05</span>建立连接</a>
+          <a class="route-link" href="?view=fitness" data-route="fitness"><span>06</span>健身计划</a>
         </nav>
       </div>
 
@@ -86,9 +88,10 @@
     <span class="mono" id="transition-copy">OPENING MODULE...</span>
   </div>
 
-  <script src="content.js"></script>
+  <script src="content.js?v=20260815-7"></script>
   <script src="assets/maps/world-countries.js"></script>
   <script src="assets/maps/china-provinces.js"></script>
-  <script src="app.js"></script>
+  <script src="fitness-data.js"></script>
+  <script src="app.js?v=20260815-7"></script>
 </body>
 </html>

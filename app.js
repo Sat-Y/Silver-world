@@ -6,14 +6,14 @@
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
   const esc = value => String(value).replace(/[&<>'"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[char]));
   const sha256 = async value => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value)))].map(byte => byte.toString(16).padStart(2, "0")).join("");
-  const routeNames = { resume: "RESUME", projects: "PROJECT ARCHIVE", project: "PROJECT RECORD", lab: "EXPERIMENT LAB", journey: "FOOTPRINT ATLAS", changelog: "LIFE CHANGELOG", connect: "OPEN CHANNEL" };
+  const routeNames = { resume: "RESUME", projects: "PROJECT ARCHIVE", project: "PROJECT RECORD", lab: "EXPERIMENT LAB", journey: "FOOTPRINT ATLAS", changelog: "LIFE CHANGELOG", connect: "OPEN CHANNEL", fitness: "FITNESS PROTOCOL", report: "EXPORT REPORT" };
   let currentRoute = "";
 
   function parseRoute() {
     const params = new URLSearchParams(location.search);
     const requested = params.get("view");
     const view = routeNames[requested] ? requested : "resume";
-    return { view, id: params.get("id") };
+    return { view, id: params.get("id"), type: params.get("type") };
   }
 
   function metricMarkup(metrics) {
@@ -38,6 +38,7 @@
   function renderResume() {
     const { profile } = data;
     const latest = data.versions[0];
+    const homeProjects = [...data.projects.filter(project => project.featuredOnHome), ...data.projects.filter(project => !project.featuredOnHome)].slice(0, 2);
     return `<section class="page overview-page resume-page">
       <div class="resume-cover">
       <div class="hero-art" aria-hidden="true"><div class="hero-art-shift"><div class="hero-art-image"></div><div class="hero-monitor-glow"></div><div class="hero-night-lights"></div></div><div class="hero-paper-texture"></div><div class="hero-reading-shade"></div></div>
@@ -48,7 +49,7 @@
         <h1>SILVER<span>/</span>Z</h1>
         <p class="overview-role mono">${esc(profile.role)}</p>
         <p class="overview-statement">${esc(profile.statement)}</p>
-        <div class="resume-actions"><a class="os-button route-link" href="?view=projects" data-route="projects">VIEW SELECTED WORK <span>↘</span></a><a class="resume-text-link route-link" href="?view=connect" data-route="connect">CONTACT ME →</a></div>
+        <div class="resume-actions"><a class="os-button route-link" href="?view=projects" data-route="projects">VIEW SELECTED WORK <span>↘</span></a><a class="resume-text-link route-link" href="?view=connect" data-route="connect">CONTACT ME →</a><a class="resume-text-link route-link" href="?view=report&type=resume" data-route="report">EXPORT RESUME ↓</a></div>
       </div>
       <a class="resume-scroll-cue" href="#resume-content" aria-label="向下滚动查看完整简历"><span>SCROLL TO RESUME</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v15M6.5 13.5 12 19l5.5-5.5"/></svg></a>
       </div>
@@ -63,7 +64,7 @@
         </div>
         <div class="resume-profile-copy">
           <span class="mono">PROFILE / 2026</span>
-          <h2>周瑜鸿 <i>SILVER.Z</i></h2>
+          <h2>${esc(profile.name || "周瑜鸿")} <i>SILVER.Z</i></h2>
           <p>${esc(profile.role)}</p>
           <dl><div><dt>EDUCATION</dt><dd>${esc(data.education.school)} · ${esc(data.education.major)}</dd></div><div><dt>LOCATION</dt><dd>杭州 · 中国</dd></div><div><dt>PHONE</dt><dd><a href="tel:19858810407">19858810407</a></dd></div><div><dt>EMAIL</dt><dd><a href="mailto:${esc(profile.email)}">${esc(profile.email)}</a></dd></div></dl>
         </div>
@@ -81,7 +82,7 @@
       <section class="resume-section resume-capabilities"><div class="module-label"><span>CAPABILITY EVIDENCE</span><a class="route-link" href="?view=projects" data-route="projects">TRACE TO PROJECTS →</a></div><div class="resume-cap-grid">${data.capabilities.map(item => `<article><span>${esc(item.code)}</span><h3>${esc(item.title)}</h3><p>${esc(item.desc)}</p><small>${esc(item.proof)}</small></article>`).join("")}</div></section>
       <section class="resume-section resume-education"><div class="module-label"><span>EDUCATION & TOOLKIT</span><i>VERIFIED PROFILE</i></div><div class="education-layout"><div class="education-primary"><span>EDUCATION</span><h2>${esc(data.education.school)}</h2><p>${esc(data.education.major)} · ${esc(data.education.degree)}</p><small>${esc(data.education.direction)}</small></div><div class="skill-ledger">${data.skillGroups.map(item => `<div><span>${esc(item.label)}</span><strong>${esc(item.value)}</strong></div>`).join("")}</div></div><div class="honor-strip"><span>SELECTED HONORS</span><p>${data.honors.map(item => `<i>${esc(item)}</i>`).join("")}</p></div></section>
       <div class="dashboard-bottom">
-        <section class="recent-records"><div class="module-label"><span>RECENT RECORDS</span><a class="route-link" href="?view=projects" data-route="projects">VIEW ALL →</a></div>${data.projects.slice(0, 2).map(p => `<a class="mini-record route-link" href="?view=project&id=${encodeURIComponent(p.slug)}" data-route="project"><span>${esc(p.id)}</span><strong>${esc(p.title)}</strong><i>${esc(p.status)}</i><b>↗</b></a>`).join("")}</section>
+        <section class="recent-records"><div class="module-label"><span>FEATURED PROJECTS</span><a class="route-link" href="?view=projects" data-route="projects">VIEW ALL →</a></div>${homeProjects.map(p => `<a class="mini-record route-link" href="?view=project&id=${encodeURIComponent(p.slug)}" data-route="project"><span>${esc(p.id)}</span><strong>${esc(p.title)}</strong><i>${esc(p.status)}</i><b>↗</b></a>`).join("")}</section>
         <section class="latest-update"><div class="module-label"><span>LATEST UPDATE</span><a class="route-link" href="?view=changelog" data-route="changelog">HISTORY →</a></div><strong>${esc(latest.version)}</strong><h3>${esc(latest.title)}</h3><p>${esc(latest.changes[0][1])}</p></section>
       </div>
       </div>
@@ -433,8 +434,133 @@
     return `<section class="page connect-page"><p class="section-code mono">05 / OPEN CHANNEL</p><div class="connect-hero"><h1>把疯狂想法<br>变成可运行的系统。</h1><p>如果你正在做 AI 游戏、独立产品或任何值得快速验证的创造，欢迎联系我。</p></div><div class="contact-panel"><span class="mono">PRIMARY CHANNEL</span><a href="mailto:${esc(data.profile.email)}">${esc(data.profile.email)}</a></div><div class="external-grid">${data.socials.map((item, index) => `<a href="${esc(item.href)}" target="_blank" rel="noreferrer"><span>0${index + 1}</span><strong>${esc(item.label)}</strong><i>↗</i></a>`).join("")}</div><footer class="view-footer"><span>SILVER.Z / PERSONAL OBSERVATORY</span><span>© ${new Date().getFullYear()}</span></footer></section>`;
   }
 
+  function fitnessStore() {
+    try { return JSON.parse(localStorage.getItem("silver-fitness-v1")) || { completed: {}, weights: [] }; }
+    catch { return { completed: {}, weights: [] }; }
+  }
+
+  function openFitnessPhotoDb() {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open("silver-fitness-photos", 1);
+      request.onupgradeneeded = () => request.result.createObjectStore("checkpoints", { keyPath: "day" });
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  async function getFitnessPhotos() {
+    const db = await openFitnessPhotoDb();
+    return new Promise((resolve, reject) => { const request = db.transaction("checkpoints", "readonly").objectStore("checkpoints").getAll(); request.onsuccess = () => resolve(request.result); request.onerror = () => reject(request.error); });
+  }
+
+  async function saveFitnessPhoto(record) {
+    const db = await openFitnessPhotoDb();
+    return new Promise((resolve, reject) => { const request = db.transaction("checkpoints", "readwrite").objectStore("checkpoints").put(record); request.onsuccess = () => resolve(); request.onerror = () => reject(request.error); });
+  }
+
+  async function deleteFitnessPhoto(day) {
+    const db = await openFitnessPhotoDb();
+    return new Promise((resolve, reject) => { const request = db.transaction("checkpoints", "readwrite").objectStore("checkpoints").delete(day); request.onsuccess = () => resolve(); request.onerror = () => reject(request.error); });
+  }
+
+  async function renderPhotoJournal() {
+    const records = await getFitnessPhotos(), byDay = new Map(records.map(record => [record.day, record])), days = [1, 28, 56, 84];
+    const container = $("[data-photo-journal]"); if (!container) return;
+    container.innerHTML = days.map(day => { const record = byDay.get(day), url = record?.blob ? URL.createObjectURL(record.blob) : ""; return `<article class="photo-checkpoint${record?.blob ? " has-photo" : ""}" data-photo-day="${day}"><div class="photo-frame">${url ? `<img src="${url}" alt="Day ${day} 体态记录">` : `<span>DAY ${day}</span><strong>等待照片</strong>`}<label><input type="file" accept="image/jpeg,image/png,image/webp" data-photo-input="${day}"><b>${record?.blob ? "更换照片" : "选择照片"}</b></label></div><div class="photo-meta"><div><span class="mono">CHECKPOINT · DAY ${day}</span><small>${record?.date ? esc(record.date) : "尚未记录"}</small></div><textarea data-photo-note="${day}" rows="2" placeholder="记录肩背、腰围观感、力量或精神状态…">${esc(record?.note || "")}</textarea>${record ? `<button type="button" data-photo-delete="${day}">删除记录</button>` : ""}</div></article>`; }).join("");
+    $$('[data-photo-count]').forEach(node => { node.textContent = String(records.filter(record => record.blob).length); });
+    $$('[data-photo-input]').forEach(input => input.addEventListener("change", async () => { const file = input.files?.[0]; if (!file) return; if (file.size > 12 * 1024 * 1024) { $("#photo-feedback").textContent = "图片超过 12MB，请压缩后重试。"; return; } const day = Number(input.dataset.photoInput), previous = byDay.get(day); await saveFitnessPhoto({ day, blob: file, note: previous?.note || "", date: new Date().toISOString().slice(0, 10) }); $("#photo-feedback").textContent = `Day ${day} 照片已保存在当前浏览器。`; renderPhotoJournal(); }));
+    $$('[data-photo-note]').forEach(input => input.addEventListener("change", async () => { const day = Number(input.dataset.photoNote), previous = byDay.get(day); await saveFitnessPhoto({ day, blob: previous?.blob || null, note: input.value.trim(), date: previous?.date || new Date().toISOString().slice(0, 10) }); $("#photo-feedback").textContent = `Day ${day} 备注已保存。`; renderPhotoJournal(); }));
+    $$('[data-photo-delete]').forEach(button => button.addEventListener("click", async () => { await deleteFitnessPhoto(Number(button.dataset.photoDelete)); $("#photo-feedback").textContent = "记录已删除。"; renderPhotoJournal(); }));
+  }
+
+  function fitnessWeekKey() {
+    const now = new Date(); const first = new Date(now.getFullYear(), 0, 1);
+    return `${now.getFullYear()}-W${String(Math.ceil((((now - first) / 86400000) + first.getDay() + 1) / 7)).padStart(2, "0")}`;
+  }
+
+  function renderWeightChart(weights) {
+    if (!weights.length) return `<div class="weight-empty"><strong>等待第一条记录</strong><span>录入体重后，这里会生成 7 日趋势。</span></div>`;
+    const recent = weights.slice(-14), min = Math.min(...recent.map(x => x.value)) - .3, max = Math.max(...recent.map(x => x.value)) + .3;
+    const points = recent.map((x, i) => `${recent.length === 1 ? 50 : i / (recent.length - 1) * 100},${84 - (x.value - min) / Math.max(.1, max - min) * 68}`).join(" ");
+    return `<svg class="weight-chart" viewBox="0 0 100 100" preserveAspectRatio="none" role="img" aria-label="最近体重趋势"><path d="M0 84H100M0 50H100M0 16H100"/><polyline points="${points}"/><g>${recent.map((x, i) => `<circle cx="${recent.length === 1 ? 50 : i / (recent.length - 1) * 100}" cy="${84 - (x.value - min) / Math.max(.1, max - min) * 68}" r="1.4"><title>${esc(x.date)} · ${x.value}kg</title></circle>`).join("")}</g></svg>`;
+  }
+
+  function renderFitness() {
+    const f = window.SILVER_FITNESS, store = fitnessStore(), weekKey = fitnessWeekKey(), done = store.completed[weekKey] || [];
+    const weights = store.weights || [], latest = weights.at(-1)?.value ?? f.profile.weight, avg = weights.slice(-7).length ? (weights.slice(-7).reduce((sum, x) => sum + x.value, 0) / weights.slice(-7).length).toFixed(1) : "—";
+    const stats = [["AGE", f.profile.age], ["HEIGHT", `${f.profile.height}cm`], ["WEIGHT", `${latest}kg`], ["WAIST", `≈${f.profile.waist}cm`], ["PUSH-UP PR", f.profile.pushups], ["PULL-UP / N", f.profile.narrowPullups], ["PULL-UP / W", f.profile.widePullups]];
+    return `<section class="page fitness-page">
+      <header class="fitness-command"><div class="fitness-title"><span class="mono">PERSONAL PHYSICAL SYSTEM · 12 WEEK PROTOCOL</span><h1>身体不是项目。<br><i>但成长需要系统。</i></h1><p>${esc(f.profile.goal)}。当前先从 ${f.profile.weight}kg 稳定走向 ${esc(f.profile.phaseTarget)}，用力量、外观与腰围共同判断进度。</p><a class="fitness-export route-link" href="?view=report&type=fitness" data-route="report">生成阶段报告 <span>↗</span></a></div><div class="fitness-target"><span class="mono">CURRENT VECTOR</span><div><b>55</b><i>→</i><strong>59</strong><small>KG / PHASE 01</small></div><p>最终方向 65kg，不设三个月硬性截止。</p></div></header>
+      <div class="fitness-stat-strip">${stats.map(([label, value]) => `<div><span class="mono">${label}</span><strong>${value}</strong></div>`).join("")}</div>
+      <section class="fitness-dashboard"><div class="section-intro"><h2>本周运行状态</h2><p>每周四练。完成一次训练，系统就向前推进一个刻度。</p></div><div class="fitness-live"><div class="completion-readout"><span class="mono">WEEKLY COMPLETION · ${esc(weekKey)}</span><strong><i data-fitness-count>${done.length}</i><small>/ 4</small></strong><div class="completion-track"><i data-fitness-progress style="width:${done.length / 4 * 100}%"></i></div></div><div class="tracking-grid"><div><span>今日体重</span><strong data-latest-weight>${latest}<small>kg</small></strong></div><div><span>7 日平均</span><strong data-average-weight>${avg}<small>${avg === "—" ? "" : "kg"}</small></strong></div><div><span>当前阶段增重</span><strong data-phase-gain>+${Math.max(0, latest - 55).toFixed(1)}<small>kg</small></strong></div><div><span>训练周数</span><strong>01<small>/ 12</small></strong></div></div></div></section>
+      <section class="phase-section"><div class="section-intro"><h2>12 周阶段轨道</h2><p>先建立可以长期重复的系统，再逐步提高容量与视觉重点。</p></div><div class="phase-track">${f.phases.map((phase, i) => `<article${i === 0 ? ' class="active"' : ""}><div class="phase-marker"><span>0${i + 1}</span><i></i><b>${phase.weeks}</b></div><h3>${phase.title}</h3><strong>${phase.target}</strong><ul>${phase.goals.map(goal => `<li>${goal}</li>`).join("")}</ul></article>`).join("")}</div></section>
+      <section class="weekly-section"><div class="section-intro"><h2>每周训练安排</h2><p>工作日固定 19:30–20:15；周六保留 45–60 分钟自由窗口。</p></div><div class="week-board">${f.week.map(day => `<article class="${day.training ? "training-day" : "rest-day"}"><span class="mono">${day.code}</span><strong>${day.day}</strong><b>${day.type}</b><p>${day.focus}</p><small>${day.duration || "RECOVERY"}</small>${day.training ? `<label><input type="checkbox" data-workout-day="${day.code}" ${done.includes(day.code) ? "checked" : ""}><span>完成</span></label>` : ""}</article>`).join("")}</div></section>
+      <section class="workout-section"><div class="section-intro"><h2>动作协议</h2><p>展开当天计划并逐项勾选。动作完成状态保存在当前设备。</p></div><div class="workout-list">${Object.entries(f.workouts).map(([type, moves], i) => `<details ${i === 0 ? "open" : ""}><summary><span class="mono">${String(i + 1).padStart(2, "0")} / ${type}</span><strong>${f.week.find(x => x.type === type).day} · ${f.week.find(x => x.type === type).focus}</strong><i>+</i></summary><div class="move-list">${moves.map(([name, dose], moveIndex) => `<label><input type="checkbox" data-exercise="${type}-${moveIndex}"><span><b>${name}</b><small>${dose}</small></span></label>`).join("")}</div>${type === "PULL" ? `<p class="safety-note"><b>安全边界</b> 没有安全单杠时跳过引体，改用弹力带动作。禁止使用衣柜等不安全家具训练。</p>` : ""}</details>`).join("")}</div></section>
+      <section class="principle-section"><div class="section-intro"><h2>训练原则</h2><p>稳定动作质量，留下恢复空间，再用难度而不是无限次数制造进步。</p></div><div class="principle-layout"><article><span class="mono">RIR ≈ 2</span><h3>每组留下两次余力</h3><p>不要每组完全力竭。动作开始变形之前结束这一组，让下一次训练仍可稳定推进。</p></article><div class="progression-flow"><span>12 / 11 / 10 / 9</span><i>持续补齐</i><strong>15 / 15 / 15 / 15</strong><i>提高难度</i><b>慢速 → 弹力带 → 更难版本</b><small>随后回到 8–10 次区间</small></div></div></section>
+      <section class="nutrition-section"><div class="section-intro"><h2>低成本饮食系统</h2><p>每日蛋白质约 90g。优先公司餐补，不喝牛奶，暂不购买蛋白粉、增肌粉、肌酸或补剂。</p></div><div class="meal-grid">${f.meals.map(meal => `<article><span class="mono">${meal.label}</span><h3>${meal.title}</h3><p>${meal.note}</p></article>`).join("")}</div><div class="vegetable-line"><span>优先蔬菜</span>${f.vegetables.map(x => `<b>${x}</b>`).join("")}</div></section>
+      <section class="weight-section"><div class="section-intro"><h2>体重观测与调节</h2><p>只依据 7 日平均调整饮食，不对单日波动作出反应。</p></div><div class="weight-console"><form id="weight-form"><label for="fitness-weight">录入今日体重</label><div><input id="fitness-weight" name="weight" type="number" min="40" max="100" step="0.1" required placeholder="55.0"><button type="submit">保存记录</button></div><small id="weight-feedback" aria-live="polite">数据仅保存在当前浏览器。</small></form><div data-weight-chart>${renderWeightChart(weights)}</div></div><div class="adjustment-logic"><article><span>&lt; 0.1kg / 周</span><strong>增加碳水</strong><p>晚餐加半碗至一碗米饭，或早餐增加低成本碳水。</p></article><article class="stable"><span>0.15–0.3kg / 周</span><strong>保持不变</strong><p>处于目标增速，继续当前训练与饮食结构。</p></article><article><span>&gt; 0.4–0.5kg / 周</span><strong>稍微减少</strong><p>长期超出范围时，减少额外碳水，不做激进调整。</p></article></div></section>
+      <section class="future-section"><div class="section-intro"><h2>长期里程碑</h2><p>第一阶段确认体重、力量和外观同步改善，腰围没有明显失控，并且训练能长期坚持。</p></div><div class="milestone-line"><strong class="current">55<small>NOW</small></strong><i></i><strong>60<small>NEXT</small></strong><i></i><strong>65<small>LONG TERM</small></strong></div><div class="photo-placeholders">${[1, 28, 56, 84].map(day => `<div><span class="mono">DAY ${day}</span><b>PHOTO SLOT</b></div>`).join("")}</div></section>
+    </section>`;
+  }
+
+  function bindFitnessEvents() {
+    const weekKey = fitnessWeekKey();
+    const observation = $(".weight-section");
+    const photoRecords = data.fitnessPhotos || [], photoCount = photoRecords.filter(record => record.image).length;
+    if (observation) observation.innerHTML = `<div class="section-intro"><h2>体态照片记录</h2><p>没有体重秤也可以稳定观察变化。尽量在相同光线、距离、时间和站姿下拍摄，重点比较肩背、胸部、手臂与腰线。</p></div><div class="photo-protocol"><div><span class="mono">PHOTO PROTOCOL</span><strong><i>${photoCount}</i><small>/ 4 个阶段</small></strong></div><ol><li>固定正面、侧面和背面角度</li><li>建议早晨、自然站姿、相同光线</li><li>每 28 天比较一次，不因单日状态判断</li></ol></div><div class="photo-journal">${[1, 28, 56, 84].map(day => { const record = photoRecords.find(item => Number(item.day) === day); return `<article class="photo-checkpoint${record?.image ? " has-photo" : ""}"><div class="photo-frame">${record?.image ? `<img src="${esc(record.image)}" alt="Day ${day} 体态记录" loading="lazy">` : `<span>DAY ${day}</span><strong>尚未记录</strong>`}</div><div class="photo-meta"><div><span class="mono">CHECKPOINT · DAY ${day}</span><small>${esc(record?.date || "等待更新")}</small></div>${record?.note ? `<p>${esc(record.note)}</p>` : `<p class="photo-empty-note">阶段备注将在工作台导出后显示。</p>`}</div></article>`; }).join("")}</div><p class="photo-feedback">照片与备注由 Silver Content Studio 管理，公开页面仅展示已导出的内容。</p>`;
+    $(".photo-placeholders")?.remove();
+    const tracking = $(".tracking-grid");
+    if (tracking) tracking.innerHTML = `<div><span>照片记录</span><strong>${photoCount}<small>/ 4</small></strong></div><div><span>当前阶段</span><strong>DAY 01<small>/ 84</small></strong></div><div><span>俯卧撑最好成绩</span><strong>${window.SILVER_FITNESS.profile.pushups}<small>次</small></strong></div><div><span>训练周数</span><strong>01<small>/ 12</small></strong></div>`;
+    $$('[data-workout-day]').forEach(input => input.addEventListener("change", () => { const store = fitnessStore(); const set = new Set(store.completed[weekKey] || []); input.checked ? set.add(input.dataset.workoutDay) : set.delete(input.dataset.workoutDay); store.completed[weekKey] = [...set]; localStorage.setItem("silver-fitness-v1", JSON.stringify(store)); $("[data-fitness-count]").textContent = set.size; $("[data-fitness-progress]").style.width = `${set.size / 4 * 100}%`; }));
+  }
+
+  function reportToolbar(type) {
+    return `<div class="report-toolbar" role="toolbar" aria-label="报告操作"><a class="route-link" href="?view=${type === "resume" ? "resume" : "fitness"}" data-route="${type === "resume" ? "resume" : "fitness"}">← 返回${type === "resume" ? "简历" : "健身计划"}</a><div><button type="button" data-report-print>打印 / 保存 PDF</button>${type === "fitness" ? `<button type="button" data-report-png>下载 4:5 PNG</button>` : ""}</div></div>`;
+  }
+
+  function renderResumeReport() {
+    const p = data.profile, github = data.socials.find(x => x.label === "GitHub");
+    data.skillGroups.forEach(group => { if (!group.items) group.items = [group.value]; });
+    const resumeProjects = [...data.projects.filter(item => item.featuredOnHome), ...data.projects.filter(item => !item.featuredOnHome)].slice(0, 3);
+    return `<section class="report-page resume-report">${reportToolbar("resume")}<article class="a4-sheet"><header><div><h1>${esc(p.name || "周瑜鸿")} <small>SILVER.Z</small></h1><p>${esc(p.role)}</p></div><address><a href="mailto:${esc(p.email)}">${esc(p.email)}</a><span>杭州，中国</span>${github ? `<a href="${esc(github.href)}">github.com/Sat-Y</a>` : ""}</address></header><p class="resume-summary">${esc(p.statement)}专注把生成式 AI 能力组织成可运行、可验证的游戏机制与产品流程。</p><section><h2>工作经历</h2>${data.experience.map(item => `<article class="resume-entry"><div><h3>${esc(item.role)}</h3><strong>${esc(item.company)}</strong></div><time>${esc(item.period)}</time><p>${esc(item.summary)}</p><ul>${item.highlights.map(x => `<li>${esc(x)}</li>`).join("")}</ul></article>`).join("")}</section><section><h2>精选项目</h2>${resumeProjects.map(item => `<article class="resume-entry project-entry"><div><h3>${esc(item.title)} <small>${esc(item.english)}</small></h3><strong>${esc(item.role)} · ${esc(item.status)}</strong></div><p>${esc(item.summary)}</p><ul>${item.evidence.map(x => `<li>${esc(x)}</li>`).join("")}</ul></article>`).join("")}</section><section class="resume-honors"><h2>奖项荣誉</h2><ul>${data.honors.map(item => `<li>${esc(item)}</li>`).join("")}</ul></section><section class="resume-bottom"><div><h2>教育经历</h2><article class="resume-entry"><div><h3>${esc(data.education.school)}</h3><strong>${esc(data.education.major)} · ${esc(data.education.degree)}</strong></div><p>${esc(data.education.direction)}</p></article></div><div><h2>能力与工具</h2><p>${data.capabilities.map(x => esc(x.title)).join(" · ")}</p><p>${data.skillGroups.flatMap(x => x.items || []).slice(0, 12).map(x => typeof x === "string" ? esc(x) : esc(x.name || x.label)).join(" · ")}</p></div></section><footer><span>SILVER OS / EVIDENCE RESUME</span><span>UPDATED ${esc(p.updatedAt)}</span></footer></article></section>`;
+  }
+
+  function fitnessReportData() {
+    const f = window.SILVER_FITNESS, store = fitnessStore(), weights = store.weights || [], latest = weights.at(-1)?.value ?? f.profile.weight;
+    const average = weights.slice(-7).length ? (weights.slice(-7).reduce((sum, x) => sum + x.value, 0) / weights.slice(-7).length).toFixed(1) : "—";
+    const completed = Object.values(store.completed || {}).reduce((sum, days) => sum + days.length, 0);
+    return { f, store, weights, latest, average, completed, gain: Math.max(0, latest - f.profile.weight).toFixed(1) };
+  }
+
+  function renderFitnessReport() {
+    const { f, weights, latest, average, completed, gain } = fitnessReportData();
+    return `<section class="report-page fitness-report">${reportToolbar("fitness")}<article class="social-sheet" id="fitness-social-card"><header><span>SILVER OS · PHYSICAL RECORD</span><time>${new Date().toLocaleDateString("zh-CN", { year: "numeric", month: "2-digit", day: "2-digit" })}</time></header><div class="social-title"><h1>阶段成长<br>记录</h1><p>${esc(f.profile.goal)}</p></div><div class="social-vector"><div><span>START</span><strong>${f.profile.weight}</strong><small>KG</small></div><i>→</i><div><span>CURRENT</span><strong>${latest}</strong><small>KG</small></div><b>+${gain} KG</b></div><div class="social-metrics"><div><span>7 日平均</span><strong>${average}${average === "—" ? "" : "kg"}</strong></div><div><span>累计训练</span><strong>${completed} 次</strong></div><div><span>俯卧撑 PR</span><strong>${f.profile.pushups} 次</strong></div><div><span>腰围</span><strong>≈ ${f.profile.waist}cm</strong></div></div><div class="social-chart"><span>WEIGHT TREND · RECENT 14 RECORDS</span>${renderWeightChart(weights)}</div><blockquote>“先让体重、力量与外观一起变好，<br>再进入下一个阶段。”</blockquote><footer><span>PHASE 01 · 55 → 57–59KG</span><span>@ SILVER.Z</span></footer></article><p class="report-hint">社交版按 1080 × 1350（4:5）导出；没有历史数据时会保留清晰的空状态。</p></section>`;
+  }
+
+  function renderReport(route) { return route.type === "resume" ? renderResumeReport() : renderFitnessReport(); }
+
+  function downloadFitnessPng() {
+    const { f, latest, average, completed, gain, weights } = fitnessReportData(), canvas = document.createElement("canvas"), ctx = canvas.getContext("2d");
+    canvas.width = 1080; canvas.height = 1350; ctx.fillStyle = "#eceeea"; ctx.fillRect(0, 0, 1080, 1350); ctx.fillStyle = "#121618"; ctx.font = "24px Manrope, sans-serif"; ctx.fillText("SILVER OS  /  PHYSICAL RECORD", 72, 82); ctx.textAlign = "right"; ctx.fillText(new Date().toLocaleDateString("zh-CN"), 1008, 82); ctx.textAlign = "left";
+    ctx.font = "500 104px Manrope, sans-serif"; ctx.fillText("阶段成长", 72, 238); ctx.fillText("记录", 72, 346); ctx.fillStyle = "#5f6668"; ctx.font = "30px Manrope, sans-serif"; ctx.fillText(f.profile.goal, 72, 410);
+    ctx.strokeStyle = "rgba(18,22,24,.28)"; ctx.beginPath(); ctx.moveTo(72, 458); ctx.lineTo(1008, 458); ctx.stroke();
+    ctx.fillStyle = "#121618"; ctx.font = "20px monospace"; ctx.fillText("START", 72, 520); ctx.fillText("CURRENT", 620, 520); ctx.font = "500 126px monospace"; ctx.fillText(String(f.profile.weight), 72, 654); ctx.fillStyle = "#176c79"; ctx.fillText(String(latest), 620, 654); ctx.fillStyle = "#176c79"; ctx.font = "500 34px monospace"; ctx.fillText(`+${gain} KG`, 825, 630);
+    const metrics = [["7 日平均", average === "—" ? "—" : `${average}kg`], ["累计训练", `${completed} 次`], ["俯卧撑 PR", `${f.profile.pushups} 次`], ["腰围", `≈ ${f.profile.waist}cm`]]; metrics.forEach(([label, value], i) => { const x = 72 + i * 234; ctx.fillStyle = "#5f6668"; ctx.font = "22px Manrope, sans-serif"; ctx.fillText(label, x, 754); ctx.fillStyle = "#121618"; ctx.font = "500 38px Manrope, sans-serif"; ctx.fillText(value, x, 812); });
+    ctx.fillStyle = "#5f6668"; ctx.font = "20px monospace"; ctx.fillText("WEIGHT TREND  /  RECENT 14 RECORDS", 72, 902); ctx.strokeStyle = "rgba(18,22,24,.2)"; ctx.strokeRect(72, 936, 936, 190); if (weights.length > 1) { const recent = weights.slice(-14), min = Math.min(...recent.map(x => x.value)) - .2, max = Math.max(...recent.map(x => x.value)) + .2; ctx.strokeStyle = "#176c79"; ctx.lineWidth = 4; ctx.beginPath(); recent.forEach((x, i) => { const px = 92 + i / (recent.length - 1) * 896, py = 1096 - (x.value - min) / Math.max(.1, max - min) * 130; i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); }); ctx.stroke(); } else { ctx.fillStyle = "#5f6668"; ctx.font = "24px Manrope, sans-serif"; ctx.fillText("等待更多体重记录", 390, 1040); }
+    ctx.fillStyle = "#121618"; ctx.font = "500 34px Manrope, sans-serif"; ctx.fillText("先让体重、力量与外观一起变好，", 72, 1200); ctx.fillText("再进入下一个阶段。", 72, 1248); ctx.fillStyle = "#176c79"; ctx.font = "20px monospace"; ctx.fillText("PHASE 01  ·  55 → 57–59KG", 72, 1310); ctx.textAlign = "right"; ctx.fillText("@ SILVER.Z", 1008, 1310);
+    const link = document.createElement("a"); link.download = `silver-fitness-${new Date().toISOString().slice(0, 10)}.png`; link.href = canvas.toDataURL("image/png"); link.click();
+  }
+
+  function bindReportEvents(route) {
+    $("[data-report-print]")?.addEventListener("click", () => print());
+    if (route.type === "resume") {
+      const projectsSection = $$(".a4-sheet > section")[1];
+      if (projectsSection) projectsSection.insertAdjacentHTML("beforeend", `<p class="resume-more">更多项目经历与完整案例：<a href="https://silverz.netlify.app/">silverz.netlify.app</a></p>`);
+    } else $("[data-report-png]")?.addEventListener("click", downloadFitnessPng);
+  }
+
   function render(route) {
-    const renderers = { resume: renderResume, projects: renderProjects, project: () => renderProject(route.id), lab: renderLab, journey: renderJourney, changelog: renderChangelog, connect: renderConnect };
+    const renderers = { resume: renderResume, projects: renderProjects, project: () => renderProject(route.id), lab: renderLab, journey: renderJourney, changelog: renderChangelog, connect: renderConnect, fitness: renderFitness, report: () => renderReport(route) };
     $("#view").innerHTML = renderers[route.view]();
     document.body.dataset.view = route.view;
     $("#route-label").textContent = routeNames[route.view];
@@ -455,6 +581,8 @@
       $$(".archive-card").forEach(card => { const p = data.projects.find(item => card.href.includes(encodeURIComponent(item.slug))); card.hidden = button.dataset.filter !== "all" && p.category !== button.dataset.filter; });
     }));
     if (route.view === "journey") initFootprintMap();
+    if (route.view === "fitness") bindFitnessEvents();
+    if (route.view === "report") bindReportEvents(route);
     if (route.view === "changelog") $$('[data-release]').forEach(button => button.addEventListener("click", () => { const body = button.closest(".release").querySelector(".release-changes"); body.hidden = !body.hidden; button.textContent = body.hidden ? "+" : "−"; button.setAttribute("aria-expanded", String(!body.hidden)); }));
     if (route.view === "changelog") $("[data-history-lock]")?.addEventListener("click", async () => {
       const password = prompt("请输入历史版本访问密码");
