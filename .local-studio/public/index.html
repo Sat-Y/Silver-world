@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Silver Content Studio</title>
+  <link rel="stylesheet" href="studio.css">
+</head>
+<body>
+  <div class="studio-shell">
+    <aside class="sidebar">
+      <div class="studio-brand"><span>S/Z</span><div><strong>CONTENT STUDIO</strong><small>LOCAL WORKSPACE</small></div></div>
+      <nav id="studio-nav" aria-label="编辑模块">
+        <button class="nav-item is-active" data-section="dashboard"><span>00</span><b>总览</b><small>发布状态</small></button>
+        <button class="nav-item" data-section="resume"><span>01</span><b>简历</b><small>身份与经历</small></button>
+        <button class="nav-item" data-section="projects"><span>02</span><b>项目</b><small>档案与媒体</small></button>
+        <button class="nav-item" data-section="footprints"><span>03</span><b>足迹</b><small>地点与动态</small></button>
+        <button class="nav-item" data-section="fitness"><span>04</span><b>健身</b><small>体态照片</small></button>
+        <button class="nav-item" data-section="trading"><span>05</span><b>交易</b><small>资金与日志</small></button>
+        <button class="nav-item" data-section="advanced"><span>06</span><b>高级数据</b><small>完整 JSON</small></button>
+      </nav>
+      <div class="local-notice"><i></i><strong>仅本地运行</strong><p>草稿不会进入公开网站，除非主动导出。</p></div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div><span id="route-label">WORKSPACE / OVERVIEW</span><strong id="page-title">内容总览</strong></div>
+        <div class="toolbar">
+          <span class="save-state" id="save-state">已同步本地草稿</span>
+          <button class="button secondary" id="preview-button" type="button">打开预览</button>
+          <button class="button secondary" id="save-button" type="button">保存草稿</button>
+          <button class="button primary" id="export-button" type="button">导出公开内容</button>
+        </div>
+      </header>
+      <div class="workbench">
+        <section class="editor" id="editor" aria-live="polite"><div class="loading-lines"><i></i><i></i><i></i></div></section>
+        <aside class="preview" id="preview" aria-label="网站实时预览">
+          <header><div><strong>实时网站预览</strong><span id="preview-route">RESUME</span></div><button id="close-preview" type="button" aria-label="关闭预览">×</button></header>
+          <iframe id="preview-frame" title="Silver OS 草稿预览"></iframe>
+        </aside>
+      </div>
+    </main>
+  </div>
+  <input id="asset-input" type="file" accept="image/png,image/jpeg,image/webp,image/gif,video/mp4,video/webm" hidden>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="studio.js"></script>
+</body>
+</html>

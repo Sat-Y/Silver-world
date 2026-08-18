@@ -6,7 +6,7 @@
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
   const esc = value => String(value).replace(/[&<>'"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[char]));
   const sha256 = async value => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value)))].map(byte => byte.toString(16).padStart(2, "0")).join("");
-  const routeNames = { resume: "RESUME", projects: "PROJECT ARCHIVE", project: "PROJECT RECORD", lab: "EXPERIMENT LAB", journey: "FOOTPRINT ATLAS", changelog: "LIFE CHANGELOG", connect: "OPEN CHANNEL", fitness: "FITNESS PROTOCOL", report: "EXPORT REPORT" };
+  const routeNames = { resume: "RESUME", projects: "PROJECT ARCHIVE", project: "PROJECT RECORD", lab: "EXPERIMENT LAB", journey: "FOOTPRINT ATLAS", changelog: "LIFE CHANGELOG", connect: "OPEN CHANNEL", fitness: "FITNESS PROTOCOL", trading: "SILVER TRADING SYSTEM", report: "EXPORT REPORT" };
   let currentRoute = "";
 
   function parseRoute() {
@@ -434,6 +434,81 @@
     return `<section class="page connect-page"><p class="section-code mono">05 / OPEN CHANNEL</p><div class="connect-hero"><h1>把疯狂想法<br>变成可运行的系统。</h1><p>如果你正在做 AI 游戏、独立产品或任何值得快速验证的创造，欢迎联系我。</p></div><div class="contact-panel"><span class="mono">PRIMARY CHANNEL</span><a href="mailto:${esc(data.profile.email)}">${esc(data.profile.email)}</a></div><div class="external-grid">${data.socials.map((item, index) => `<a href="${esc(item.href)}" target="_blank" rel="noreferrer"><span>0${index + 1}</span><strong>${esc(item.label)}</strong><i>↗</i></a>`).join("")}</div><footer class="view-footer"><span>SILVER.Z / PERSONAL OBSERVATORY</span><span>© ${new Date().getFullYear()}</span></footer></section>`;
   }
 
+  function money(value) {
+    return Number.isFinite(value) ? new Intl.NumberFormat("zh-CN", { style: "currency", currency: "CNY", maximumFractionDigits: 0 }).format(value) : "--";
+  }
+
+  function percent(value) { return Number.isFinite(value) ? `${value >= 0 ? "+" : ""}${value.toFixed(2)}%` : "--"; }
+
+  const stsChinese = {
+    "Market": "市场环境", "Sector": "板块周期", "Stock": "个股地位", "Position": "所处位置", "Volume & Price": "量价关系", "Support": "支撑 / 承接", "Divergence / Consensus": "分歧 / 一致", "Plan": "交易计划", "Execution": "执行", "Review": "复盘",
+    "HIGH OPEN": "高开", "FLAT OPEN": "平开", "LOW OPEN": "低开", "Resistance": "压力位", "Entry": "入场位置", "Stop Loss": "价格止损", "Target": "目标位置", "Invalid Condition": "逻辑失效条件"
+  };
+  function stsTerm(value) { return `<span class="sts-term-en">${esc(value)}</span>${stsChinese[value] ? `<small>${esc(stsChinese[value])}</small>` : ""}`; }
+
+  function equityChart(snapshots) {
+    const values = snapshots.map(item => item.capital), min = Math.min(...values), max = Math.max(...values), range = Math.max(1, max - min);
+    const points = snapshots.map((item, index) => `${snapshots.length === 1 ? 50 : 4 + index / (snapshots.length - 1) * 92},${88 - (item.capital - min) / range * 72}`).join(" ");
+    const dots = snapshots.map((item, index) => { const x = snapshots.length === 1 ? 50 : 4 + index / (snapshots.length - 1) * 92, y = 88 - (item.capital - min) / range * 72, label = `${item.date} · ${money(item.capital)}`; return item.journalId ? `<a class="sts-chart-point route-link" style="--point-x:${x}%;--point-y:${y}%" href="?view=trading#journal-${encodeURIComponent(item.journalId)}" data-route="trading" aria-label="${esc(label)}，打开交易日志" title="${esc(label)} · 打开交易日志"></a>` : `<span class="sts-chart-point" style="--point-x:${x}%;--point-y:${y}%" role="img" aria-label="${esc(label)}" title="${esc(label)}"></span>`; }).join("");
+    return `<div class="sts-chart"><div class="sts-chart-plot"><svg viewBox="0 0 100 100" preserveAspectRatio="none" role="img" aria-label="资金曲线，共 ${snapshots.length} 条真实记录"><path d="M4 16H96M4 40H96M4 64H96M4 88H96"/><polyline points="${points}"/></svg>${dots}</div><div class="sts-chart-axis"><span>${esc(snapshots[0].date)}</span><strong>${money(min)} — ${money(max)}</strong><span>${esc(snapshots.at(-1).date)}</span></div></div>`;
+  }
+
+  function journalEntry(entry) {
+    const outcomes = [["DECISION", "最终决定", entry.decision], ["EXECUTION", "实际操作", entry.execution], ["RESULT", "市场结果", entry.result], ["REVIEW", "盘后复盘", entry.review], ["LESSON", "当日经验", entry.lesson]].filter(([, , value]) => value);
+    return `<article class="sts-journal-entry" id="journal-${esc(entry.id)}"><header><time>${esc(entry.date)}</time><span class="mono">${esc(entry.id)}</span></header><h3>${esc(entry.title || "Trading Journal")}</h3>${entry.context ? `<div class="sts-journal-context"><span class="mono">CONTEXT <small>市场背景</small></span><p>${esc(entry.context)}</p></div>` : ""}<div class="sts-conversation">${(entry.conversations || []).map(message => `<div class="${message.role === "ai" ? "is-ai" : "is-silver"}"><span class="mono">${message.role === "ai" ? "AI / 分析伙伴" : "SILVER / 我的判断"}</span><p>${esc(message.content).replace(/\n/g, "<br>")}</p></div>`).join("")}</div>${outcomes.length ? `<dl class="sts-journal-outcomes">${outcomes.map(([label, cn, value]) => `<div><dt>${label}<small>${cn}</small></dt><dd>${esc(value)}</dd></div>`).join("")}</dl>` : ""}</article>`;
+  }
+
+  function renderTrading() {
+    const t = window.SILVER_TRADING;
+    const snapshots = (t.capital.snapshots || []).filter(item => item.date && Number.isFinite(item.capital)).sort((a, b) => a.date.localeCompare(b.date));
+    const currentCapital = Number.isFinite(t.capital.current) ? t.capital.current : snapshots.at(-1)?.capital;
+    const initialCapital = Number.isFinite(t.capital.initial) ? t.capital.initial : snapshots[0]?.capital;
+    const hasCapital = snapshots.length > 0;
+    const totalPnl = Number.isFinite(currentCapital) && Number.isFinite(initialCapital) ? currentCapital - initialCapital : null;
+    const totalReturn = Number.isFinite(totalPnl) && initialCapital ? totalPnl / initialCapital * 100 : null;
+    const latestSnapshot = snapshots.at(-1);
+    const monthKeys = ["07", "08", "09", "10", "11", "12"];
+    const monthLabels = ["JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+    const monthlyValues = monthKeys.map(month => { const records = snapshots.filter(item => item.date.slice(5, 7) === month); if (!records.length) return null; if (records.length > 1 && records[0].capital) return (records.at(-1).capital / records[0].capital - 1) * 100; return Number.isFinite(records[0].pnlPercent) ? records[0].pnlPercent : null; });
+    const latestJournal = t.journals[0];
+    return `<section class="page sts-page">
+      <header class="sts-hero">
+        <div class="sts-hero-copy"><h1>Silver Trading<br>System</h1><p>A 股短线 / 短波段的个人研究档案。记录资金如何变化、方法如何形成，以及判断如何在与 AI 的长期对话中被验证。</p></div>
+        <div class="sts-system-state"><span class="mono">${esc(t.strategy.version)}</span><strong>${esc(t.strategy.status)}</strong><p>Money × Strategy × Conversation</p></div>
+        <nav class="sts-local-nav mono" aria-label="交易系统章节"><a href="#sts-capital">CAPITAL</a><a href="#sts-strategy">STRATEGY</a><a href="#sts-journal">JOURNAL</a></nav>
+      </header>
+
+      <section class="sts-chapter sts-capital" id="sts-capital">
+        <header class="sts-chapter-head"><div><span class="sts-chapter-index mono">01 / RESULT</span><h2>资金发生了什么变化？</h2></div><p>Capital 是结果层。所有数字只来自真实记录；尚未同步的数据保持空白。</p></header>
+        <div class="sts-capital-readout"><div><span class="mono">CURRENT CAPITAL</span><strong>${money(currentCapital)}</strong><small>${hasCapital ? `LATEST VERIFIED · ${esc(latestSnapshot.date)}` : "WAITING FOR VERIFIED DATA"}</small></div><dl><div><dt>INITIAL CAPITAL</dt><dd>${money(initialCapital)}</dd></div><div><dt>TOTAL P&amp;L</dt><dd>${money(totalPnl)}</dd></div><div><dt>TOTAL RETURN</dt><dd>${percent(totalReturn)}</dd></div><div><dt>LATEST P&amp;L</dt><dd>${money(latestSnapshot?.pnl)}</dd></div></dl></div>
+        <div class="sts-equity-panel">
+          <header><div><h3>Equity Curve</h3><span class="mono">DATE → CAPITAL</span></div><div class="sts-range" role="group" aria-label="资金曲线时间范围">${["1M", "3M", "6M", "YTD", "ALL"].map((x, i) => `<button type="button"${i === 4 ? ' class="active"' : ""} disabled>${x}</button>`).join("")}</div></header>
+          ${hasCapital ? equityChart(snapshots) : `<div class="sts-chart-empty"><div class="sts-empty-line" aria-hidden="true"></div><strong>等待第一条资金快照</strong><p>录入真实 CapitalSnapshot 后，资金曲线会在这里出现，并可从日期进入对应的交易日志。</p></div>`}
+        </div>
+        <div class="sts-capital-secondary">
+          <section><header><h3>Monthly Performance</h3><span class="mono">2026 / VERIFIED SNAPSHOTS</span></header><div class="sts-months">${monthLabels.map((x, i) => `<div><span>${x}</span><strong>${percent(monthlyValues[i])}</strong></div>`).join("")}</div></section>
+          <section><header><h3>Capital Milestones</h3><span class="mono">LEVEL / LONG TERM</span></header><ol class="sts-milestones">${t.capital.milestones.map((item, i) => `<li><i>${String(i + 1).padStart(2, "0")}</i><div><strong>${money(item.amount)}</strong><span>${esc(item.label)}</span></div><small>${item.status === "reached" ? "REACHED" : "WAITING"}</small></li>`).join("")}</ol></section>
+        </div>
+      </section>
+
+      <section class="sts-chapter sts-strategy" id="sts-strategy">
+        <header class="sts-chapter-head"><div><span class="sts-chapter-index mono">02 / METHOD</span><h2>我现在怎么交易？</h2></div><p>这不是教程，也不是已经完成的盈利系统。它是 Silver 当前正在真实交易中验证和修改的方法。</p></header>
+        <blockquote class="sts-thesis"><span class="mono">CURRENT STYLE / 当前风格</span><p>${esc(t.strategy.style)}</p><footer>${esc(t.strategy.principle)}</footer></blockquote>
+        <div class="sts-analysis-flow" aria-label="交易分析顺序">${t.strategy.flow.map((item, i) => `<div><span>${String(i + 1).padStart(2, "0")}</span><strong>${stsTerm(item)}</strong>${i < t.strategy.flow.length - 1 ? "<i>↓</i>" : ""}</div>`).join("")}</div>
+        <div class="sts-setups">${t.strategy.setups.map(item => `<article><header><span class="mono">${esc(item.id)}</span><small>TESTING / 验证中</small></header><h3>${esc(item.title)}</h3><h4>${esc(item.cn)}</h4><p>${esc(item.summary)}</p><ul>${item.checks.map(x => `<li>${esc(x)}</li>`).join("")}</ul></article>`).join("")}</div>
+        <div class="sts-plan-grid"><section><h3>盘后做计划，盘中执行</h3><p>对每只关注股票预先写下三种开盘情景，市场没有重大异常时优先执行原计划。</p><div class="sts-scenarios">${t.strategy.planScenarios.map(x => `<div>${stsTerm(x)}</div>`).join("")}</div><div class="sts-plan-fields">${t.strategy.planFields.map(x => `<div>${stsTerm(x)}</div>`).join("")}</div></section><section class="sts-invalid"><span class="mono">RISK MANAGEMENT / 风险管理</span><h3>Invalid Condition <small>逻辑失效条件</small></h3><p>止损不只是“跌了 X%”。当买入的核心逻辑已经被破坏，这笔交易就必须重新评估或退出，同时保留明确的价格止损。</p></section></div>
+        <div class="sts-evidence"><div><span class="mono">EVIDENCE</span><h3>已经发生的事实</h3><p>板块多股涨停、龙头没有破位、个股缩量回踩、尾盘资金回流。</p></div><b aria-hidden="true">≠</b><div><span class="mono">ASSUMPTION</span><h3>尚未验证的推测</h3><p>“一定在洗盘”“明天肯定反包”“板块必然继续上涨”。</p></div><footer>逐渐减少把推测当成事实。</footer></div>
+      </section>
+
+      <section class="sts-chapter sts-journal" id="sts-journal">
+        <header class="sts-chapter-head"><div><span class="sts-chapter-index mono">03 / EVOLUTION</span><h2>我为什么会变成现在这样交易？</h2></div><p>AI Conversation 本身就是 Trading Journal。主角不是 AI，而是 Silver 的判断如何在讨论、执行和结果中逐渐变化。</p></header>
+        <div class="sts-journal-chain mono"><span>MY THOUGHT<small>我的判断</small></span><i>→</i><span>AI RESPONSE<small>AI 回应</small></span><i>→</i><span>MY DECISION<small>我的决定</small></span><i>→</i><span>MARKET RESULT<small>市场结果</small></span><i>→</i><span>REVIEW<small>复盘</small></span></div>
+        ${latestJournal ? `<div class="sts-journal-list">${t.journals.slice().sort((a, b) => b.date.localeCompare(a.date)).map(journalEntry).join("")}</div>` : `<div class="sts-journal-empty"><div><span class="mono">JOURNAL TIMELINE</span><strong>No conversation archived yet.</strong></div><p>当真实交易对话被整理后，每一天会按 Context、Conversation、Decision、Execution、Result、Review 与 Lesson 展开，并与资金曲线上的同一天互相连接。</p><ul><li>Context</li><li>Conversation</li><li>Decision</li><li>Execution</li><li>Review</li><li>Lesson</li></ul></div>`}
+      </section>
+      <footer class="sts-footer"><span>SILVER TRADING SYSTEM</span><strong>Result × Method × Evolution</strong><span>LONG-TERM ARCHIVE</span></footer>
+    </section>`;
+  }
+
   function fitnessStore() {
     try { return JSON.parse(localStorage.getItem("silver-fitness-v1")) || { completed: {}, weights: [] }; }
     catch { return { completed: {}, weights: [] }; }
@@ -560,7 +635,7 @@
   }
 
   function render(route) {
-    const renderers = { resume: renderResume, projects: renderProjects, project: () => renderProject(route.id), lab: renderLab, journey: renderJourney, changelog: renderChangelog, connect: renderConnect, fitness: renderFitness, report: () => renderReport(route) };
+    const renderers = { resume: renderResume, projects: renderProjects, project: () => renderProject(route.id), lab: renderLab, journey: renderJourney, changelog: renderChangelog, connect: renderConnect, fitness: renderFitness, trading: renderTrading, report: () => renderReport(route) };
     $("#view").innerHTML = renderers[route.view]();
     document.body.dataset.view = route.view;
     $("#route-label").textContent = routeNames[route.view];

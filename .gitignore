@@ -1,5 +1,13 @@
 # Silver Content Studio is intentionally local-only.
-.local-studio/
+.local-studio/*
+!.local-studio/server.js
+!.local-studio/public/
+.local-studio/public/*
+!.local-studio/public/index.html
+!.local-studio/public/studio.js
+!.local-studio/public/studio.css
+!.local-studio/启动编辑器.bat
+!.local-studio/使用说明.md
 
 # Local verification artifacts.
 .artifacts/
