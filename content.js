@@ -250,9 +250,9 @@ window.SILVER_DATA = {
   "fitnessPhotos": [
     {
       "day": 1,
-      "date": "",
-      "image": "",
-      "note": ""
+      "date": "2026.8.14",
+      "image": "assets/uploads/1787140529235-ecf7de-f4cee81ecf96389cb2f6242863945f66.jpg",
+      "note": "初期"
     },
     {
       "day": 28,

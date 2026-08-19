@@ -449,7 +449,7 @@
   function equityChart(snapshots) {
     const values = snapshots.map(item => item.capital), min = Math.min(...values), max = Math.max(...values), range = Math.max(1, max - min);
     const points = snapshots.map((item, index) => `${snapshots.length === 1 ? 50 : 4 + index / (snapshots.length - 1) * 92},${88 - (item.capital - min) / range * 72}`).join(" ");
-    const dots = snapshots.map((item, index) => { const x = snapshots.length === 1 ? 50 : 4 + index / (snapshots.length - 1) * 92, y = 88 - (item.capital - min) / range * 72, label = `${item.date} · ${money(item.capital)}`; return item.journalId ? `<a class="sts-chart-point route-link" style="--point-x:${x}%;--point-y:${y}%" href="?view=trading#journal-${encodeURIComponent(item.journalId)}" data-route="trading" aria-label="${esc(label)}，打开交易日志" title="${esc(label)} · 打开交易日志"></a>` : `<span class="sts-chart-point" style="--point-x:${x}%;--point-y:${y}%" role="img" aria-label="${esc(label)}" title="${esc(label)}"></span>`; }).join("");
+    const dots = snapshots.map((item, index) => { const x = snapshots.length === 1 ? 50 : 4 + index / (snapshots.length - 1) * 92, y = 88 - (item.capital - min) / range * 72, label = `${item.date} · ${money(item.capital)}`; return item.journalId ? `<a class="sts-chart-point route-link" style="--point-x:${x}%;--point-y:${y}%" href="?view=trading&journal=${encodeURIComponent(item.journalId)}#sts-journal" data-route="trading" aria-label="${esc(label)}，打开交易日志" title="${esc(label)} · 打开交易日志"></a>` : `<span class="sts-chart-point" style="--point-x:${x}%;--point-y:${y}%" role="img" aria-label="${esc(label)}" title="${esc(label)}"></span>`; }).join("");
     return `<div class="sts-chart"><div class="sts-chart-plot"><svg viewBox="0 0 100 100" preserveAspectRatio="none" role="img" aria-label="资金曲线，共 ${snapshots.length} 条真实记录"><path d="M4 16H96M4 40H96M4 64H96M4 88H96"/><polyline points="${points}"/></svg>${dots}</div><div class="sts-chart-axis"><span>${esc(snapshots[0].date)}</span><strong>${money(min)} — ${money(max)}</strong><span>${esc(snapshots.at(-1).date)}</span></div></div>`;
   }
 
@@ -460,6 +460,10 @@
 
   function renderTrading() {
     const t = window.SILVER_TRADING;
+    const journals = (t.journals || []).slice().sort((a, b) => b.date.localeCompare(a.date));
+    const requestedJournal = new URLSearchParams(location.search).get("journal");
+    const selectedJournalIndex = Math.max(0, journals.findIndex(item => item.id === requestedJournal));
+    const selectedJournal = journals[selectedJournalIndex];
     const snapshots = (t.capital.snapshots || []).filter(item => item.date && Number.isFinite(item.capital)).sort((a, b) => a.date.localeCompare(b.date));
     const currentCapital = Number.isFinite(t.capital.current) ? t.capital.current : snapshots.at(-1)?.capital;
     const initialCapital = Number.isFinite(t.capital.initial) ? t.capital.initial : snapshots[0]?.capital;
@@ -470,7 +474,6 @@
     const monthKeys = ["07", "08", "09", "10", "11", "12"];
     const monthLabels = ["JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
     const monthlyValues = monthKeys.map(month => { const records = snapshots.filter(item => item.date.slice(5, 7) === month); if (!records.length) return null; if (records.length > 1 && records[0].capital) return (records.at(-1).capital / records[0].capital - 1) * 100; return Number.isFinite(records[0].pnlPercent) ? records[0].pnlPercent : null; });
-    const latestJournal = t.journals[0];
     return `<section class="page sts-page">
       <header class="sts-hero">
         <div class="sts-hero-copy"><h1>Silver Trading<br>System</h1><p>A 股短线 / 短波段的个人研究档案。记录资金如何变化、方法如何形成，以及判断如何在与 AI 的长期对话中被验证。</p></div>
@@ -503,7 +506,7 @@
       <section class="sts-chapter sts-journal" id="sts-journal">
         <header class="sts-chapter-head"><div><span class="sts-chapter-index mono">03 / EVOLUTION</span><h2>我为什么会变成现在这样交易？</h2></div><p>AI Conversation 本身就是 Trading Journal。主角不是 AI，而是 Silver 的判断如何在讨论、执行和结果中逐渐变化。</p></header>
         <div class="sts-journal-chain mono"><span>MY THOUGHT<small>我的判断</small></span><i>→</i><span>AI RESPONSE<small>AI 回应</small></span><i>→</i><span>MY DECISION<small>我的决定</small></span><i>→</i><span>MARKET RESULT<small>市场结果</small></span><i>→</i><span>REVIEW<small>复盘</small></span></div>
-        ${latestJournal ? `<div class="sts-journal-list">${t.journals.slice().sort((a, b) => b.date.localeCompare(a.date)).map(journalEntry).join("")}</div>` : `<div class="sts-journal-empty"><div><span class="mono">JOURNAL TIMELINE</span><strong>No conversation archived yet.</strong></div><p>当真实交易对话被整理后，每一天会按 Context、Conversation、Decision、Execution、Result、Review 与 Lesson 展开，并与资金曲线上的同一天互相连接。</p><ul><li>Context</li><li>Conversation</li><li>Decision</li><li>Execution</li><li>Review</li><li>Lesson</li></ul></div>`}
+        ${selectedJournal ? `<div class="sts-journal-browser"><div class="sts-journal-browser-copy"><span class="mono">JOURNAL ARCHIVE / 交易记录</span><strong>选择要查看的交易日</strong><small>共 ${journals.length} 天，当前为第 ${selectedJournalIndex + 1} 条</small></div><div class="sts-journal-controls"><label for="sts-journal-date">交易日期</label><select id="sts-journal-date" data-journal-select>${journals.map((item, index) => `<option value="${esc(item.id)}"${index === selectedJournalIndex ? " selected" : ""}>${esc(item.date)} · ${esc(item.title || "交易记录")}</option>`).join("")}</select><div><button type="button" data-journal-newer${selectedJournalIndex === 0 ? " disabled" : ""}>← 较新一天</button><button type="button" data-journal-older${selectedJournalIndex === journals.length - 1 ? " disabled" : ""}>较早一天 →</button></div></div></div><div class="sts-journal-list">${journalEntry(selectedJournal)}</div>` : `<div class="sts-journal-empty"><div><span class="mono">JOURNAL TIMELINE</span><strong>No conversation archived yet.</strong></div><p>当真实交易对话被整理后，每一天会按 Context、Conversation、Decision、Execution、Result、Review 与 Lesson 展开，并与资金曲线上的同一天互相连接。</p><ul><li>Context</li><li>Conversation</li><li>Decision</li><li>Execution</li><li>Review</li><li>Lesson</li></ul></div>`}
       </section>
       <footer class="sts-footer"><span>SILVER TRADING SYSTEM</span><strong>Result × Method × Evolution</strong><span>LONG-TERM ARCHIVE</span></footer>
     </section>`;
@@ -657,6 +660,21 @@
     }));
     if (route.view === "journey") initFootprintMap();
     if (route.view === "fitness") bindFitnessEvents();
+    if (route.view === "trading") {
+      const openJournal = id => {
+        const url = new URL(location.href);
+        url.searchParams.set("view", "trading");
+        url.searchParams.set("journal", id);
+        url.hash = "sts-journal";
+        history.replaceState({}, "", url);
+        render(parseRoute());
+        requestAnimationFrame(() => $("#sts-journal")?.scrollIntoView({ block: "start" }));
+      };
+      const select = $("[data-journal-select]");
+      select?.addEventListener("change", () => openJournal(select.value));
+      $("[data-journal-newer]")?.addEventListener("click", () => select && openJournal(select.options[Math.max(0, select.selectedIndex - 1)].value));
+      $("[data-journal-older]")?.addEventListener("click", () => select && openJournal(select.options[Math.min(select.options.length - 1, select.selectedIndex + 1)].value));
+    }
     if (route.view === "report") bindReportEvents(route);
     if (route.view === "changelog") $$('[data-release]').forEach(button => button.addEventListener("click", () => { const body = button.closest(".release").querySelector(".release-changes"); body.hidden = !body.hidden; button.textContent = body.hidden ? "+" : "−"; button.setAttribute("aria-expanded", String(!body.hidden)); }));
     if (route.view === "changelog") $("[data-history-lock]")?.addEventListener("click", async () => {

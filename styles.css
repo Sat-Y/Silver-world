@@ -319,8 +319,22 @@ a.sts-chart-point:hover::before, a.sts-chart-point:focus-visible::before { backg
 .sts-journal-chain i { color: var(--accent); font-style: normal; }
 .sts-journal-chain span small { display: block; margin-top: 5px; color: var(--text); font: 12px var(--sans); letter-spacing: 0; }
 .sts-journal-empty { margin-top: 60px; display: grid; grid-template-columns: .8fr 1.2fr; gap: 8vw; padding: 52px 0; border-block: 1px solid var(--line); }
-.sts-journal-list { margin-top: 70px; border-top: 1px solid var(--line-strong); }
+.sts-journal-browser { margin-top: 70px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 420px); gap: 7vw; align-items: end; padding: 28px 0; border-block: 1px solid var(--line-strong); }
+.sts-journal-browser-copy { display: grid; gap: 8px; }
+.sts-journal-browser-copy > span { color: var(--accent); font-size: 9px; }
+.sts-journal-browser-copy strong { font-size: clamp(24px, 3vw, 38px); font-weight: 500; letter-spacing: -.025em; }
+.sts-journal-browser-copy small { color: var(--muted); }
+.sts-journal-controls { min-width: 0; }
+.sts-journal-controls label { display: block; margin-bottom: 8px; color: var(--muted); font: 9px var(--mono); }
+.sts-journal-controls select { width: 100%; min-height: 46px; padding: 0 40px 0 13px; border: 1px solid var(--line-strong); border-radius: 0; background: var(--bg); color: var(--text); font: 16px var(--sans); }
+.sts-journal-controls > div { display: grid; grid-template-columns: 1fr 1fr; margin-top: 8px; }
+.sts-journal-controls button { min-height: 44px; border: 1px solid var(--line); background: transparent; color: var(--text); font: 9px var(--mono); cursor: pointer; }
+.sts-journal-controls button + button { border-left: 0; }
+.sts-journal-controls button:hover:not(:disabled), .sts-journal-controls button:focus-visible { border-color: var(--accent); color: var(--accent); }
+.sts-journal-controls button:disabled { color: var(--faint); cursor: not-allowed; }
+.sts-journal-list { border-bottom: 1px solid var(--line-strong); }
 .sts-journal-entry { padding: 46px 0 80px; border-bottom: 1px solid var(--line-strong); scroll-margin-top: 90px; }
+.sts-journal-list .sts-journal-entry { border-bottom: 0; }
 .sts-journal-entry > header { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
 .sts-journal-entry time { font: 500 14px var(--mono); color: var(--accent); }
 .sts-journal-entry header span { color: var(--muted); font-size: 9px; }
@@ -348,7 +362,7 @@ a.sts-chart-point:hover::before, a.sts-chart-point:focus-visible::before { backg
 .sts-footer strong { color: var(--text); font-size: 14px; font-weight: 500; }
 
 @media (max-width: 900px) {
-  .sts-hero, .sts-chapter-head, .sts-capital-readout, .sts-capital-secondary, .sts-plan-grid, .sts-journal-empty { grid-template-columns: 1fr; }
+  .sts-hero, .sts-chapter-head, .sts-capital-readout, .sts-capital-secondary, .sts-plan-grid, .sts-journal-empty, .sts-journal-browser { grid-template-columns: 1fr; }
   .sts-hero { min-height: auto; }
   .sts-system-state { align-self: auto; }
   .sts-capital-readout dl { border-left: 0; border-top: 1px solid var(--line); }
