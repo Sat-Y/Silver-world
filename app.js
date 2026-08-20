@@ -476,8 +476,16 @@
     const monthlyValues = monthKeys.map(month => { const records = snapshots.filter(item => item.date.slice(5, 7) === month); if (!records.length) return null; if (records.length > 1 && records[0].capital) return (records.at(-1).capital / records[0].capital - 1) * 100; return Number.isFinite(records[0].pnlPercent) ? records[0].pnlPercent : null; });
     return `<section class="page sts-page">
       <header class="sts-hero">
-        <div class="sts-hero-copy"><h1>Silver Trading<br>System</h1><p>A 股短线 / 短波段的个人研究档案。记录资金如何变化、方法如何形成，以及判断如何在与 AI 的长期对话中被验证。</p></div>
-        <div class="sts-system-state"><span class="mono">${esc(t.strategy.version)}</span><strong>${esc(t.strategy.status)}</strong><p>Money × Strategy × Conversation</p></div>
+        <div class="sts-hero-copy"><span class="sts-cover-label mono">PERSONAL TRADING ARCHIVE / 个人交易档案</span><h1><span class="sts-title-owner">SILVER</span><span class="sts-title-main">TRADING</span><span class="sts-title-system">SYSTEM</span></h1><p>A 股短线 / 短波段的个人研究档案。记录资金如何变化、方法如何形成，以及判断如何在与 AI 的长期对话中被验证。</p></div>
+        <aside class="sts-hero-summary" aria-label="交易系统实时摘要">
+          <div class="sts-hero-summary-head"><span class="mono">${esc(t.strategy.version)}</span><strong>${esc(t.strategy.status)}</strong></div>
+          <dl>
+            <div class="sts-hero-primary"><dt>CURRENT CAPITAL</dt><dd>${money(currentCapital)}</dd></div>
+            <div><dt>TOTAL RETURN</dt><dd class="${totalReturn >= 0 ? "is-positive" : "is-negative"}">${percent(totalReturn)}</dd></div>
+            <div><dt>UPDATED</dt><dd>${esc(latestSnapshot?.date || "WAITING")}</dd></div>
+            <div><dt>SYSTEM</dt><dd>Money × Strategy × AI</dd></div>
+          </dl>
+        </aside>
         <nav class="sts-local-nav mono" aria-label="交易系统章节"><a href="#sts-capital">CAPITAL</a><a href="#sts-strategy">STRATEGY</a><a href="#sts-journal">JOURNAL</a></nav>
       </header>
 
