@@ -137,7 +137,6 @@ button { color: inherit; }
 .table-editor-row .field > span { display: none; }
 .milestone-grid { grid-template-columns: 1fr 1fr 1fr auto; align-items: end; }
 .compact-repeater .repeater-row { padding: 12px; }
-.trading-strategy-lists { display: grid; grid-template-columns: 1.4fr .8fr .8fr; gap: 18px; margin-top: 22px; }
 .conversation-editor { display: grid; gap: 8px; }
 .conversation-row { display: grid; grid-template-columns: 180px minmax(0, 1fr) 34px; gap: 10px; align-items: start; padding: 12px; border: 1px solid var(--line); background: var(--panel); }
 .conversation-row textarea { min-height: 112px; }
@@ -168,7 +167,7 @@ button { color: inherit; }
   .editor { padding: 20px 14px; }
   .form-grid, .split-editor, .dashboard-section { grid-template-columns: 1fr; }
   .trading-sync-note { align-items: flex-start; flex-direction: column; }
-  .milestone-grid, .trading-strategy-lists, .conversation-row { grid-template-columns: 1fr; }
+  .milestone-grid, .conversation-row { grid-template-columns: 1fr; }
   .record-list { position: static; max-height: 240px; overflow: auto; }
   .preview { inset: 0; height: 100vh; }
   .dashboard-grid { grid-template-columns: 1fr 1fr; }

@@ -55,15 +55,15 @@ window.SILVER_DATA = {
   },
   "experience": [
     {
-      "period": "2026.05 — 2026.11",
+      "period": "2026.05 — 至今（预计2026.11结束）",
       "company": "腾娱互动（腾讯子公司）",
       "role": "AI 游戏策划实习生",
       "status": "实习中",
       "summary": "参与 AI 小游戏的策划与制作，把模型能力转化为可以运行、验证和迭代的游戏流程。",
       "highlights": [
-        "参与 AI 小游戏从玩法构想到原型制作的工作流程",
-        "完成游戏角色一键 AI 换肤流程的策划与制作",
-        "参与游戏测试提出并复现bug并讨论解决方案"
+        "参与AI游戏原型的需求梳理、功能验收、玩法测试与版本迭代。",
+        "根据玩法目标整理功能需求和验收要点，跟进问题复现、修改确认与回归测试。",
+        "使用AI辅助完成原型验证，在开发过程中持续校验功能表现与策划预期。"
       ]
     }
   ],
@@ -96,7 +96,8 @@ window.SILVER_DATA = {
     "浙江省大创银奖、铜奖",
     "校级 AIGC 一等奖",
     "亚太杯数学建模 F 奖",
-    "温州大学二等奖学金"
+    "温州大学二等奖学金",
+    "中国智能机器人创意大赛一等奖"
   ],
   "lab": [
     {
@@ -175,7 +176,7 @@ window.SILVER_DATA = {
       "evidence": [
         "RAG 镜像模仿",
         "16 种 MBTI 结局",
-        "约 3,000 行代码"
+        "AI人设框定"
       ],
       "showcaseImage": "assets/the-final-resonance.jpg",
       "showcaseImageWebp": "assets/the-final-resonance.webp",

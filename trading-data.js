@@ -2,7 +2,7 @@
 window.SILVER_TRADING = {
   "capital": {
     "initial": 10000,
-    "current": 11061.37,
+    "current": 10598.13,
     "snapshots": [
       {
         "date": "2026-08-17",
@@ -51,6 +51,14 @@ window.SILVER_TRADING = {
         "pnlPercent": null,
         "journalId": "",
         "note": "抓到了强势股，吃了半个涨停"
+      },
+      {
+        "date": "2026-08-24",
+        "capital": 10598.13,
+        "pnl": -463.24,
+        "pnlPercent": null,
+        "journalId": "",
+        "note": "没招了，不敢玩了，减仓了，目前只剩200股"
       }
     ],
     "monthly": [],
@@ -144,6 +152,23 @@ window.SILVER_TRADING = {
     ]
   },
   "journals": [
+    {
+      "id": "journal-2026-08-24",
+      "date": "2026-08-24",
+      "title": "今天开始手打，之前是ai写的",
+      "context": "市场1000多加上涨，4000多家下跌，49家涨停，9家跌停好像，主要涨的是小金属，剩下忘记了，没事，后面我会越来越专业，巧了，无语了，我没割肉的那两支又大跌了，所以我有点崩溃了，下班的时候电动车还倒在马路边了，诗人哇，黑色824，曹",
+      "conversations": [
+        {
+          "role": "silver",
+          "content": "我今天的操作，\n割肉方正，认亏464，\n割肉彩虹，把收益500输到了90才收菜，老八了，运营失败，\n卖了一部分通鼎，又买了一笔，收益40，高开没走，我认为我也是错了\n然后哈药尾盘冲高，又被骗进去了，目前亏损-15"
+        }
+      ],
+      "decision": "",
+      "execution": "",
+      "result": "",
+      "review": "由于长期盯盘，不断有踏空和错买错卖心理，导致心态失控，有损心情健康，决定降低仓位和改变交易方式",
+      "lesson": "没什么经验，单纯觉得和gpt的配合没有和gemini熟练，目前把gpt罢免了"
+    },
     {
       "id": "journal-2026-08-21",
       "date": "2026-08-21",
