@@ -607,5 +607,15 @@ window.SILVER_DATA = {
       "label": "Douyin",
       "href": "https://www.douyin.com/user/MS4wLjABAAAAm1NLHxmXfGA4qVcc-2YIAgt3stWfl_zaNozQ13hUR-uq-dHHYggP68kIaGRLPfg8"
     }
+  ],
+  "games": [
+    {
+      "id": "game-fd2cd2eb-29fb-4b97-9c30-6c20eff20d14",
+      "title": "王者荣耀",
+      "format": "online",
+      "status": "暂时搁置",
+      "hours": "",
+      "genre": "MOBA手游"
+    }
   ]
 };

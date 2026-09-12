@@ -2,7 +2,7 @@
 window.SILVER_TRADING = {
   "capital": {
     "initial": 10000,
-    "current": 10598.13,
+    "current": 22085.43,
     "snapshots": [
       {
         "date": "2026-08-17",
@@ -59,6 +59,70 @@ window.SILVER_TRADING = {
         "pnlPercent": null,
         "journalId": "",
         "note": "没招了，不敢玩了，减仓了，目前只剩200股"
+      },
+      {
+        "date": "2026-08-25",
+        "capital": 10743.14,
+        "pnl": 145.01,
+        "pnlPercent": null,
+        "journalId": "",
+        "note": ""
+      },
+      {
+        "date": "2026-08-26",
+        "capital": 11107.18,
+        "pnl": 364.04,
+        "pnlPercent": null,
+        "journalId": "",
+        "note": ""
+      },
+      {
+        "date": "2026-08-27",
+        "capital": 11614.73,
+        "pnl": 507.55,
+        "pnlPercent": null,
+        "journalId": "",
+        "note": ""
+      },
+      {
+        "date": "2026-08-28",
+        "capital": 11717.81,
+        "pnl": 103.08,
+        "pnlPercent": null,
+        "journalId": "",
+        "note": ""
+      },
+      {
+        "date": "2026-08-31",
+        "capital": 11697.22,
+        "pnl": -20.59,
+        "pnlPercent": null,
+        "journalId": "",
+        "note": ""
+      },
+      {
+        "date": "2026-09-02",
+        "capital": 11454.02,
+        "pnl": -243.2,
+        "pnlPercent": null,
+        "journalId": "",
+        "note": ""
+      },
+      {
+        "date": "2026-09-05",
+        "capital": 20593.32,
+        "pnl": 9139.32,
+        "pnlPercent": null,
+        "journalId": "",
+        "note": ""
+      },
+      {
+        "date": "2026-09-11",
+        "capital": 22085.43,
+        "pnl": 1492.11,
+        "pnlPercent": null,
+        "journalId": "",
+        "note": ""
       }
     ],
     "monthly": [],
@@ -152,6 +216,40 @@ window.SILVER_TRADING = {
     ]
   },
   "journals": [
+    {
+      "id": "journal-2026-09-12",
+      "date": "2026-09-12",
+      "title": "9.7到9.11的交易总结",
+      "context": "市场是大盘指数稳定在39.23上下的横盘震荡，最后在9.11发生了向下变盘，触底测试承接3850",
+      "conversations": [
+        {
+          "role": "silver",
+          "content": "我运气好，刚好在小行情板块，光纤电缆，原因是找热门股，也就是之前涨停过的股票，\n- 先找到了通鼎互联，也就是目前的三龙最弱龙，吃到了二板，最终获利600撤离\n后续开始关注了光纤电缆板块\n- 所以在大龙远东冲击涨停时，我初生牛犊不怕虎，我上车打板，当天尾盘成功封板，后续不断突破前压，但我后续因为恐高下车了，19块的上的车，24.90下的车，获利1800\n- 目前资金来到了光纤二龙杭电股份，目前盈利300，是在回踩承接时进的场，因为我认为他会跟龙涨，且刚回踩承接并证明承接有效，属于胜率较高的入场时机\n\n还有小部分资金在确认自己的策略，放量站上会五日线的由弱转强的入场信号"
+        }
+      ],
+      "decision": "",
+      "execution": "",
+      "result": "",
+      "review": "",
+      "lesson": ""
+    },
+    {
+      "id": "journal-2026-09-05",
+      "date": "2026-09-05",
+      "title": "9月，新的交易的开始",
+      "context": "目前市场是弱势震荡行情，A股大盘在3900附近震荡，板块轮动，暂时没有看到明确主线",
+      "conversations": [
+        {
+          "role": "silver",
+          "content": "月初的交易可以说是失败的，30块进宇环，由于没有考虑宇环中报亏损和市值降低因素，还是想着会和以前一样资金会拉题材股，最后宇环破位，导致亏损500\n第二笔亏损就是通鼎，周五由于市场外存在不确定因素，所以机构和主力资金大量撤离，最后到达止损，亏损390"
+        }
+      ],
+      "decision": "目前持仓\n远东股份   400股    20.77成本     21.20现价\n通鼎互联   200股    22.37成本     20.38现价\n通鼎是因为周五追高又进了200股，属于不冷静操作，后续需要尽量避免",
+      "execution": "",
+      "result": "",
+      "review": "",
+      "lesson": ""
+    },
     {
       "id": "journal-2026-08-24",
       "date": "2026-08-24",

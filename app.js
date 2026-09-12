@@ -8,6 +8,7 @@
   const sha256 = async value => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value)))].map(byte => byte.toString(16).padStart(2, "0")).join("");
   const routeNames = { resume: "RESUME", projects: "PROJECT ARCHIVE", project: "PROJECT RECORD", lab: "EXPERIMENT LAB", journey: "FOOTPRINT ATLAS", changelog: "LIFE CHANGELOG", connect: "OPEN CHANNEL", fitness: "FITNESS PROTOCOL", trading: "CAPITAL CHANGE", report: "EXPORT REPORT" };
   let currentRoute = "";
+  Object.assign(routeNames, { games: "GAME ATLAS", game: "GAME STUDY" });
 
   function parseRoute() {
     const params = new URLSearchParams(location.search);
@@ -630,12 +631,18 @@
 
   function render(route) {
     const renderers = { resume: renderResume, projects: renderProjects, project: () => renderProject(route.id), lab: renderLab, journey: renderJourney, changelog: renderChangelog, connect: renderConnect, fitness: renderFitness, trading: renderTrading, report: () => renderReport(route) };
+    renderers.games = () => window.SILVER_GAME_ATLAS.render();
+    renderers.game = () => window.SILVER_GAME_ATLAS.render(route.id || "missing");
     $("#view").innerHTML = renderers[route.view]();
     document.body.dataset.view = route.view;
     $("#route-label").textContent = routeNames[route.view];
     document.title = `${routeNames[route.view]} — Silver OS`;
     $$("[data-route]").forEach(link => link.classList.toggle("active", link.dataset.route === route.view || (route.view === "project" && link.dataset.route === "projects")));
     bindDynamicEvents(route);
+    if (route.view === "games" || route.view === "game") {
+      window.SILVER_GAME_ATLAS.bind();
+      $$('[data-route="games"]').forEach(link => link.classList.add("active"));
+    }
     requestAnimationFrame(() => $$(".page > *, .archive-card, .cap-node, .release").forEach((node, index) => { node.style.setProperty("--enter-index", Math.min(index, 10)); node.classList.add("panel-enter"); }));
   }
 

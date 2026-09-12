@@ -172,3 +172,8 @@ button { color: inherit; }
   .preview { inset: 0; height: 100vh; }
   .dashboard-grid { grid-template-columns: 1fr 1fr; }
 }
+:root .game-editor-section { border-top: 1px solid var(--line); margin-top: 24px; padding-top: 16px; }
+:root .game-editor-section summary { cursor: pointer; padding: 12px 0; font-weight: 600; }
+:root .game-editor-section .form-grid { margin-top: 16px; }
+:root .game-template-note { display: flex; justify-content: space-between; gap: 16px; margin: 0 0 22px; padding: 14px 16px; background: var(--surface-2); color: var(--muted); }
+:root .game-template-note strong { color: var(--text); }

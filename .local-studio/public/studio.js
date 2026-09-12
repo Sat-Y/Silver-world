@@ -7,6 +7,7 @@ const state = {
   mapCountries: [],
   section: "dashboard",
   selectedProject: 0,
+  selectedGame: 0,
   selectedProvince: "",
   selectedJournal: 0,
   dirty: false,
@@ -20,6 +21,7 @@ const sectionMeta = {
   dashboard: ["WORKSPACE / OVERVIEW", "内容总览"],
   resume: ["CONTENT / RESUME", "简历编辑"],
   projects: ["CONTENT / PROJECTS", "项目档案"],
+  games: ["CONTENT / GAME ATLAS", "游戏图鉴"],
   footprints: ["CONTENT / FOOTPRINTS", "人生足迹"],
   fitness: ["CONTENT / FITNESS", "健身记录"],
   trading: ["CONTENT / CAPITAL", "资金变动"],
@@ -255,6 +257,17 @@ function renderAdvanced() {
     <div class="section-rule"><span>应用后仍只保存为本地草稿</span><button class="button primary" data-action="apply-json" type="button">验证并应用 JSON</button></div>`;
 }
 
+function renderGames() {
+  const games = state.data.games || [];
+  state.selectedGame = Math.min(state.selectedGame, Math.max(0, games.length - 1));
+  const game = games[state.selectedGame];
+  const top = heading("游戏图鉴", "先记游玩经历，再选一个值得研究的设计展开。观察要有场景，方案要有验证。", '<button class="button primary" data-action="add-game" type="button">新建游戏</button>');
+  if (!game) return `${top}<div class="empty">从最近玩过的一款开始。基础记录只需游戏名、游玩状态和一句话体验，其他分析按需填写。</div>`;
+  const p = ["games", state.selectedGame];
+  const analysisSections = window.SILVER_GAME_ATLAS.getSections(game);
+  return `${top}<div class="split-editor"><div class="record-list">${games.map((g,i) => `<button class="record-item${i === state.selectedGame ? " is-active" : ""}" data-action="select-game" data-index="${i}" type="button"><strong>${esc(g.title || "未命名游戏")}</strong><small>${esc((g.format || "indie") === "online" ? "网络游戏" : "独立 / 单机")} · ${esc(g.status || "在玩")}</small></button>`).join("")}</div><article class="record-editor"><header class="record-editor-header"><h2>${esc(game.title || "未命名游戏")}</h2><button class="button small danger" data-action="remove-game" type="button">删除游戏</button></header><div class="game-template-note"><strong>${game.format === "online" ? "网络游戏精简模板" : "独立 / 单机完整模板"}</strong><span>${game.format === "online" ? "聚焦循环、长线成长、运营经济、社交与留存。" : "覆盖玩法、数值、关卡、叙事、交互与设计验证。"}</span></div><div class="form-grid">${field([...p,"title"], "游戏名称")}${field([...p,"format"], "游戏形态", {select: window.SILVER_GAME_ATLAS.formats})}${visibility([...p,"_visibility"])}${field([...p,"status"], "游玩状态", {select: window.SILVER_GAME_ATLAS.statuses.map(s => ({value:s,label:s}))})}${field([...p,"genre"], "玩法类型", {help:"例如：动作 RPG、策略、模拟经营"})}${field([...p,"platform"], "游玩平台")}${field([...p,"hours"], "累计游玩时长（小时）", {type:"number",help:"可填小数；未知留空"})}${field([...p,"version"], "版本 / 模式 / 难度")}${field([...p,"focus"], "本次拆解主题", {help:"例如：战斗反馈、新手引导、资源循环"})}${field([...p,"startedAt"], "开始游玩", {type:"date"})}${field([...p,"finishedAt"], "结束 / 最近游玩", {type:"date"})}${assetField([...p,"cover"], "代表截图（可选）")}</div>${analysisSections.map((s,i) => `<details class="game-editor-section" ${i === 0 ? "open" : ""}><summary>${s.title} · ${s.ability}</summary><div class="form-grid">${s.fields.map(([key,label,help]) => field([...p,key], label, {multiline:true,rows:3,help})).join("")}</div></details>`).join("")}</article></div>`;
+}
+
 function render() {
   if (!state.data) return;
   const [route, title] = sectionMeta[state.section];
@@ -262,6 +275,7 @@ function render() {
   $("#page-title").textContent = title;
   $$(".nav-item").forEach(item => item.classList.toggle("is-active", item.dataset.section === state.section));
   const renderers = { dashboard: renderDashboard, resume: renderResume, projects: renderProjects, footprints: renderFootprints, fitness: renderFitness, trading: renderTrading, advanced: renderAdvanced };
+  renderers.games = renderGames;
   $("#editor").innerHTML = renderers[state.section]();
 }
 
@@ -357,6 +371,7 @@ function toast(message, error = false) {
 }
 
 function previewView() {
+  if (state.section === "games") return state.data.games?.[state.selectedGame]?.id ? `game&id=${encodeURIComponent(state.data.games[state.selectedGame].id)}` : "games";
   return state.section === "projects" && state.data.projects?.[state.selectedProject]?.slug
     ? `project&id=${encodeURIComponent(state.data.projects[state.selectedProject].slug)}`
     : state.section === "footprints" ? "journey" : state.section === "fitness" ? "fitness" : state.section === "trading" ? "trading" : state.section === "resume" ? "resume" : "projects";
@@ -392,6 +407,16 @@ function mutateAndRender(callback) {
 function handleAction(button) {
   const [action, suffix] = button.dataset.action.split(":");
   const index = Number(button.dataset.index);
+  if (action === "select-game") { state.selectedGame = index; render(); refreshPreview(); return; }
+  if (action === "add-game") return mutateAndRender(() => {
+    state.data.games ||= [];
+    state.data.games.unshift({ id: `game-${crypto.randomUUID()}`, title: "", format: "indie", status: "在玩", _visibility: "draft", hours: "" });
+    state.selectedGame = 0;
+  });
+  if (action === "remove-game") {
+    if (confirm("删除这款游戏及其拆解笔记？已保存的内容可从本地备份恢复。")) return mutateAndRender(() => state.data.games.splice(state.selectedGame, 1));
+    return;
+  }
   if (action === "select-project") { state.selectedProject = index; render(); refreshPreview(); return; }
   if (action === "add-project") return mutateAndRender(() => {
     state.data.projects ||= [];
@@ -477,6 +502,13 @@ $("#editor").addEventListener("input", event => {
   const path = JSON.parse(decodeURIComponent(encoded));
   const value = event.target.type === "number" ? (event.target.value === "" ? null : Number(event.target.value)) : event.target.value;
   setAt(path, value);
+  if (path[0] === "games" && path[2] === "title") {
+    const title = value.trim() || "未命名游戏";
+    const listTitle = $('.record-item.is-active strong');
+    const editorTitle = $('.record-editor-header h2');
+    if (listTitle) listTitle.textContent = title;
+    if (editorTitle) editorTitle.textContent = title;
+  }
   markDirty();
 });
 
