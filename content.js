@@ -610,12 +610,45 @@ window.SILVER_DATA = {
   ],
   "games": [
     {
+      "id": "game-39c4d2e0-5195-4ee0-afbd-d9fe3fddcffa",
+      "title": "金铲铲之战",
+      "format": "online",
+      "status": "在玩",
+      "hours": 2000,
+      "platform": "腾讯",
+      "genre": "自走棋",
+      "startedAt": "2023-09-13",
+      "finishedAt": "2026-09-13",
+      "cover": "assets/uploads/1789295338274-f9add1-d6892973db1d26c0255d197aeb84f588.jpg",
+      "hook": "阵容搭配，赌狗阵容每个赛季的多样化，三星五费碾压的爽感和翻车的不甘心"
+    },
+    {
+      "id": "game-e29cae31-77d7-467c-a729-78d760dadb8e",
+      "title": "无畏契约（端游）",
+      "format": "online",
+      "status": "在玩",
+      "hours": 2000,
+      "genre": "FPS射击游戏",
+      "platform": "拳头/腾讯",
+      "startedAt": "2024-01-13",
+      "finishedAt": "2026-09-13",
+      "version": "",
+      "focus": "",
+      "cover": "assets/uploads/1789294448469-d36c2a-2b7c016eaf55dba7c7515eed5f45a054.jpg",
+      "hook": "队友间的配合，极致的瞄准，思路的博弈集于一体的游戏"
+    },
+    {
       "id": "game-fd2cd2eb-29fb-4b97-9c30-6c20eff20d14",
       "title": "王者荣耀",
       "format": "online",
       "status": "暂时搁置",
-      "hours": "",
-      "genre": "MOBA手游"
+      "hours": 3908,
+      "genre": "MOBA手游",
+      "finishedAt": "2026-09-13",
+      "cover": "assets/uploads/1789293914104-9e1119-736479ba1ba7f44560ddb8fb9d1bc338.jpg",
+      "startedAt": "2016-01-15",
+      "platform": "腾讯",
+      "hook": "以前是游戏的新鲜感，不同的英雄不同的技能，追求最强王者；现在是朋友间的一起娱乐的项目，休闲"
     }
   ]
 };
