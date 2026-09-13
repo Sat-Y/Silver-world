@@ -634,7 +634,7 @@ window.SILVER_DATA = {
       "finishedAt": "2026-09-13",
       "version": "",
       "focus": "",
-      "cover": "assets/uploads/1789294448469-d36c2a-2b7c016eaf55dba7c7515eed5f45a054.jpg",
+      "cover": "assets/uploads/1789295999653-d5d43a-2026-09-13-183846.png",
       "hook": "队友间的配合，极致的瞄准，思路的博弈集于一体的游戏"
     },
     {
