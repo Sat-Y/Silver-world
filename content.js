@@ -610,6 +610,19 @@ window.SILVER_DATA = {
   ],
   "games": [
     {
+      "id": "game-fb59d3a0-643b-4b27-9a5b-eebac61f65f6",
+      "title": "三角洲行动",
+      "format": "online",
+      "status": "已弃坑",
+      "hours": 665,
+      "platform": "腾讯",
+      "genre": "FPS+搜打撤",
+      "startedAt": "2024-11-21",
+      "finishedAt": "2026-07-08",
+      "cover": "assets/uploads/1789297098518-28430c-2026-09-13-185543.png",
+      "hook": "起初游戏玩法新颖，打到的就是自己的，后续物价上涨且我的账号爆率低，再加上新图需要真金白银的熟图成本，所以退游"
+    },
+    {
       "id": "game-9d5df673-aa12-4196-96fe-bfefea91a727",
       "title": "杀戮尖塔2",
       "format": "indie",
