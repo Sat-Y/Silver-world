@@ -610,6 +610,21 @@ window.SILVER_DATA = {
   ],
   "games": [
     {
+      "id": "game-9d5df673-aa12-4196-96fe-bfefea91a727",
+      "title": "杀戮尖塔2",
+      "format": "indie",
+      "status": "在玩",
+      "hours": 150,
+      "genre": "卡牌肉鸽",
+      "platform": "steam",
+      "version": "2026.6.19常见版",
+      "cover": "assets/uploads/1789296390984-e0128c-2026-09-13-184543.png",
+      "finishedAt": "2026-09-13",
+      "startedAt": "2026-06-30",
+      "hook": "自己的卡牌构筑过程，和看到自己的构筑无敌的爽感，还有有时候数值只差1的不甘",
+      "focus": "数值设计"
+    },
+    {
       "id": "game-39c4d2e0-5195-4ee0-afbd-d9fe3fddcffa",
       "title": "金铲铲之战",
       "format": "online",
