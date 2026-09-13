@@ -46,12 +46,12 @@
       <div class="overview-grid" aria-hidden="true"></div>
       <div class="overview-identity">
         <p class="eyebrow"><i class="signal"></i>${esc(profile.availability)}</p>
-        <div class="manga-kicker">RESUME FILE <span>／</span> OPEN TO OPPORTUNITIES</div>
         <h1>SILVER<span>/</span>Z</h1>
         <p class="overview-role mono">${esc(profile.role)}</p>
         <p class="overview-statement">${esc(profile.statement)}</p>
         <div class="resume-actions"><a class="os-button route-link" href="?view=projects" data-route="projects">VIEW SELECTED WORK <span>↘</span></a><a class="resume-text-link route-link" href="?view=connect" data-route="connect">CONTACT ME →</a><a class="resume-text-link route-link" href="?view=report&type=resume" data-route="report">EXPORT RESUME ↓</a></div>
       </div>
+      <div class="cover-sculpture" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
       <a class="resume-scroll-cue" href="#resume-content" aria-label="向下滚动查看完整简历"><span>SCROLL TO RESUME</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v15M6.5 13.5 12 19l5.5-5.5"/></svg></a>
       </div>
       <div class="resume-document">
@@ -261,6 +261,11 @@
     return (data.footprints?.countryFeed || []).map(post => ({ country: "China", countryLabel: "中国", ...post }));
   }
 
+  function mapRegionVisual(count = 0) {
+    const strength = Math.round(Math.min(86, 46 + Math.log2(Math.max(count, 1)) * 14));
+    return `--visit-strength:${strength}%`;
+  }
+
   function showChinaFootprintFeed() {
     showFootprintFeed("中国内足迹", "CHINA / ALL FOOTPRINTS", footprintRecords().filter(post => post.country === "China"));
   }
@@ -336,12 +341,10 @@
       if (post.country === "China" && post.province) counts.set(post.province, (counts.get(post.province) || 0) + 1);
       return counts;
     }, new Map());
-    const recordColor = count => Math.round(12 + Math.min(count, 10) * 5.4);
-    const fixedProvinceColor = name => name === "北京市" || name === "上海市";
     const provinces = (window.SILVER_CHINA_MAP?.features || []).filter(feature => feature.properties?.name);
-    const provincePaths = provinces.map(feature => { const name = feature.properties.name; const count = provinceCounts.get(name) || 0; const fixed = fixedProvinceColor(name); const explored = count > 0 || fixed; const strength = fixed ? 66 : recordColor(count); return `<path class="map-region map-province${explored ? " is-explored" : ""}"${explored ? ` style="--record-color:${strength}%"` : ""} d="${geoPath(feature.geometry, project)}" data-map-region="${esc(name)}" tabindex="-1" role="button" aria-label="${esc(name)}${explored ? "，已有足迹" : "，尚未建立足迹"}"><title>${esc(name)}</title></path>`; }).join("");
+    const provincePaths = provinces.map(feature => { const name = feature.properties.name; const count = provinceCounts.get(name) || 0; const explored = count > 0; return `<path class="map-region map-province${explored ? " is-explored" : ""}" style="${mapRegionVisual(count)}" d="${geoPath(feature.geometry, project)}" data-map-region="${esc(name)}" tabindex="-1" role="button" aria-label="${esc(name)}${explored ? "，已有足迹" : "，尚未建立足迹"}"><title>${esc(name)}</title></path>`; }).join("");
     const provinceLabels = provinces.map(feature => { const name = feature.properties.name; const points = geometryPoints(feature.geometry); const xs = points.map(point => point[0]), ys = points.map(point => point[1]); const [x, y] = project((Math.min(...xs) + Math.max(...xs)) / 2, (Math.min(...ys) + Math.max(...ys)) / 2); return `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}">${esc(name.replace(/省|市|壮族自治区|回族自治区|维吾尔自治区|自治区|特别行政区/g, ""))}</text>`; }).join("");
-    canvas.innerHTML = `<svg class="footprint-svg footprint-world" viewBox="35 20 1130 560" role="group" aria-label="可交互世界国家与中国省级地图" data-world-viewbox="35 20 1130 560" data-default-label="CHINA ACTIVE"><g class="country-layer">${features.map(feature => { const name = feature.properties?.name || feature.id || "Unknown"; const china = feature.id === "CHN" || name === "China"; const count = countryCounts.get(name) || 0; const explored = count > 0; const strength = recordColor(count); return `<path class="map-region country-region${china ? " country-china" : ""}${explored ? " is-explored" : ""}"${explored ? ` style="--record-color:${strength}%"` : ""} d="${geoPath(feature.geometry, project)}" data-map-region="${esc(name)}" tabindex="0" role="button" aria-label="${esc(name)}${explored ? "，已有足迹" : "，暂未探索"}"><title>${esc(name)}</title></path>`; }).join("")}</g><g class="embedded-province-layer">${provincePaths}</g><g class="province-labels embedded-province-labels" aria-hidden="true">${provinceLabels}</g></svg>`;
+    canvas.innerHTML = `<svg class="footprint-svg footprint-world" viewBox="35 20 1130 560" role="group" aria-label="可交互世界国家与中国省级地图" data-world-viewbox="35 20 1130 560" data-default-label="CHINA ACTIVE"><g class="country-layer">${features.map(feature => { const name = feature.properties?.name || feature.id || "Unknown"; const china = feature.id === "CHN" || name === "China"; const count = countryCounts.get(name) || 0; const explored = count > 0; return `<path class="map-region country-region${china ? " country-china" : ""}${explored ? " is-explored" : ""}" style="${mapRegionVisual(count)}" d="${geoPath(feature.geometry, project)}" data-map-region="${esc(name)}" tabindex="0" role="button" aria-label="${esc(name)}${explored ? `，${count} 条足迹记录` : "，暂未探索"}"><title>${esc(name)}${explored ? ` · ${count} 条记录` : ""}</title></path>`; }).join("")}</g><g class="embedded-province-layer">${provincePaths}</g><g class="province-labels embedded-province-labels" aria-hidden="true">${provinceLabels}</g></svg>`;
     const svg = $(".footprint-svg", canvas);
     bindMapRegions(svg, (name, region) => {
       if (region.classList.contains("map-province")) {
@@ -374,7 +377,7 @@
     $("#map-level").textContent = "WORLD / CHINA / PROVINCE INDEX";
     $("#map-location-name").textContent = "浙江省 ACTIVE";
     const provinceCounts = footprintRecords().reduce((counts, post) => { if (post.country === "China" && post.province) counts.set(post.province, (counts.get(post.province) || 0) + 1); return counts; }, new Map());
-    const paths = features.map(feature => { const name = feature.properties.name; const count = provinceCounts.get(name) || 0; const fixed = name === "北京市" || name === "上海市"; const explored = count > 0 || fixed; const strength = fixed ? 66 : Math.round(12 + Math.min(count, 10) * 5.4); return `<path class="map-region map-province${explored ? " is-explored" : ""}"${explored ? ` style="--record-color:${strength}%"` : ""} d="${geoPath(feature.geometry, project)}" data-map-region="${esc(name)}" tabindex="0" role="button" aria-label="${esc(name)}${explored ? "，已有足迹" : "，尚未建立足迹"}"><title>${esc(name)}</title></path>`; }).join("");
+    const paths = features.map(feature => { const name = feature.properties.name; const count = provinceCounts.get(name) || 0; const explored = count > 0; return `<path class="map-region map-province${explored ? " is-explored" : ""}" style="${mapRegionVisual(count)}" d="${geoPath(feature.geometry, project)}" data-map-region="${esc(name)}" tabindex="0" role="button" aria-label="${esc(name)}${explored ? `，${count} 条足迹记录` : "，尚未建立足迹"}"><title>${esc(name)}${explored ? ` · ${count} 条记录` : ""}</title></path>`; }).join("");
     const labels = features.map(feature => { const name = feature.properties.name; const points = geometryPoints(feature.geometry); const xs = points.map(point => point[0]), ys = points.map(point => point[1]); const [x, y] = project((Math.min(...xs) + Math.max(...xs)) / 2, (Math.min(...ys) + Math.max(...ys)) / 2); return `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}">${esc(name.replace(/省|市|壮族自治区|回族自治区|维吾尔自治区|自治区|特别行政区/g, ""))}</text>`; }).join("");
     canvas.innerHTML = `<svg class="footprint-svg footprint-china" viewBox="0 0 ${width} ${height}" role="group" aria-label="可交互中国省级地图" data-default-label="浙江省 ACTIVE"><g>${paths}</g><g class="province-labels" aria-hidden="true">${labels}</g></svg>`;
     const svg = $(".footprint-svg", canvas);
@@ -420,7 +423,7 @@
       <section class="footprint-atlas">
         <header class="map-toolbar"><div class="map-brand"><span class="mono">03 / FOOTPRINT ATLAS</span><strong>人生足迹</strong></div><div class="map-context"><span class="mono" id="map-level">WORLD / COUNTRY INDEX</span><strong id="map-location-name">LOADING MAP DATA</strong></div><button type="button" id="map-back" hidden>← 返回世界地图</button></header>
         <div class="map-layout"><div class="map-viewport"><div class="map-axis map-axis-x">180°W <span>0°</span> 180°E</div><div class="map-axis map-axis-y">90°N <span>0°</span> 90°S</div><div id="footprint-map-canvas" class="footprint-map-canvas" aria-live="polite"><div class="map-loading"><i></i><span>LOADING GEOGRAPHIC ARCHIVE</span></div></div></div><aside class="footprint-panel" id="footprint-panel" aria-label="足迹详情"><button class="footprint-panel-close" type="button" aria-label="关闭足迹详情">×</button><div class="footprint-panel-content"></div></aside></div>
-        <footer class="map-legend"><span><i class="is-active"></i>已有足迹</span><span><i></i>暂未探索 / 暂无记录</span><b>DRAG DISABLED · SELECT TO EXPLORE</b></footer>
+        <footer class="map-legend"><span><i></i>暂未探索</span><span><i class="visit-low"></i>少量足迹</span><span><i class="visit-mid"></i>多次到访</span><span><i class="visit-high"></i>频繁记录</span><b>橙色深浅代表到访次数</b></footer>
       </section>
     </section>`;
   }
@@ -444,8 +447,9 @@
   function equityChart(snapshots) {
     const values = snapshots.map(item => item.capital), min = Math.min(...values), max = Math.max(...values), range = Math.max(1, max - min);
     const points = snapshots.map((item, index) => `${snapshots.length === 1 ? 50 : 4 + index / (snapshots.length - 1) * 92},${88 - (item.capital - min) / range * 72}`).join(" ");
-    const dots = snapshots.map((item, index) => { const x = snapshots.length === 1 ? 50 : 4 + index / (snapshots.length - 1) * 92, y = 88 - (item.capital - min) / range * 72, label = `${item.date} · ${money(item.capital)}`; return item.journalId ? `<a class="sts-chart-point route-link" style="--point-x:${x}%;--point-y:${y}%" href="?view=trading&journal=${encodeURIComponent(item.journalId)}#sts-journal" data-route="trading" aria-label="${esc(label)}，打开资金变动记录" title="${esc(label)} · 打开资金变动记录"></a>` : `<span class="sts-chart-point" style="--point-x:${x}%;--point-y:${y}%" role="img" aria-label="${esc(label)}" title="${esc(label)}"></span>`; }).join("");
-    return `<div class="sts-chart"><div class="sts-chart-plot"><svg viewBox="0 0 100 100" preserveAspectRatio="none" role="img" aria-label="资金曲线，共 ${snapshots.length} 条真实记录"><path d="M4 16H96M4 40H96M4 64H96M4 88H96"/><polyline points="${points}"/></svg>${dots}</div><div class="sts-chart-axis"><span>${esc(snapshots[0].date)}</span><strong>${money(min)} — ${money(max)}</strong><span>${esc(snapshots.at(-1).date)}</span></div></div>`;
+    const precise = value => new Intl.NumberFormat("zh-CN", { style: "currency", currency: "CNY", minimumFractionDigits: 2 }).format(value);
+    const dots = snapshots.map((item, index) => { const x = snapshots.length === 1 ? 50 : 4 + index / (snapshots.length - 1) * 92, y = 88 - (item.capital - min) / range * 72; const delta = index ? item.capital - snapshots[index - 1].capital : null; return `<button type="button" class="sts-chart-point" style="--point-x:${x}%;--point-y:${y}%" data-chart-index="${index}" data-date="${esc(item.date)}" data-value="${esc(precise(item.capital))}" data-change="${delta === null ? '首条记录' : esc(`${delta >= 0 ? '+' : '−'}${precise(Math.abs(delta))} · 较上一条记录`)}" data-journal="${esc(item.journalId || '')}" aria-label="${esc(`${item.date}，资金 ${precise(item.capital)}`)}"></button>`; }).join("");
+    return `<div class="sts-chart"><div class="sts-chart-readout" aria-live="polite"><span data-chart-date>${esc(snapshots.at(-1).date)}</span><strong data-chart-value>${precise(snapshots.at(-1).capital)}</strong><span data-chart-change>移动、点选或用方向键查看记录</span><a data-chart-journal hidden>查看复盘 ↗</a></div><div class="sts-chart-plot"><svg viewBox="0 0 100 100" preserveAspectRatio="none" role="img" aria-label="资金曲线，共 ${snapshots.length} 条记录，横轴按记录等距排列"><path d="M4 16H96M4 40H96M4 64H96M4 88H96"/><polyline points="${points}"/></svg><span class="chart-guide" hidden></span>${dots}<span class="chart-scale chart-scale-high">${money(max)}</span><span class="chart-scale chart-scale-low">${money(min)}</span></div><div class="sts-chart-axis"><span>${esc(snapshots[0].date)}</span><strong>按记录排列 · 资金余额</strong><span>${esc(snapshots.at(-1).date)}</span></div></div>`;
   }
 
   function journalEntry(entry) {
@@ -659,6 +663,39 @@
     if (route.view === "journey") initFootprintMap();
     if (route.view === "fitness") bindFitnessEvents();
     if (route.view === "trading") {
+      const chart = $(".sts-chart");
+      if (chart) {
+        const dots = $$("[data-chart-index]", chart), plot = $(".sts-chart-plot", chart);
+        const show = index => {
+          const point = dots[index];
+          dots.forEach(dot => dot.classList.toggle("is-selected", dot === point));
+          $("[data-chart-date]", chart).textContent = point.dataset.date;
+          $("[data-chart-value]", chart).textContent = point.dataset.value;
+          $("[data-chart-change]", chart).textContent = point.dataset.change;
+          const link = $("[data-chart-journal]", chart);
+          link.hidden = !point.dataset.journal;
+          link.href = `?view=trading&journal=${encodeURIComponent(point.dataset.journal)}#sts-journal`;
+          const guide = $(".chart-guide", chart);
+          guide.hidden = false;
+          guide.style.left = point.style.getPropertyValue("--point-x");
+        };
+        plot.addEventListener("pointermove", event => {
+          const rect = plot.getBoundingClientRect();
+          const position = (event.clientX - rect.left) / rect.width * 100;
+          const nearest = dots.reduce((best, dot, index) => Math.abs(parseFloat(dot.style.getPropertyValue("--point-x")) - position) < Math.abs(parseFloat(dots[best].style.getPropertyValue("--point-x")) - position) ? index : best, 0);
+          show(nearest);
+        });
+        dots.forEach((dot, index) => {
+          dot.addEventListener("focus", () => show(index));
+          dot.addEventListener("click", () => show(index));
+          dot.addEventListener("keydown", event => {
+            if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+            event.preventDefault();
+            const next = event.key === "Home" ? 0 : event.key === "End" ? dots.length - 1 : Math.max(0, Math.min(dots.length - 1, index + (event.key === "ArrowRight" ? 1 : -1)));
+            dots[next].focus();
+          });
+        });
+      }
       const openJournal = id => {
         const url = new URL(location.href);
         url.searchParams.set("view", "trading");
