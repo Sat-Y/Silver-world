@@ -32,6 +32,21 @@
     </a>`;
   }
 
+  function heroProjectCard(project, index) {
+    const preview = project.showcaseImage || "";
+    const tags = (project.evidence || []).slice(0, 2);
+    return `<article class="hero-project-card hero-project-card--${index + 1}" data-hero-card style="--card-order:${index}">
+      <div class="hero-card-rotor">
+        <div class="hero-card-face hero-card-back" aria-hidden="true"><span class="hero-card-register top"></span><span class="hero-card-register bottom"></span><strong>SILVERZ</strong><i></i></div>
+        <a class="hero-card-face hero-card-front route-link" href="?view=project&id=${encodeURIComponent(project.slug)}" data-route="project" aria-label="打开项目：${esc(project.title)}">
+          <span class="hero-card-index mono">${esc(project.id)}</span><span class="hero-card-preview${preview ? " has-image" : ""}">${preview ? `<img src="${esc(preview)}" alt="" loading="lazy" decoding="async">` : `<b>${esc(project.index)}</b>`}</span>
+          <span class="hero-card-copy"><small>${esc(project.status)}</small><strong>${esc(project.title)}</strong><i>${esc(project.english)}</i></span><span class="hero-card-tags">${tags.map(tag => `<b>${esc(tag)}</b>`).join("")}</span><span class="hero-card-enter mono">OPEN CASE <b>→</b></span>
+        </a>
+      </div>
+      <button class="hero-card-trigger" type="button" data-card-trigger aria-expanded="false" aria-label="翻开${esc(project.title)}项目卡"><span>FLIP</span></button>
+    </article>`;
+  }
+
   function viewHeader(code, title, description) {
     return `<header class="view-header"><div><p class="section-code mono">${esc(code)}</p><h1>${title}</h1></div><p>${esc(description)}</p></header>`;
   }
@@ -39,10 +54,11 @@
   function renderResume() {
     const { profile } = data;
     const latest = data.versions[0];
-    const homeProjects = [...data.projects.filter(project => project.featuredOnHome), ...data.projects.filter(project => !project.featuredOnHome)].slice(0, 2);
+    const homeProjects = [...data.projects.filter(project => project.featuredOnHome), ...data.projects.filter(project => !project.featuredOnHome)].slice(0, 3);
     return `<section class="page overview-page resume-page">
       <div class="resume-cover">
-      <div class="hero-art" aria-hidden="true"><div class="hero-art-shift"><div class="hero-art-image"></div><div class="hero-monitor-glow"></div><div class="hero-night-lights"></div></div><div class="hero-paper-texture"></div><div class="hero-reading-shade"></div></div>
+      <div class="hero-scene" aria-hidden="true"><div class="hero-layer hero-layer-background"></div><div class="hero-layer hero-layer-character"><div class="hero-character-breath"></div></div><div class="hero-layer hero-hair-wind"></div><div class="hero-layer-vignette"></div></div>
+      <div class="hero-card-deck" aria-label="精选项目卡牌">${homeProjects.map(heroProjectCard).join("")}</div>
       <div class="overview-grid" aria-hidden="true"></div>
       <div class="overview-identity">
         <p class="eyebrow"><i class="signal"></i>${esc(profile.availability)}</p>
@@ -654,6 +670,10 @@
     if (route.view === "resume") {
       const cover = $(".resume-cover");
       if (cover && "IntersectionObserver" in window) new IntersectionObserver(([entry], observer) => { cover.classList.toggle("motion-paused", !entry.isIntersecting); if (!cover.isConnected) observer.disconnect(); }, { threshold: .05 }).observe(cover);
+      const cards = $$("[data-hero-card]", cover);
+      const closeCards = () => cards.forEach(card => { card.classList.remove("is-flipped"); $("[data-card-trigger]", card)?.setAttribute("aria-expanded", "false"); });
+      cards.forEach(card => $("[data-card-trigger]", card)?.addEventListener("click", () => { const opening = !card.classList.contains("is-flipped"); card.classList.toggle("is-flipped", opening); $("[data-card-trigger]", card).setAttribute("aria-expanded", String(opening)); }));
+      cover?.addEventListener("keydown", event => { if (event.key === "Escape") closeCards(); });
     }
     if (route.view === "projects") $$(".filter").forEach(button => button.addEventListener("click", () => {
       $$(".filter").forEach(item => item.classList.remove("active"));
@@ -754,16 +774,4 @@
   currentRoute = location.search;
   render(parseRoute());
 
-  addEventListener("pointermove", event => {
-    const cover = $(".resume-cover");
-    if (cover && !matchMedia("(prefers-reduced-motion: reduce)").matches && innerWidth >= 900) {
-      cover.style.setProperty("--hero-x", `${(event.clientX / innerWidth - .5) * -8}px`);
-      cover.style.setProperty("--hero-y", `${(event.clientY / innerHeight - .5) * -5}px`);
-    }
-    const portrait = $(".manga-portrait img");
-    if (!portrait || matchMedia("(prefers-reduced-motion: reduce)").matches || innerWidth < 900) return;
-    const x = (event.clientX / innerWidth - .5) * 8;
-    const y = (event.clientY / innerHeight - .5) * 6;
-    portrait.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-  }, { passive: true });
 })();
