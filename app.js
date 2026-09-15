@@ -32,18 +32,29 @@
     </a>`;
   }
 
-  function heroProjectCard(project, index) {
-    const preview = project.showcaseImage || "";
-    const tags = (project.evidence || []).slice(0, 2);
-    return `<article class="hero-project-card hero-project-card--${index + 1}" data-hero-card style="--card-order:${index}">
+  function heroProjectCard(card, index, total) {
+    const project = data.projects.find(item => item.slug === card.projectSlug) || {};
+    const display = { ...project, ...card };
+    const tags = (card.tags || project.evidence || []).filter(Boolean).slice(0, 2);
+    const center = index - (total - 1) / 2;
+    const step = total > 3 ? 52 : 66;
+    const mobileStep = total > 3 ? 38 : 70;
+    const x = -50 + center * step;
+    const y = -47 + Math.abs(center) * 7;
+    const rotation = center * 8;
+    const mobileX = -50 + center * mobileStep;
+    const targetSlug = display.projectSlug || display.slug || "";
+    const defaultLayout = { id: { x: 8, y: 5, w: 42 }, index: { x: 8, y: 17, w: 34 }, copy: { x: 9, y: 47, w: 82 }, tags: { x: 9, y: 70, w: 82 }, action: { x: 9, y: 91, w: 82 } };
+    const regionStyle = key => { const region = { ...defaultLayout[key], ...(card.layout?.[key] || {}) }; return `left:${region.x}%;top:${region.y}%;width:${region.w}%`; };
+    return `<article class="hero-project-card" data-hero-card style="--card-x:${x}%;--card-y:${y}%;--card-rot:${rotation}deg;--card-hover-y:${y - 6}%;--card-hover-rot:${rotation * .72}deg;--mobile-card-x:${mobileX}%;--card-z:${index + 1}">
       <div class="hero-card-rotor">
         <div class="hero-card-face hero-card-back" aria-hidden="true"><span class="hero-card-register top"></span><span class="hero-card-register bottom"></span><strong>SILVERZ</strong><i></i></div>
-        <a class="hero-card-face hero-card-front route-link" href="?view=project&id=${encodeURIComponent(project.slug)}" data-route="project" aria-label="打开项目：${esc(project.title)}">
-          <span class="hero-card-index mono">${esc(project.id)}</span><span class="hero-card-preview${preview ? " has-image" : ""}">${preview ? `<img src="${esc(preview)}" alt="" loading="lazy" decoding="async">` : `<b>${esc(project.index)}</b>`}</span>
-          <span class="hero-card-copy"><small>${esc(project.status)}</small><strong>${esc(project.title)}</strong><i>${esc(project.english)}</i></span><span class="hero-card-tags">${tags.map(tag => `<b>${esc(tag)}</b>`).join("")}</span><span class="hero-card-enter mono">OPEN CASE <b>→</b></span>
+        <a class="hero-card-face hero-card-front route-link" href="?view=project&id=${encodeURIComponent(targetSlug)}" data-route="project" aria-label="打开项目：${esc(display.title || "未命名卡牌")}">
+          <span class="hero-card-index mono" style="${regionStyle("id")}">${esc(display.id || "")}</span><span class="hero-card-preview" aria-hidden="true" style="${regionStyle("index")}"><b>${esc(display.index || String(index + 1).padStart(2, "0"))}</b><i>SELECTED<br>PROJECT</i></span>
+          <span class="hero-card-copy" style="${regionStyle("copy")}"><small>${esc(display.status || "")}</small><strong>${esc(display.title || "未命名卡牌")}</strong><i>${esc(display.english || "")}</i></span><span class="hero-card-tags" style="${regionStyle("tags")}">${tags.map(tag => `<b>${esc(tag)}</b>`).join("")}</span><span class="hero-card-enter mono" style="${regionStyle("action")}">OPEN CASE <b>→</b></span>
         </a>
       </div>
-      <button class="hero-card-trigger" type="button" data-card-trigger aria-expanded="false" aria-label="翻开${esc(project.title)}项目卡"><span>FLIP</span></button>
+      <button class="hero-card-trigger" type="button" data-card-trigger aria-expanded="false" aria-label="翻开${esc(display.title || "项目")}卡"><span>FLIP</span></button>
     </article>`;
   }
 
@@ -54,11 +65,14 @@
   function renderResume() {
     const { profile } = data;
     const latest = data.versions[0];
-    const homeProjects = [...data.projects.filter(project => project.featuredOnHome), ...data.projects.filter(project => !project.featuredOnHome)].slice(0, 3);
+    const fallbackCards = [...data.projects.filter(project => project.featuredOnHome), ...data.projects.filter(project => !project.featuredOnHome)].slice(0, 3).map(project => ({ ...project, projectSlug: project.slug, tags: (project.evidence || []).slice(0, 2) }));
+    const homeCards = Array.isArray(data.homeCards) ? data.homeCards : fallbackCards;
+    const featuredProjects = homeCards.map(card => data.projects.find(project => project.slug === card.projectSlug)).filter(Boolean);
     return `<section class="page overview-page resume-page">
       <div class="resume-cover">
-      <div class="hero-scene" aria-hidden="true"><div class="hero-layer hero-layer-background"></div><div class="hero-layer hero-layer-character"><div class="hero-character-breath"></div></div><div class="hero-layer hero-hair-wind"></div><div class="hero-layer-vignette"></div></div>
-      <div class="hero-card-deck" aria-label="精选项目卡牌">${homeProjects.map(heroProjectCard).join("")}</div>
+      <div class="hero-scene" aria-hidden="true"><div class="hero-layer hero-layer-background"></div><svg class="hero-character-art" viewBox="0 0 1000 563" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><image href="assets/hero-character-transparent-v2.png" width="1000" height="563"/></svg><div class="hero-layer-vignette"></div></div>
+      <div class="hero-card-deck" aria-label="精选项目卡牌">${homeCards.map((card, index) => heroProjectCard(card, index, homeCards.length)).join("")}</div>
+      <div class="hero-grip-layer"><svg class="hero-grip-art" viewBox="0 0 1000 563" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><clipPath id="hero-grip-clip"><path d="M474 533 Q467 513 477 490 L497 467 Q509 462 512 432 L514 410 Q514 402 523 396 L565 365 Q570 362 577 365 L602 372 L623 384 Q630 391 619 396 Q610 395 598 389 L577 390 L548 407 L583 395 Q593 393 600 398 L617 405 Q626 412 623 425 Q621 430 616 425 L607 418 Q601 413 594 418 L563 432 L593 422 Q603 418 609 425 L616 437 Q618 445 611 449 L603 442 L574 455 L599 445 Q609 441 612 450 Q612 461 600 466 L580 479 Q572 487 568 500 Q559 514 540 519 L510 524 Z"/></clipPath></defs><image href="assets/hero-layer-character-v1.png" width="1000" height="563" clip-path="url(#hero-grip-clip)"/></svg></div>
       <div class="overview-grid" aria-hidden="true"></div>
       <div class="overview-identity">
         <p class="eyebrow"><i class="signal"></i>${esc(profile.availability)}</p>
@@ -99,7 +113,7 @@
       <section class="resume-section resume-capabilities"><div class="module-label"><span>CAPABILITY EVIDENCE</span><a class="route-link" href="?view=projects" data-route="projects">TRACE TO PROJECTS →</a></div><div class="resume-cap-grid">${data.capabilities.map(item => `<article><span>${esc(item.code)}</span><h3>${esc(item.title)}</h3><p>${esc(item.desc)}</p><small>${esc(item.proof)}</small></article>`).join("")}</div></section>
       <section class="resume-section resume-education"><div class="module-label"><span>EDUCATION & TOOLKIT</span><i>VERIFIED PROFILE</i></div><div class="education-layout"><div class="education-primary"><span>EDUCATION</span><h2>${esc(data.education.school)}</h2><p>${esc(data.education.major)} · ${esc(data.education.degree)}</p><small>${esc(data.education.direction)}</small></div><div class="skill-ledger">${data.skillGroups.map(item => `<div><span>${esc(item.label)}</span><strong>${esc(item.value)}</strong></div>`).join("")}</div></div><div class="honor-strip"><span>SELECTED HONORS</span><p>${data.honors.map(item => `<i>${esc(item)}</i>`).join("")}</p></div></section>
       <div class="dashboard-bottom">
-        <section class="recent-records"><div class="module-label"><span>FEATURED PROJECTS</span><a class="route-link" href="?view=projects" data-route="projects">VIEW ALL →</a></div>${homeProjects.map(p => `<a class="mini-record route-link" href="?view=project&id=${encodeURIComponent(p.slug)}" data-route="project"><span>${esc(p.id)}</span><strong>${esc(p.title)}</strong><i>${esc(p.status)}</i><b>↗</b></a>`).join("")}</section>
+        <section class="recent-records"><div class="module-label"><span>FEATURED PROJECTS</span><a class="route-link" href="?view=projects" data-route="projects">VIEW ALL →</a></div>${featuredProjects.map(p => `<a class="mini-record route-link" href="?view=project&id=${encodeURIComponent(p.slug)}" data-route="project"><span>${esc(p.id)}</span><strong>${esc(p.title)}</strong><i>${esc(p.status)}</i><b>↗</b></a>`).join("")}</section>
         <section class="latest-update"><div class="module-label"><span>LATEST UPDATE</span><a class="route-link" href="?view=changelog" data-route="changelog">HISTORY →</a></div><strong>${esc(latest.version)}</strong><h3>${esc(latest.title)}</h3><p>${esc(latest.changes[0][1])}</p></section>
       </div>
       </div>
@@ -669,7 +683,6 @@
   function bindDynamicEvents(route) {
     if (route.view === "resume") {
       const cover = $(".resume-cover");
-      if (cover && "IntersectionObserver" in window) new IntersectionObserver(([entry], observer) => { cover.classList.toggle("motion-paused", !entry.isIntersecting); if (!cover.isConnected) observer.disconnect(); }, { threshold: .05 }).observe(cover);
       const cards = $$("[data-hero-card]", cover);
       const closeCards = () => cards.forEach(card => { card.classList.remove("is-flipped"); $("[data-card-trigger]", card)?.setAttribute("aria-expanded", "false"); });
       cards.forEach(card => $("[data-card-trigger]", card)?.addEventListener("click", () => { const opening = !card.classList.contains("is-flipped"); card.classList.toggle("is-flipped", opening); $("[data-card-trigger]", card).setAttribute("aria-expanded", String(opening)); }));

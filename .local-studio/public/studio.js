@@ -101,6 +101,34 @@ function sectionRule(title, note, action = "") {
   return `<div class="section-rule"><div><h2>${esc(title)}</h2><span>${esc(note)}</span></div>${action}</div>`;
 }
 
+const defaultHomeCardLayout = {
+  id: { x: 8, y: 5, w: 42 },
+  index: { x: 8, y: 17, w: 34 },
+  copy: { x: 9, y: 47, w: 82 },
+  tags: { x: 9, y: 70, w: 82 },
+  action: { x: 9, y: 91, w: 82 }
+};
+
+function homeCardRegion(card, key) {
+  return { ...defaultHomeCardLayout[key], ...(card.layout?.[key] || {}) };
+}
+
+function homeCardRegionStyle(card, key) {
+  const region = homeCardRegion(card, key);
+  return `left:${region.x}%;top:${region.y}%;width:${region.w}%`;
+}
+
+function homeCardPreview(card, index) {
+  const tags = (card.tags || []).filter(Boolean).slice(0, 2);
+  return `<div class="studio-card-stage"><div class="studio-card-face" data-home-card-preview="${index}">
+    <div class="studio-card-region studio-card-id" data-card-region="id" data-card-index="${index}" style="${homeCardRegionStyle(card, "id")}"><span>${esc(card.id || "")}</span></div>
+    <div class="studio-card-region studio-card-index" data-card-region="index" data-card-index="${index}" style="${homeCardRegionStyle(card, "index")}"><b>${esc(card.index || String(index + 1).padStart(2, "0"))}</b><i>SELECTED<br>PROJECT</i></div>
+    <div class="studio-card-region studio-card-copy" data-card-region="copy" data-card-index="${index}" style="${homeCardRegionStyle(card, "copy")}"><small>${esc(card.status || "")}</small><strong>${esc(card.title || "未命名卡牌")}</strong><i>${esc(card.english || "")}</i></div>
+    <div class="studio-card-region studio-card-tags" data-card-region="tags" data-card-index="${index}" style="${homeCardRegionStyle(card, "tags")}">${tags.map(tag => `<b>${esc(tag)}</b>`).join("")}</div>
+    <div class="studio-card-region studio-card-action" data-card-region="action" data-card-index="${index}" style="${homeCardRegionStyle(card, "action")}"><span>OPEN CASE</span><b>→</b></div>
+  </div><small>拖动卡片上的文字区域调整位置</small></div>`;
+}
+
 function textList(path, label, addAction, removeAction) {
   const list = getAt(path) || [];
   return `${sectionRule(label, `${list.length} 条`, `<button class="button small" data-action="${addAction}" type="button">添加一条</button>`)}<div class="text-list">${list.map((item, index) => `<div class="text-list-row"><input data-path="${pathAttr([...path, index])}" value="${esc(item)}"><button class="icon-button" data-action="${removeAction}" data-index="${index}" type="button" aria-label="删除">×</button></div>`).join("") || `<div class="empty">尚无内容，点击“添加一条”开始记录。</div>`}</div>`;
@@ -134,6 +162,8 @@ function renderDashboard() {
 function renderResume() {
   const experiences = state.data.experience || [];
   const skills = state.data.skillGroups || [];
+  const homeCards = state.data.homeCards || [];
+  const projectOptions = (state.data.projects || []).map(project => ({ value: project.slug || "", label: `${project.title || "未命名项目"} · ${project.slug || "NO SLUG"}` }));
   return `${heading("简历编辑", "更新首页身份、教育和实习经历。文字修改会自动保存到本地草稿。")}
     ${sectionRule("身份与首页", "PROFILE")}
     <div class="form-grid">
@@ -146,6 +176,22 @@ function renderResume() {
       ${field(["profile", "chapter", "title"], "当前章节标题")}
       ${field(["profile", "chapter", "summary"], "当前章节说明", { multiline: true })}
     </div>
+    ${sectionRule("首页卡牌", `${homeCards.length} / 5 张 · 拖动无需使用，按钮可调整顺序`, `<button class="button small" data-action="add-home-card" type="button"${homeCards.length >= 5 ? " disabled" : ""}>添加卡牌</button>`)}
+    <div class="repeater home-card-editor">${homeCards.map((card, index) => {
+      const p = ["homeCards", index];
+      return `<article class="repeater-row"><header class="repeater-row-header"><strong>CARD ${String(index + 1).padStart(2, "0")} · ${esc(card.title || "未命名卡牌")}</strong><div class="row-actions"><button class="button small secondary" data-action="reset-home-card-layout" data-index="${index}" type="button">恢复布局</button><button class="button small secondary" data-action="move-home-card-up" data-index="${index}" type="button"${index === 0 ? " disabled" : ""}>上移</button><button class="button small secondary" data-action="move-home-card-down" data-index="${index}" type="button"${index === homeCards.length - 1 ? " disabled" : ""}>下移</button><button class="button small danger" data-action="remove-home-card" data-index="${index}" type="button">删除</button></div></header><div class="home-card-workspace">
+        ${homeCardPreview(card, index)}
+        <div class="form-grid">
+        ${field([...p, "projectSlug"], "跳转到项目", { select: projectOptions })}
+        ${field([...p, "id"], "卡牌档案 ID")}
+        ${field([...p, "index"], "展示序号")}
+        ${field([...p, "status"], "状态")}
+        ${field([...p, "title"], "卡牌标题")}
+        ${field([...p, "english"], "英文副标题")}
+        ${field([...p, "tags", 0], "标签一")}
+        ${field([...p, "tags", 1], "标签二")}
+      </div></div></article>`;
+    }).join("") || `<div class="empty">首页暂时没有卡牌。点击“添加卡牌”创建第一张。</div>`}</div>
     ${sectionRule("教育经历", "EDUCATION")}
     <div class="form-grid">
       ${field(["education", "school"], "学校")}${field(["education", "major"], "专业")}
@@ -418,6 +464,17 @@ function handleAction(button) {
     return;
   }
   if (action === "select-project") { state.selectedProject = index; render(); refreshPreview(); return; }
+  if (action === "add-home-card") return mutateAndRender(() => {
+    state.data.homeCards ||= [];
+    if (state.data.homeCards.length >= 5) return;
+    const used = new Set(state.data.homeCards.map(card => card.projectSlug));
+    const project = (state.data.projects || []).find(item => !used.has(item.slug)) || (state.data.projects || [])[0] || {};
+    state.data.homeCards.push({ projectSlug: project.slug || "", id: project.id || "", index: project.index || String(state.data.homeCards.length + 1).padStart(2, "0"), status: project.status || "SELECTED", title: project.title || "未命名卡牌", english: project.english || "Untitled Project", tags: (project.evidence || []).slice(0, 2), layout: structuredClone(defaultHomeCardLayout) });
+  });
+  if (action === "remove-home-card") return mutateAndRender(() => { if (confirm("确定从首页删除这张卡牌吗？项目档案本身不会被删除。")) state.data.homeCards.splice(index, 1); });
+  if (action === "move-home-card-up" && index > 0) return mutateAndRender(() => { const [card] = state.data.homeCards.splice(index, 1); state.data.homeCards.splice(index - 1, 0, card); });
+  if (action === "move-home-card-down" && index < state.data.homeCards.length - 1) return mutateAndRender(() => { const [card] = state.data.homeCards.splice(index, 1); state.data.homeCards.splice(index + 1, 0, card); });
+  if (action === "reset-home-card-layout") return mutateAndRender(() => { state.data.homeCards[index].layout = structuredClone(defaultHomeCardLayout); });
   if (action === "add-project") return mutateAndRender(() => {
     state.data.projects ||= [];
     state.data.projects.push({ _visibility: "draft", id: `OBS-P${String(state.data.projects.length + 1).padStart(2, "0")}`, slug: `new-project-${Date.now()}`, category: "game", status: "草稿", title: "未命名项目", english: "Untitled Project", summary: "", problem: "", system: "", outcome: "", role: "", evidence: [], index: String(state.data.projects.length + 1).padStart(2, "0") });
@@ -502,6 +559,15 @@ $("#editor").addEventListener("input", event => {
   const path = JSON.parse(decodeURIComponent(encoded));
   const value = event.target.type === "number" ? (event.target.value === "" ? null : Number(event.target.value)) : event.target.value;
   setAt(path, value);
+  if (path[0] === "homeCards") {
+    const preview = `[data-home-card-preview="${path[1]}"]`;
+    const fields = { id: ".studio-card-id span", index: ".studio-card-index b", status: ".studio-card-copy small", title: ".studio-card-copy strong", english: ".studio-card-copy i" };
+    if (fields[path[2]]) $(fields[path[2]], $(preview)).textContent = value || "";
+    if (path[2] === "tags") {
+      const tags = (state.data.homeCards[path[1]].tags || []).filter(Boolean).slice(0, 2);
+      $(".studio-card-tags", $(preview)).innerHTML = tags.map(tag => `<b>${esc(tag)}</b>`).join("");
+    }
+  }
   if (path[0] === "games" && path[2] === "title") {
     const title = value.trim() || "未命名游戏";
     const listTitle = $('.record-item.is-active strong');
@@ -515,6 +581,38 @@ $("#editor").addEventListener("input", event => {
 $("#editor").addEventListener("change", event => {
   if (event.target.matches("select[data-path]")) render();
 });
+
+let activeCardDrag = null;
+$("#editor").addEventListener("pointerdown", event => {
+  const region = event.target.closest("[data-card-region]");
+  if (!region) return;
+  const card = region.closest("[data-home-card-preview]");
+  const rect = card.getBoundingClientRect();
+  const regionRect = region.getBoundingClientRect();
+  activeCardDrag = { region, card, rect, index: Number(region.dataset.cardIndex), key: region.dataset.cardRegion, offsetX: event.clientX - regionRect.left, offsetY: event.clientY - regionRect.top };
+  region.setPointerCapture(event.pointerId);
+  region.classList.add("is-dragging");
+  event.preventDefault();
+});
+$("#editor").addEventListener("pointermove", event => {
+  if (!activeCardDrag) return;
+  const { region, rect, index, key, offsetX, offsetY } = activeCardDrag;
+  const x = Math.max(0, Math.min(100 - region.offsetWidth / rect.width * 100, (event.clientX - rect.left - offsetX) / rect.width * 100));
+  const y = Math.max(0, Math.min(96, (event.clientY - rect.top - offsetY) / rect.height * 100));
+  state.data.homeCards[index].layout ||= {};
+  state.data.homeCards[index].layout[key] = { ...homeCardRegion(state.data.homeCards[index], key), x: Number(x.toFixed(1)), y: Number(y.toFixed(1)) };
+  region.style.left = `${x}%`;
+  region.style.top = `${y}%`;
+});
+function finishCardDrag() {
+  if (!activeCardDrag) return;
+  activeCardDrag.region.classList.remove("is-dragging");
+  activeCardDrag = null;
+  markDirty();
+  refreshPreview();
+}
+$("#editor").addEventListener("pointerup", finishCardDrag);
+$("#editor").addEventListener("pointercancel", finishCardDrag);
 
 $("#editor").addEventListener("click", event => {
   const upload = event.target.closest("[data-upload-path]");

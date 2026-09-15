@@ -35,6 +35,34 @@ function readTradingData() {
 }
 
 function migrateData(data) {
+  const defaultCardLayout = {
+    id: { x: 8, y: 5, w: 42 },
+    index: { x: 8, y: 17, w: 34 },
+    copy: { x: 9, y: 47, w: 82 },
+    tags: { x: 9, y: 70, w: 82 },
+    action: { x: 9, y: 91, w: 82 }
+  };
+  if (!Array.isArray(data.homeCards)) {
+    const projects = Array.isArray(data.projects) ? data.projects : [];
+    const featured = [...projects.filter(project => project.featuredOnHome), ...projects.filter(project => !project.featuredOnHome)].slice(0, 3);
+    data.homeCards = featured.map(project => ({
+      projectSlug: project.slug || "",
+      id: project.id || "",
+      index: project.index || "",
+      status: project.status || "",
+      title: project.title || "",
+      english: project.english || "",
+      tags: (project.evidence || []).slice(0, 2)
+    }));
+  }
+  data.homeCards.forEach(card => {
+    card.tags = Array.isArray(card.tags) ? card.tags : [];
+    card.layout ||= {};
+    for (const [key, fallback] of Object.entries(defaultCardLayout)) {
+      card.layout[key] ||= { ...fallback };
+      for (const axis of ["x", "y", "w"]) if (!Number.isFinite(Number(card.layout[key][axis]))) card.layout[key][axis] = fallback[axis];
+    }
+  });
   data.trading ||= readTradingData();
   data.trading.capital ||= { initial: null, current: null, snapshots: [], monthly: [], milestones: [] };
   data.trading.capital.snapshots ||= [];

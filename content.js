@@ -678,5 +678,124 @@ window.SILVER_DATA = {
       "platform": "腾讯",
       "hook": "以前是游戏的新鲜感，不同的英雄不同的技能，追求最强王者；现在是朋友间的一起娱乐的项目，休闲"
     }
+  ],
+  "homeCards": [
+    {
+      "projectSlug": "casual-translation",
+      "id": "OBS–P04",
+      "index": "",
+      "status": "本地 Alpha",
+      "title": "雅喵 IELTS Pet",
+      "english": "IELTS Pet Learning Companion",
+      "tags": [
+        "React 19 / TypeScript / Tauri v2",
+        "Rust / SQLite / Zustand"
+      ],
+      "layout": {
+        "id": {
+          "x": 25.8,
+          "y": 6,
+          "w": 42
+        },
+        "index": {
+          "x": 55.6,
+          "y": 10.1,
+          "w": 34
+        },
+        "copy": {
+          "x": 9.2,
+          "y": 16.2,
+          "w": 82
+        },
+        "tags": {
+          "x": 9.5,
+          "y": 78.2,
+          "w": 82
+        },
+        "action": {
+          "x": 7.5,
+          "y": 90.6,
+          "w": 82
+        }
+      }
+    },
+    {
+      "projectSlug": "interrogation-room-0",
+      "id": "OBS–P01",
+      "index": "",
+      "status": "开发中",
+      "title": "0号审讯室",
+      "english": "Interrogation Room #0",
+      "tags": [
+        "三维心理状态引擎",
+        "证物标签影响对话树"
+      ],
+      "layout": {
+        "id": {
+          "x": 26.7,
+          "y": 6.2,
+          "w": 42
+        },
+        "index": {
+          "x": 57.1,
+          "y": 10,
+          "w": 34
+        },
+        "copy": {
+          "x": 10.2,
+          "y": 16.1,
+          "w": 82
+        },
+        "tags": {
+          "x": 9,
+          "y": 78.1,
+          "w": 82
+        },
+        "action": {
+          "x": 8.5,
+          "y": 90.7,
+          "w": 82
+        }
+      }
+    },
+    {
+      "projectSlug": "the-final-resonance",
+      "id": "OBS–P02",
+      "index": "",
+      "status": "可运行 Demo",
+      "title": "最终共鸣",
+      "english": "The Final Resonance",
+      "tags": [
+        "RAG 镜像模仿",
+        "16 种 MBTI 结局"
+      ],
+      "layout": {
+        "id": {
+          "x": 26,
+          "y": 5.8,
+          "w": 42
+        },
+        "index": {
+          "x": 57.1,
+          "y": 10,
+          "w": 34
+        },
+        "copy": {
+          "x": 10.5,
+          "y": 16.5,
+          "w": 82
+        },
+        "tags": {
+          "x": 9.5,
+          "y": 78.2,
+          "w": 82
+        },
+        "action": {
+          "x": 8.5,
+          "y": 90.6,
+          "w": 82
+        }
+      }
+    }
   ]
 };
