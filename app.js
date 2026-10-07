@@ -8,7 +8,7 @@
   const sha256 = async value => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value)))].map(byte => byte.toString(16).padStart(2, "0")).join("");
   const routeNames = { resume: "RESUME", projects: "PROJECT ARCHIVE", project: "PROJECT RECORD", lab: "EXPERIMENT LAB", journey: "FOOTPRINT ATLAS", changelog: "LIFE CHANGELOG", connect: "OPEN CHANNEL", fitness: "FITNESS PROTOCOL", trading: "CAPITAL CHANGE", report: "EXPORT REPORT" };
   let currentRoute = "";
-  Object.assign(routeNames, { games: "GAME ATLAS", game: "GAME STUDY" });
+  Object.assign(routeNames, { games: "GAME ATLAS", game: "GAME STUDY", stars: "漫天繁星" });
 
   function parseRoute() {
     const params = new URLSearchParams(location.search);
@@ -44,13 +44,13 @@
     const rotation = center * 8;
     const mobileX = -50 + center * mobileStep;
     const targetSlug = display.projectSlug || display.slug || "";
-    const defaultLayout = { id: { x: 8, y: 5, w: 42 }, index: { x: 8, y: 17, w: 34 }, copy: { x: 9, y: 47, w: 82 }, tags: { x: 9, y: 70, w: 82 }, action: { x: 9, y: 91, w: 82 } };
+    const defaultLayout = { id: { x: 8, y: 5, w: 42 }, copy: { x: 9, y: 47, w: 82 }, tags: { x: 9, y: 70, w: 82 }, action: { x: 9, y: 91, w: 82 } };
     const regionStyle = key => { const region = { ...defaultLayout[key], ...(card.layout?.[key] || {}) }; return `left:${region.x}%;top:${region.y}%;width:${region.w}%`; };
-    return `<article class="hero-project-card" data-hero-card style="--card-x:${x}%;--card-y:${y}%;--card-rot:${rotation}deg;--card-hover-y:${y - 6}%;--card-hover-rot:${rotation * .72}deg;--mobile-card-x:${mobileX}%;--card-z:${index + 1}">
+    return `<article class="hero-project-card" data-hero-card style="--card-x:${x}%;--card-y:${y}%;--card-rot:${rotation}deg;--card-hover-y:${y - 6}%;--card-float-y:${y - 13}%;--card-hover-rot:${rotation * .72}deg;--card-float-rot:${rotation * .42}deg;--mobile-card-x:${mobileX}%;--card-z:${index + 1}">
       <div class="hero-card-rotor">
         <div class="hero-card-face hero-card-back" aria-hidden="true"><span class="hero-card-register top"></span><span class="hero-card-register bottom"></span><strong>SILVERZ</strong><i></i></div>
         <a class="hero-card-face hero-card-front route-link" href="?view=project&id=${encodeURIComponent(targetSlug)}" data-route="project" aria-label="打开项目：${esc(display.title || "未命名卡牌")}">
-          <span class="hero-card-index mono" style="${regionStyle("id")}">${esc(display.id || "")}</span><span class="hero-card-preview" aria-hidden="true" style="${regionStyle("index")}"><b>${esc(display.index || String(index + 1).padStart(2, "0"))}</b><i>SELECTED<br>PROJECT</i></span>
+          <span class="hero-card-index mono" style="${regionStyle("id")}">${esc(display.id || "")}</span>
           <span class="hero-card-copy" style="${regionStyle("copy")}"><small>${esc(display.status || "")}</small><strong>${esc(display.title || "未命名卡牌")}</strong><i>${esc(display.english || "")}</i></span><span class="hero-card-tags" style="${regionStyle("tags")}">${tags.map(tag => `<b>${esc(tag)}</b>`).join("")}</span><span class="hero-card-enter mono" style="${regionStyle("action")}">OPEN CASE <b>→</b></span>
         </a>
       </div>
@@ -348,7 +348,7 @@
       const select = () => activate(region.dataset.mapRegion, region);
       region.addEventListener("click", select);
       region.addEventListener("keydown", event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); select(); } });
-      region.addEventListener("pointerenter", () => { const label = $("#map-location-name"); if (label) label.textContent = region.dataset.mapRegion; });
+      region.addEventListener("pointerenter", () => { const label = $("#map-location-name"); if (label) label.textContent = region.dataset.mapLabel || region.dataset.mapRegion; });
     });
     svg.addEventListener("pointerleave", () => { const label = $("#map-location-name"); if (label) label.textContent = svg.dataset.defaultLabel || "SELECT A REGION"; });
   }
@@ -374,7 +374,7 @@
     const provinces = (window.SILVER_CHINA_MAP?.features || []).filter(feature => feature.properties?.name);
     const provincePaths = provinces.map(feature => { const name = feature.properties.name; const count = provinceCounts.get(name) || 0; const explored = count > 0; return `<path class="map-region map-province${explored ? " is-explored" : ""}" style="${mapRegionVisual(count)}" d="${geoPath(feature.geometry, project)}" data-map-region="${esc(name)}" tabindex="-1" role="button" aria-label="${esc(name)}${explored ? "，已有足迹" : "，尚未建立足迹"}"><title>${esc(name)}</title></path>`; }).join("");
     const provinceLabels = provinces.map(feature => { const name = feature.properties.name; const points = geometryPoints(feature.geometry); const xs = points.map(point => point[0]), ys = points.map(point => point[1]); const [x, y] = project((Math.min(...xs) + Math.max(...xs)) / 2, (Math.min(...ys) + Math.max(...ys)) / 2); return `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}">${esc(name.replace(/省|市|壮族自治区|回族自治区|维吾尔自治区|自治区|特别行政区/g, ""))}</text>`; }).join("");
-    canvas.innerHTML = `<svg class="footprint-svg footprint-world" viewBox="35 20 1130 560" role="group" aria-label="可交互世界国家与中国省级地图" data-world-viewbox="35 20 1130 560" data-default-label="CHINA ACTIVE"><g class="country-layer">${features.map(feature => { const name = feature.properties?.name || feature.id || "Unknown"; const china = feature.id === "CHN" || name === "China"; const count = countryCounts.get(name) || 0; const explored = count > 0; return `<path class="map-region country-region${china ? " country-china" : ""}${explored ? " is-explored" : ""}" style="${mapRegionVisual(count)}" d="${geoPath(feature.geometry, project)}" data-map-region="${esc(name)}" tabindex="0" role="button" aria-label="${esc(name)}${explored ? `，${count} 条足迹记录` : "，暂未探索"}"><title>${esc(name)}${explored ? ` · ${count} 条记录` : ""}</title></path>`; }).join("")}</g><g class="embedded-province-layer">${provincePaths}</g><g class="province-labels embedded-province-labels" aria-hidden="true">${provinceLabels}</g></svg>`;
+    canvas.innerHTML = `<svg class="footprint-svg footprint-world" viewBox="35 20 1130 560" role="group" aria-label="可交互世界国家与中国省级地图" data-world-viewbox="35 20 1130 560" data-default-label="CHINA ACTIVE"><g class="country-layer">${features.map(feature => { const sourceName = feature.properties?.name || feature.id || "Unknown"; const taiwan = feature.id === "TWN" || sourceName === "Taiwan"; const china = feature.id === "CHN" || sourceName === "China" || taiwan; const name = china ? "China" : sourceName; const displayName = taiwan ? "中国 · 台湾省" : name; const count = countryCounts.get(name) || 0; const explored = count > 0; return `<path class="map-region country-region${china ? " country-china" : ""}${explored ? " is-explored" : ""}" style="${mapRegionVisual(count)}" d="${geoPath(feature.geometry, project)}" data-map-region="${esc(name)}" data-map-label="${esc(displayName)}" tabindex="0" role="button" aria-label="${esc(displayName)}${explored ? `，中国共 ${count} 条足迹记录` : "，进入中国省级地图"}"><title>${esc(displayName)}${explored ? ` · 中国共 ${count} 条记录` : ""}</title></path>`; }).join("")}</g><g class="embedded-province-layer">${provincePaths}</g><g class="province-labels embedded-province-labels" aria-hidden="true">${provinceLabels}</g></svg>`;
     const svg = $(".footprint-svg", canvas);
     bindMapRegions(svg, (name, region) => {
       if (region.classList.contains("map-province")) {
@@ -513,7 +513,6 @@
             <div><dt>UPDATED</dt><dd>${esc(latestSnapshot?.date || "WAITING")}</dd></div>
           </dl>
         </aside>
-        <nav class="sts-local-nav mono" aria-label="资金变动章节"><a href="#sts-capital">CAPITAL</a><a href="#sts-journal">RECORDS</a></nav>
       </header>
 
       <section class="sts-chapter sts-capital" id="sts-capital">
@@ -543,40 +542,6 @@
     catch { return { completed: {}, weights: [] }; }
   }
 
-  function openFitnessPhotoDb() {
-    return new Promise((resolve, reject) => {
-      const request = indexedDB.open("silver-fitness-photos", 1);
-      request.onupgradeneeded = () => request.result.createObjectStore("checkpoints", { keyPath: "day" });
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error);
-    });
-  }
-
-  async function getFitnessPhotos() {
-    const db = await openFitnessPhotoDb();
-    return new Promise((resolve, reject) => { const request = db.transaction("checkpoints", "readonly").objectStore("checkpoints").getAll(); request.onsuccess = () => resolve(request.result); request.onerror = () => reject(request.error); });
-  }
-
-  async function saveFitnessPhoto(record) {
-    const db = await openFitnessPhotoDb();
-    return new Promise((resolve, reject) => { const request = db.transaction("checkpoints", "readwrite").objectStore("checkpoints").put(record); request.onsuccess = () => resolve(); request.onerror = () => reject(request.error); });
-  }
-
-  async function deleteFitnessPhoto(day) {
-    const db = await openFitnessPhotoDb();
-    return new Promise((resolve, reject) => { const request = db.transaction("checkpoints", "readwrite").objectStore("checkpoints").delete(day); request.onsuccess = () => resolve(); request.onerror = () => reject(request.error); });
-  }
-
-  async function renderPhotoJournal() {
-    const records = await getFitnessPhotos(), byDay = new Map(records.map(record => [record.day, record])), days = [1, 28, 56, 84];
-    const container = $("[data-photo-journal]"); if (!container) return;
-    container.innerHTML = days.map(day => { const record = byDay.get(day), url = record?.blob ? URL.createObjectURL(record.blob) : ""; return `<article class="photo-checkpoint${record?.blob ? " has-photo" : ""}" data-photo-day="${day}"><div class="photo-frame">${url ? `<img src="${url}" alt="Day ${day} 体态记录">` : `<span>DAY ${day}</span><strong>等待照片</strong>`}<label><input type="file" accept="image/jpeg,image/png,image/webp" data-photo-input="${day}"><b>${record?.blob ? "更换照片" : "选择照片"}</b></label></div><div class="photo-meta"><div><span class="mono">CHECKPOINT · DAY ${day}</span><small>${record?.date ? esc(record.date) : "尚未记录"}</small></div><textarea data-photo-note="${day}" rows="2" placeholder="记录肩背、腰围观感、力量或精神状态…">${esc(record?.note || "")}</textarea>${record ? `<button type="button" data-photo-delete="${day}">删除记录</button>` : ""}</div></article>`; }).join("");
-    $$('[data-photo-count]').forEach(node => { node.textContent = String(records.filter(record => record.blob).length); });
-    $$('[data-photo-input]').forEach(input => input.addEventListener("change", async () => { const file = input.files?.[0]; if (!file) return; if (file.size > 12 * 1024 * 1024) { $("#photo-feedback").textContent = "图片超过 12MB，请压缩后重试。"; return; } const day = Number(input.dataset.photoInput), previous = byDay.get(day); await saveFitnessPhoto({ day, blob: file, note: previous?.note || "", date: new Date().toISOString().slice(0, 10) }); $("#photo-feedback").textContent = `Day ${day} 照片已保存在当前浏览器。`; renderPhotoJournal(); }));
-    $$('[data-photo-note]').forEach(input => input.addEventListener("change", async () => { const day = Number(input.dataset.photoNote), previous = byDay.get(day); await saveFitnessPhoto({ day, blob: previous?.blob || null, note: input.value.trim(), date: previous?.date || new Date().toISOString().slice(0, 10) }); $("#photo-feedback").textContent = `Day ${day} 备注已保存。`; renderPhotoJournal(); }));
-    $$('[data-photo-delete]').forEach(button => button.addEventListener("click", async () => { await deleteFitnessPhoto(Number(button.dataset.photoDelete)); $("#photo-feedback").textContent = "记录已删除。"; renderPhotoJournal(); }));
-  }
-
   function fitnessWeekKey() {
     const now = new Date(); const first = new Date(now.getFullYear(), 0, 1);
     return `${now.getFullYear()}-W${String(Math.ceil((((now - first) / 86400000) + first.getDay() + 1) / 7)).padStart(2, "0")}`;
@@ -603,19 +568,22 @@
       <section class="principle-section"><div class="section-intro"><h2>训练原则</h2><p>稳定动作质量，留下恢复空间，再用哑铃与弹力带逐步提高有效刺激。</p></div><div class="principle-layout"><article><span class="mono">RIR ≈ 2</span><h3>每组留下两次余力</h3><p>不要每组完全力竭。动作开始变形之前结束这一组；出现锐痛、关节痛或无法控制阻力时立即停止。</p></article><div class="progression-flow"><span>8 → 12 → 15</span><i>先补齐次数</i><strong>全组达到上限</strong><i>再提高难度</i><b>哑铃放慢下放 / 弹力带增加张力</b><small>随后再考虑停顿或增加 1 组</small></div></div></section>
       <section class="nutrition-section"><div class="section-intro"><h2>低成本饮食系统</h2><p>每日蛋白质约 90g。优先公司餐补，不喝牛奶，暂不购买蛋白粉、增肌粉、肌酸或补剂。</p></div><div class="meal-grid">${f.meals.map(meal => `<article><span class="mono">${meal.label}</span><h3>${meal.title}</h3><p>${meal.note}</p></article>`).join("")}</div><div class="vegetable-line"><span>优先蔬菜</span>${f.vegetables.map(x => `<b>${x}</b>`).join("")}</div></section>
       <section class="weight-section"><div class="section-intro"><h2>体重观测与调节</h2><p>只依据 7 日平均调整饮食，不对单日波动作出反应。</p></div><div class="weight-console"><form id="weight-form"><label for="fitness-weight">录入今日体重</label><div><input id="fitness-weight" name="weight" type="number" min="40" max="100" step="0.1" required placeholder="55.0"><button type="submit">保存记录</button></div><small id="weight-feedback" aria-live="polite">数据仅保存在当前浏览器。</small></form><div data-weight-chart>${renderWeightChart(weights)}</div></div><div class="adjustment-logic"><article><span>&lt; 0.1kg / 周</span><strong>增加碳水</strong><p>晚餐加半碗至一碗米饭，或早餐增加低成本碳水。</p></article><article class="stable"><span>0.15–0.3kg / 周</span><strong>保持不变</strong><p>处于目标增速，继续当前训练与饮食结构。</p></article><article><span>&gt; 0.4–0.5kg / 周</span><strong>稍微减少</strong><p>长期超出范围时，减少额外碳水，不做激进调整。</p></article></div></section>
-      <section class="future-section"><div class="section-intro"><h2>长期里程碑</h2><p>第一阶段确认体重、力量和外观同步改善，腰围没有明显失控，并且训练能长期坚持。</p></div><div class="milestone-line"><strong class="current">55<small>NOW</small></strong><i></i><strong>60<small>NEXT</small></strong><i></i><strong>65<small>LONG TERM</small></strong></div><div class="photo-placeholders">${[1, 28, 56, 84].map(day => `<div><span class="mono">DAY ${day}</span><b>PHOTO SLOT</b></div>`).join("")}</div></section>
+      <section class="future-section"><div class="section-intro"><h2>长期里程碑</h2><p>第一阶段确认体重、力量和外观同步改善，腰围没有明显失控，并且训练能长期坚持。</p></div><div class="milestone-line"><strong class="current">55<small>NOW</small></strong><i></i><strong>60<small>NEXT</small></strong><i></i><strong>65<small>LONG TERM</small></strong></div></section>
     </section>`;
   }
 
   function bindFitnessEvents() {
     const weekKey = fitnessWeekKey();
-    const observation = $(".weight-section");
-    const photoRecords = data.fitnessPhotos || [], photoCount = photoRecords.filter(record => record.image).length;
-    if (observation) observation.innerHTML = `<div class="section-intro"><h2>体态照片记录</h2><p>没有体重秤也可以稳定观察变化。尽量在相同光线、距离、时间和站姿下拍摄，重点比较肩背、胸部、手臂与腰线。</p></div><div class="photo-protocol"><div><span class="mono">PHOTO PROTOCOL</span><strong><i>${photoCount}</i><small>/ 4 个阶段</small></strong></div><ol><li>固定正面、侧面和背面角度</li><li>建议早晨、自然站姿、相同光线</li><li>每 28 天比较一次，不因单日状态判断</li></ol></div><div class="photo-journal">${[1, 28, 56, 84].map(day => { const record = photoRecords.find(item => Number(item.day) === day); return `<article class="photo-checkpoint${record?.image ? " has-photo" : ""}"><div class="photo-frame">${record?.image ? `<img src="${esc(record.image)}" alt="Day ${day} 体态记录" loading="lazy">` : `<span>DAY ${day}</span><strong>尚未记录</strong>`}</div><div class="photo-meta"><div><span class="mono">CHECKPOINT · DAY ${day}</span><small>${esc(record?.date || "等待更新")}</small></div>${record?.note ? `<p>${esc(record.note)}</p>` : `<p class="photo-empty-note">阶段备注将在工作台导出后显示。</p>`}</div></article>`; }).join("")}</div><p class="photo-feedback">照片与备注由 Silver Content Studio 管理，公开页面仅展示已导出的内容。</p>`;
-    $(".photo-placeholders")?.remove();
-    const tracking = $(".tracking-grid");
-    if (tracking) tracking.innerHTML = `<div><span>照片记录</span><strong>${photoCount}<small>/ 4</small></strong></div><div><span>当前阶段</span><strong>DAY 01<small>/ 84</small></strong></div><div><span>俯卧撑最好成绩</span><strong>${window.SILVER_FITNESS.profile.pushups}<small>次</small></strong></div><div><span>训练周数</span><strong>01<small>/ 12</small></strong></div>`;
     $$('[data-workout-day]').forEach(input => input.addEventListener("change", () => { const store = fitnessStore(); const set = new Set(store.completed[weekKey] || []); input.checked ? set.add(input.dataset.workoutDay) : set.delete(input.dataset.workoutDay); store.completed[weekKey] = [...set]; localStorage.setItem("silver-fitness-v1", JSON.stringify(store)); $("[data-fitness-count]").textContent = set.size; $("[data-fitness-progress]").style.width = `${set.size / 4 * 100}%`; }));
+    $("#weight-form")?.addEventListener("submit", event => {
+      event.preventDefault();
+      const input = $("#fitness-weight"), value = Number(input?.value);
+      if (!Number.isFinite(value) || value < 40 || value > 100) return;
+      const store = fitnessStore(), date = new Date().toISOString().slice(0, 10);
+      store.weights = [...(store.weights || []).filter(item => item.date !== date), { date, value }].sort((a, b) => a.date.localeCompare(b.date)).slice(-365);
+      localStorage.setItem("silver-fitness-v1", JSON.stringify(store));
+      render({ view: "fitness" });
+    });
   }
 
   function reportToolbar(type) {
@@ -665,6 +633,7 @@
 
   function render(route) {
     const renderers = { resume: renderResume, projects: renderProjects, project: () => renderProject(route.id), lab: renderLab, journey: renderJourney, changelog: renderChangelog, connect: renderConnect, fitness: renderFitness, trading: renderTrading, report: () => renderReport(route) };
+    renderers.stars = () => '<silver-starfield></silver-starfield>';
     renderers.games = () => window.SILVER_GAME_ATLAS.render();
     renderers.game = () => window.SILVER_GAME_ATLAS.render(route.id || "missing");
     $("#view").innerHTML = renderers[route.view]();

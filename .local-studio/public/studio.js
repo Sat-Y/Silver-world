@@ -8,6 +8,7 @@ const state = {
   section: "dashboard",
   selectedProject: 0,
   selectedGame: 0,
+  selectedThought: 0,
   selectedProvince: "",
   selectedJournal: 0,
   dirty: false,
@@ -18,12 +19,12 @@ const state = {
 };
 
 const sectionMeta = {
+  stars: ["CONTENT / STARFIELD", "漫天繁星"],
   dashboard: ["WORKSPACE / OVERVIEW", "内容总览"],
   resume: ["CONTENT / RESUME", "简历编辑"],
   projects: ["CONTENT / PROJECTS", "项目档案"],
   games: ["CONTENT / GAME ATLAS", "游戏图鉴"],
   footprints: ["CONTENT / FOOTPRINTS", "人生足迹"],
-  fitness: ["CONTENT / FITNESS", "健身记录"],
   trading: ["CONTENT / CAPITAL", "资金变动"],
   advanced: ["SYSTEM / COMPLETE DATA", "高级数据"]
 };
@@ -233,13 +234,6 @@ function renderProjects() {
     </article></div>`;
 }
 
-function renderFitness() {
-  const records = state.data.fitnessPhotos || [];
-  return `${heading("健身记录", "在本地工作台上传阶段体态照片并填写备注；公开网站只负责展示导出后的记录。")}
-    ${sectionRule("阶段照片", `${records.filter(item => item.image).length} / 4 已记录`)}
-    <div class="repeater">${records.map((item, index) => { const p = ["fitnessPhotos", index]; return `<article class="repeater-row"><header class="repeater-row-header"><strong>DAY ${esc(item.day)}</strong><span>${esc(item.date || "尚未记录")}</span></header><div class="form-grid">${visibility([...p, "_visibility"])}${field([...p, "day"], "阶段日", { type: "number" })}${field([...p, "date"], "拍摄日期")}${assetField([...p, "image"], "体态照片")}${field([...p, "note"], "阶段备注", { multiline: true })}</div></article>`; }).join("")}</div>`;
-}
-
 function renderTrading() {
   const trading = state.data.trading;
   const capital = trading.capital;
@@ -314,14 +308,25 @@ function renderGames() {
   return `${top}<div class="split-editor"><div class="record-list">${games.map((g,i) => `<button class="record-item${i === state.selectedGame ? " is-active" : ""}" data-action="select-game" data-index="${i}" type="button"><strong>${esc(g.title || "未命名游戏")}</strong><small>${esc((g.format || "indie") === "online" ? "网络游戏" : "独立 / 单机")} · ${esc(g.status || "在玩")}</small></button>`).join("")}</div><article class="record-editor"><header class="record-editor-header"><h2>${esc(game.title || "未命名游戏")}</h2><button class="button small danger" data-action="remove-game" type="button">删除游戏</button></header><div class="game-template-note"><strong>${game.format === "online" ? "网络游戏精简模板" : "独立 / 单机完整模板"}</strong><span>${game.format === "online" ? "聚焦循环、长线成长、运营经济、社交与留存。" : "覆盖玩法、数值、关卡、叙事、交互与设计验证。"}</span></div><div class="form-grid">${field([...p,"title"], "游戏名称")}${field([...p,"format"], "游戏形态", {select: window.SILVER_GAME_ATLAS.formats})}${visibility([...p,"_visibility"])}${field([...p,"status"], "游玩状态", {select: window.SILVER_GAME_ATLAS.statuses.map(s => ({value:s,label:s}))})}${field([...p,"genre"], "玩法类型", {help:"例如：动作 RPG、策略、模拟经营"})}${field([...p,"platform"], "游玩平台")}${field([...p,"hours"], "累计游玩时长（小时）", {type:"number",help:"可填小数；未知留空"})}${field([...p,"version"], "版本 / 模式 / 难度")}${field([...p,"focus"], "本次拆解主题", {help:"例如：战斗反馈、新手引导、资源循环"})}${field([...p,"startedAt"], "开始游玩", {type:"date"})}${field([...p,"finishedAt"], "结束 / 最近游玩", {type:"date"})}${assetField([...p,"cover"], "代表截图（可选）")}</div>${analysisSections.map((s,i) => `<details class="game-editor-section" ${i === 0 ? "open" : ""}><summary>${s.title} · ${s.ability}</summary><div class="form-grid">${s.fields.map(([key,label,help]) => field([...p,key], label, {multiline:true,rows:3,help})).join("")}</div></details>`).join("")}</article></div>`;
 }
 
+function renderThoughts() {
+  const records = state.data.thoughts || [];
+  state.selectedThought = Math.min(state.selectedThought, Math.max(0, records.length - 1));
+  const item = records[state.selectedThought], p = ["thoughts", state.selectedThought];
+  const top = heading("漫天繁星", "每条公开想法对应一颗星星。保存草稿后，导出公开内容即可同步星空和列表。", '<button class="button primary" data-action="add-thought" type="button">新增想法</button>');
+  if (!item) return top + '<div class="empty">写下第一条想法，点亮第一颗星。</div>';
+  const list = records.map((t,i)=>'<button class="record-item'+(i===state.selectedThought?' is-active':'')+'" data-action="select-thought" data-index="'+i+'" type="button"><strong>'+esc(t.title||'未命名想法')+'</strong><small>'+esc(t.category||'随想')+' · '+esc(t.date||'未填写日期')+'</small></button>').join('');
+  return top + '<div class="split-editor"><div class="record-list">'+list+'</div><article class="record-editor"><header class="record-editor-header"><h2>'+esc(item.title||'新想法')+'</h2><button class="button small danger" data-action="remove-thought" type="button">删除想法</button></header><div class="form-grid">'+visibility([...p,'_visibility'])+field([...p,'date'],'日期',{type:'date'})+field([...p,'title'],'标题')+field([...p,'category'],'分类',{help:'自定义分类会自动显示为网站筛选项。'})+field([...p,'excerpt'],'列表摘要',{multiline:true})+field([...p,'body'],'想法正文',{multiline:true,rows:12,help:'保留段落换行。'})+'</div></article></div>';
+}
+
 function render() {
   if (!state.data) return;
   const [route, title] = sectionMeta[state.section];
   $("#route-label").textContent = route;
   $("#page-title").textContent = title;
   $$(".nav-item").forEach(item => item.classList.toggle("is-active", item.dataset.section === state.section));
-  const renderers = { dashboard: renderDashboard, resume: renderResume, projects: renderProjects, footprints: renderFootprints, fitness: renderFitness, trading: renderTrading, advanced: renderAdvanced };
+  const renderers = { dashboard: renderDashboard, resume: renderResume, projects: renderProjects, footprints: renderFootprints, trading: renderTrading, advanced: renderAdvanced };
   renderers.games = renderGames;
+  renderers.stars = renderThoughts;
   $("#editor").innerHTML = renderers[state.section]();
 }
 
@@ -417,10 +422,11 @@ function toast(message, error = false) {
 }
 
 function previewView() {
+  if (state.section === "stars") return "stars";
   if (state.section === "games") return state.data.games?.[state.selectedGame]?.id ? `game&id=${encodeURIComponent(state.data.games[state.selectedGame].id)}` : "games";
   return state.section === "projects" && state.data.projects?.[state.selectedProject]?.slug
     ? `project&id=${encodeURIComponent(state.data.projects[state.selectedProject].slug)}`
-    : state.section === "footprints" ? "journey" : state.section === "fitness" ? "fitness" : state.section === "trading" ? "trading" : state.section === "resume" ? "resume" : "projects";
+    : state.section === "footprints" ? "journey" : state.section === "trading" ? "trading" : state.section === "resume" ? "resume" : "projects";
 }
 
 function refreshPreview() {
@@ -451,6 +457,17 @@ function mutateAndRender(callback) {
 }
 
 function handleAction(button) {
+  if (button.dataset.action === "select-thought") { state.selectedThought = Number(button.dataset.index); render(); return; }
+  if (button.dataset.action === "add-thought") return mutateAndRender(() => {
+    state.data.thoughts ||= [];
+    const now = new Date(), date = [now.getFullYear(),String(now.getMonth()+1).padStart(2,'0'),String(now.getDate()).padStart(2,'0')].join('-');
+    state.data.thoughts.unshift({id:crypto.randomUUID(),title:'',category:'随想',date,excerpt:'',body:'',_visibility:'draft'});
+    state.selectedThought = 0;
+  });
+  if (button.dataset.action === "remove-thought") {
+    if (confirm("删除这条想法？已保存的历史内容可从工作台备份恢复。")) mutateAndRender(() => state.data.thoughts.splice(state.selectedThought,1));
+    return;
+  }
   const [action, suffix] = button.dataset.action.split(":");
   const index = Number(button.dataset.index);
   if (action === "select-game") { state.selectedGame = index; render(); refreshPreview(); return; }
