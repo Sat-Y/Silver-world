@@ -103,10 +103,9 @@ function sectionRule(title, note, action = "") {
 }
 
 const defaultHomeCardLayout = {
-  id: { x: 8, y: 5, w: 42 },
-  index: { x: 8, y: 17, w: 34 },
-  copy: { x: 9, y: 47, w: 82 },
-  tags: { x: 9, y: 70, w: 82 },
+  id: { x: 26.5, y: 5.8, w: 42 },
+  copy: { x: 10.1, y: 16.8, w: 82 },
+  tags: { x: 9, y: 78.1, w: 82 },
   action: { x: 9, y: 91, w: 82 }
 };
 
@@ -121,12 +120,13 @@ function homeCardRegionStyle(card, key) {
 
 function homeCardPreview(card, index) {
   const tags = (card.tags || []).filter(Boolean).slice(0, 2);
+  const actionLabel = String(card.target || "").startsWith("project:") || (!card.target && card.projectSlug) ? "OPEN CASE" : "OPEN PAGE";
   return `<div class="studio-card-stage"><div class="studio-card-face" data-home-card-preview="${index}">
     <div class="studio-card-region studio-card-id" data-card-region="id" data-card-index="${index}" style="${homeCardRegionStyle(card, "id")}"><span>${esc(card.id || "")}</span></div>
-    <div class="studio-card-region studio-card-index" data-card-region="index" data-card-index="${index}" style="${homeCardRegionStyle(card, "index")}"><b>${esc(card.index || String(index + 1).padStart(2, "0"))}</b><i>SELECTED<br>PROJECT</i></div>
+    <div class="studio-card-image">${card.image ? `<img src="/site/${esc(card.image)}" alt="卡牌图片">` : ""}</div>
     <div class="studio-card-region studio-card-copy" data-card-region="copy" data-card-index="${index}" style="${homeCardRegionStyle(card, "copy")}"><small>${esc(card.status || "")}</small><strong>${esc(card.title || "未命名卡牌")}</strong><i>${esc(card.english || "")}</i></div>
     <div class="studio-card-region studio-card-tags" data-card-region="tags" data-card-index="${index}" style="${homeCardRegionStyle(card, "tags")}">${tags.map(tag => `<b>${esc(tag)}</b>`).join("")}</div>
-    <div class="studio-card-region studio-card-action" data-card-region="action" data-card-index="${index}" style="${homeCardRegionStyle(card, "action")}"><span>OPEN CASE</span><b>→</b></div>
+    <div class="studio-card-region studio-card-action" data-card-region="action" data-card-index="${index}" style="${homeCardRegionStyle(card, "action")}"><span>${actionLabel}</span><b>→</b></div>
   </div><small>拖动卡片上的文字区域调整位置</small></div>`;
 }
 
@@ -165,6 +165,18 @@ function renderResume() {
   const skills = state.data.skillGroups || [];
   const homeCards = state.data.homeCards || [];
   const projectOptions = (state.data.projects || []).map(project => ({ value: project.slug || "", label: `${project.title || "未命名项目"} · ${project.slug || "NO SLUG"}` }));
+  const cardTargetOptions = [
+    { value: "resume", label: "页面 · 首页 / 简历" },
+    { value: "projects", label: "页面 · 项目档案" },
+    { value: "trading", label: "页面 · 财富 / 资金变动" },
+    { value: "stars", label: "页面 · 漫天繁星" },
+    { value: "games", label: "页面 · 游戏图鉴" },
+    { value: "journey", label: "页面 · 人生足迹" },
+    { value: "changelog", label: "页面 · 成长日志" },
+    { value: "fitness", label: "页面 · 健身记录" },
+    { value: "connect", label: "页面 · 联系我" },
+    ...projectOptions.map(item => ({ value: `project:${item.value}`, label: `项目 · ${item.label}` }))
+  ];
   return `${heading("简历编辑", "更新首页身份、教育和实习经历。文字修改会自动保存到本地草稿。")}
     ${sectionRule("身份与首页", "PROFILE")}
     <div class="form-grid">
@@ -183,9 +195,9 @@ function renderResume() {
       return `<article class="repeater-row"><header class="repeater-row-header"><strong>CARD ${String(index + 1).padStart(2, "0")} · ${esc(card.title || "未命名卡牌")}</strong><div class="row-actions"><button class="button small secondary" data-action="reset-home-card-layout" data-index="${index}" type="button">恢复布局</button><button class="button small secondary" data-action="move-home-card-up" data-index="${index}" type="button"${index === 0 ? " disabled" : ""}>上移</button><button class="button small secondary" data-action="move-home-card-down" data-index="${index}" type="button"${index === homeCards.length - 1 ? " disabled" : ""}>下移</button><button class="button small danger" data-action="remove-home-card" data-index="${index}" type="button">删除</button></div></header><div class="home-card-workspace">
         ${homeCardPreview(card, index)}
         <div class="form-grid">
-        ${field([...p, "projectSlug"], "跳转到项目", { select: projectOptions })}
+        ${field([...p, "target"], "点击后跳转", { select: cardTargetOptions, help: "可选择网站栏目或具体项目详情；首页会按此设置跳转。" })}
         ${field([...p, "id"], "卡牌档案 ID")}
-        ${field([...p, "index"], "展示序号")}
+        ${assetField([...p, "image"], "卡牌图片（中间留白区域，清空路径可移除）")}
         ${field([...p, "status"], "状态")}
         ${field([...p, "title"], "卡牌标题")}
         ${field([...p, "english"], "英文副标题")}
@@ -486,7 +498,7 @@ function handleAction(button) {
     if (state.data.homeCards.length >= 5) return;
     const used = new Set(state.data.homeCards.map(card => card.projectSlug));
     const project = (state.data.projects || []).find(item => !used.has(item.slug)) || (state.data.projects || [])[0] || {};
-    state.data.homeCards.push({ projectSlug: project.slug || "", id: project.id || "", index: project.index || String(state.data.homeCards.length + 1).padStart(2, "0"), status: project.status || "SELECTED", title: project.title || "未命名卡牌", english: project.english || "Untitled Project", tags: (project.evidence || []).slice(0, 2), layout: structuredClone(defaultHomeCardLayout) });
+    state.data.homeCards.push({ target: project.slug ? `project:${project.slug}` : "projects", projectSlug: project.slug || "", id: project.id || "", index: project.index || String(state.data.homeCards.length + 1).padStart(2, "0"), status: project.status || "SELECTED", title: project.title || "未命名卡牌", english: project.english || "Untitled Project", tags: (project.evidence || []).slice(0, 2), layout: structuredClone(defaultHomeCardLayout) });
   });
   if (action === "remove-home-card") return mutateAndRender(() => { if (confirm("确定从首页删除这张卡牌吗？项目档案本身不会被删除。")) state.data.homeCards.splice(index, 1); });
   if (action === "move-home-card-up" && index > 0) return mutateAndRender(() => { const [card] = state.data.homeCards.splice(index, 1); state.data.homeCards.splice(index - 1, 0, card); });
@@ -558,6 +570,7 @@ async function uploadAsset(file, path) {
     setAt(path, result.path);
     markDirty();
     render();
+    refreshPreview();
     toast(`素材已保存：${result.path}`);
   } catch (error) { toast(error.message, true); }
 }
@@ -578,7 +591,8 @@ $("#editor").addEventListener("input", event => {
   setAt(path, value);
   if (path[0] === "homeCards") {
     const preview = `[data-home-card-preview="${path[1]}"]`;
-    const fields = { id: ".studio-card-id span", index: ".studio-card-index b", status: ".studio-card-copy small", title: ".studio-card-copy strong", english: ".studio-card-copy i" };
+    const fields = { id: ".studio-card-id span", status: ".studio-card-copy small", title: ".studio-card-copy strong", english: ".studio-card-copy i" };
+    if (path[2] === "image") $(".studio-card-image", $(preview)).innerHTML = value ? `<img src="/site/${esc(value)}" alt="卡牌图片">` : "";
     if (fields[path[2]]) $(fields[path[2]], $(preview)).textContent = value || "";
     if (path[2] === "tags") {
       const tags = (state.data.homeCards[path[1]].tags || []).filter(Boolean).slice(0, 2);

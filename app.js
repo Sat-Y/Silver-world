@@ -43,15 +43,21 @@
     const y = -47 + Math.abs(center) * 7;
     const rotation = center * 8;
     const mobileX = -50 + center * mobileStep;
-    const targetSlug = display.projectSlug || display.slug || "";
-    const defaultLayout = { id: { x: 8, y: 5, w: 42 }, copy: { x: 9, y: 47, w: 82 }, tags: { x: 9, y: 70, w: 82 }, action: { x: 9, y: 91, w: 82 } };
+    const rawTarget = String(card.target || (display.projectSlug || display.slug ? `project:${display.projectSlug || display.slug}` : "projects"));
+    const isProjectTarget = rawTarget.startsWith("project:");
+    const targetRoute = isProjectTarget ? "project" : (routeNames[rawTarget] ? rawTarget : "projects");
+    const targetId = isProjectTarget ? rawTarget.slice(8) : "";
+    const targetHref = `?view=${encodeURIComponent(targetRoute)}${targetId ? `&id=${encodeURIComponent(targetId)}` : ""}`;
+    const actionLabel = isProjectTarget ? "OPEN CASE" : "OPEN PAGE";
+    const defaultLayout = { id: { x: 26.5, y: 5.8, w: 42 }, copy: { x: 10.1, y: 16.8, w: 82 }, tags: { x: 9, y: 78.1, w: 82 }, action: { x: 9, y: 91, w: 82 } };
     const regionStyle = key => { const region = { ...defaultLayout[key], ...(card.layout?.[key] || {}) }; return `left:${region.x}%;top:${region.y}%;width:${region.w}%`; };
     return `<article class="hero-project-card" data-hero-card style="--card-x:${x}%;--card-y:${y}%;--card-rot:${rotation}deg;--card-hover-y:${y - 6}%;--card-float-y:${y - 13}%;--card-hover-rot:${rotation * .72}deg;--card-float-rot:${rotation * .42}deg;--mobile-card-x:${mobileX}%;--card-z:${index + 1}">
       <div class="hero-card-rotor">
         <div class="hero-card-face hero-card-back" aria-hidden="true"><span class="hero-card-register top"></span><span class="hero-card-register bottom"></span><strong>SILVERZ</strong><i></i></div>
-        <a class="hero-card-face hero-card-front route-link" href="?view=project&id=${encodeURIComponent(targetSlug)}" data-route="project" aria-label="打开项目：${esc(display.title || "未命名卡牌")}">
+        <a class="hero-card-face hero-card-front route-link" href="${targetHref}" data-route="${targetRoute}" aria-label="打开：${esc(display.title || "未命名卡牌")}">
           <span class="hero-card-index mono" style="${regionStyle("id")}">${esc(display.id || "")}</span>
-          <span class="hero-card-copy" style="${regionStyle("copy")}"><small>${esc(display.status || "")}</small><strong>${esc(display.title || "未命名卡牌")}</strong><i>${esc(display.english || "")}</i></span><span class="hero-card-tags" style="${regionStyle("tags")}">${tags.map(tag => `<b>${esc(tag)}</b>`).join("")}</span><span class="hero-card-enter mono" style="${regionStyle("action")}">OPEN CASE <b>→</b></span>
+          ${card.image ? `<span class="hero-card-image"><img src="${esc(card.image)}" alt="${esc(display.title || "卡牌图片")}" loading="lazy"></span>` : ""}
+          <span class="hero-card-copy" style="${regionStyle("copy")}"><small>${esc(display.status || "")}</small><strong>${esc(display.title || "未命名卡牌")}</strong><i>${esc(display.english || "")}</i></span><span class="hero-card-tags" style="${regionStyle("tags")}">${tags.map(tag => `<b>${esc(tag)}</b>`).join("")}</span><span class="hero-card-enter mono" style="${regionStyle("action")}">${actionLabel} <b>→</b></span>
         </a>
       </div>
       <button class="hero-card-trigger" type="button" data-card-trigger aria-expanded="false" aria-label="翻开${esc(display.title || "项目")}卡"><span>FLIP</span></button>

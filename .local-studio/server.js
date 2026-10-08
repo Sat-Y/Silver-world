@@ -19,11 +19,15 @@ const UPLOAD_DIR = path.join(ROOT, "assets", "uploads");
 
 for (const dir of [DATA_DIR, BACKUP_DIR, STAGED_UPLOAD_DIR, UPLOAD_DIR]) fs.mkdirSync(dir, { recursive: true });
 
-function readContentData() {
+function readContentFileData() {
   const source = fs.readFileSync(CONTENT_FILE, "utf8");
   const context = { window: {} };
   vm.runInNewContext(source, context, { filename: CONTENT_FILE });
-  return migrateData(JSON.parse(JSON.stringify(context.window.SILVER_DATA)));
+  return JSON.parse(JSON.stringify(context.window.SILVER_DATA));
+}
+
+function readContentData() {
+  return migrateData(readContentFileData());
 }
 
 function readTradingData() {
@@ -36,10 +40,9 @@ function readTradingData() {
 
 function migrateData(data) {
   const defaultCardLayout = {
-    id: { x: 8, y: 5, w: 42 },
-    index: { x: 8, y: 17, w: 34 },
-    copy: { x: 9, y: 47, w: 82 },
-    tags: { x: 9, y: 70, w: 82 },
+    id: { x: 26.5, y: 5.8, w: 42 },
+    copy: { x: 10.1, y: 16.8, w: 82 },
+    tags: { x: 9, y: 78.1, w: 82 },
     action: { x: 9, y: 91, w: 82 }
   };
   if (!Array.isArray(data.homeCards)) {
@@ -56,6 +59,7 @@ function migrateData(data) {
     }));
   }
   data.homeCards.forEach(card => {
+    card.target ||= card.projectSlug ? `project:${card.projectSlug}` : "projects";
     card.tags = Array.isArray(card.tags) ? card.tags : [];
     card.layout ||= {};
     for (const [key, fallback] of Object.entries(defaultCardLayout)) {
@@ -97,7 +101,17 @@ function readStudioData() {
     fs.writeFileSync(STUDIO_DATA, JSON.stringify(initial, null, 2), "utf8");
     return initial;
   }
-  return migrateData(JSON.parse(fs.readFileSync(STUDIO_DATA, "utf8")));
+  const stored = JSON.parse(fs.readFileSync(STUDIO_DATA, "utf8"));
+  const data = migrateData(stored);
+  if (!Array.isArray(stored.thoughts)) {
+    const publishedThoughts = readContentFileData().thoughts;
+    if (Array.isArray(publishedThoughts)) {
+      backupData("before-thoughts-migration", stored);
+      data.thoughts = JSON.parse(JSON.stringify(publishedThoughts));
+      fs.writeFileSync(STUDIO_DATA, JSON.stringify(data, null, 2), "utf8");
+    }
+  }
+  return data;
 }
 
 function timestamp() {

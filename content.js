@@ -252,8 +252,8 @@ window.SILVER_DATA = {
     {
       "day": 1,
       "date": "2026.8.14",
-      "image": "",
-      "note": ""
+      "image": "assets/uploads/1787140529235-ecf7de-f4cee81ecf96389cb2f6242863945f66.jpg",
+      "note": "初期"
     },
     {
       "day": 28,
@@ -374,7 +374,8 @@ window.SILVER_DATA = {
         "date": "经常",
         "text": "陆陆续续来了这里很多次，挺好",
         "image": {
-          "src": "assets/uploads/1785580424539-ca449a-asset.jpg"
+          "src": "assets/uploads/1785580424539-ca449a-asset.jpg",
+          "caption": ""
         },
         "province": "浙江省"
       },
@@ -682,9 +683,9 @@ window.SILVER_DATA = {
   "homeCards": [
     {
       "projectSlug": "casual-translation",
-      "id": "OBS–P04",
+      "id": "OBS–P01",
       "index": "",
-      "status": "本地 Alpha",
+      "status": "项目卡",
       "title": "雅喵 IELTS Pet",
       "english": "IELTS Pet Learning Companion",
       "tags": [
@@ -693,109 +694,113 @@ window.SILVER_DATA = {
       ],
       "layout": {
         "id": {
-          "x": 26.5,
-          "y": 5.8,
+          "x": 25.8,
+          "y": 6,
           "w": 42
         },
         "index": {
-          "x": 54.7,
-          "y": 5.3,
-          "w": 34
-        },
-        "copy": {
-          "x": 10.1,
-          "y": 16.8,
-          "w": 82
-        },
-        "tags": {
-          "x": 9,
-          "y": 78.1,
-          "w": 82
-        },
-        "action": {
-          "x": 9,
-          "y": 91,
-          "w": 82
-        }
-      }
-    },
-    {
-      "projectSlug": "interrogation-room-0",
-      "id": "OBS–P01",
-      "index": "",
-      "status": "开发中",
-      "title": "0号审讯室",
-      "english": "Interrogation Room #0",
-      "tags": [
-        "三维心理状态引擎",
-        "证物标签影响对话树"
-      ],
-      "layout": {
-        "id": {
-          "x": 26.9,
-          "y": 5.6,
-          "w": 42
-        },
-        "index": {
-          "x": 57.6,
-          "y": 9.9,
-          "w": 34
-        },
-        "copy": {
-          "x": 10.1,
-          "y": 16.4,
-          "w": 82
-        },
-        "tags": {
-          "x": 9.7,
-          "y": 78.5,
-          "w": 82
-        },
-        "action": {
-          "x": 9,
-          "y": 91,
-          "w": 82
-        }
-      }
-    },
-    {
-      "projectSlug": "the-final-resonance",
-      "id": "OBS–P02",
-      "index": "",
-      "status": "可运行 Demo",
-      "title": "最终共鸣",
-      "english": "The Final Resonance",
-      "tags": [
-        "RAG 镜像模仿",
-        "16 种 MBTI 结局"
-      ],
-      "layout": {
-        "id": {
-          "x": 26.5,
-          "y": 6.2,
-          "w": 42
-        },
-        "index": {
-          "x": 57.6,
-          "y": 9.5,
+          "x": 55.6,
+          "y": 10.1,
           "w": 34
         },
         "copy": {
           "x": 9.4,
-          "y": 16.2,
+          "y": 16.5,
           "w": 82
         },
         "tags": {
-          "x": 9,
-          "y": 78.5,
+          "x": 9.5,
+          "y": 78.2,
           "w": 82
         },
         "action": {
-          "x": 9,
-          "y": 91,
+          "x": 7.5,
+          "y": 90.6,
           "w": 82
         }
-      }
+      },
+      "target": "project:casual-translation"
+    },
+    {
+      "projectSlug": "interrogation-room-0",
+      "id": "OBS–P02",
+      "index": "",
+      "status": "财富卡",
+      "title": "33,636.28RNB",
+      "english": "CAPITAL RECORDS",
+      "tags": [
+        "财富卡",
+        ""
+      ],
+      "layout": {
+        "id": {
+          "x": 26.7,
+          "y": 6.2,
+          "w": 42
+        },
+        "index": {
+          "x": 57.1,
+          "y": 10,
+          "w": 34
+        },
+        "copy": {
+          "x": 9.5,
+          "y": 16.4,
+          "w": 82
+        },
+        "tags": {
+          "x": 9.2,
+          "y": 78.7,
+          "w": 82
+        },
+        "action": {
+          "x": 8.5,
+          "y": 90.7,
+          "w": 82
+        }
+      },
+      "target": "trading",
+      "image": "assets/wealth-card-v1.png"
+    },
+    {
+      "projectSlug": "the-final-resonance",
+      "id": "OBS–P03",
+      "index": "",
+      "status": "项目卡",
+      "title": "云端列车",
+      "english": "Cloud-mirage-express",
+      "tags": [
+        "AI故事剧情",
+        "休闲调酒放松"
+      ],
+      "layout": {
+        "id": {
+          "x": 26,
+          "y": 5.8,
+          "w": 42
+        },
+        "index": {
+          "x": 57.1,
+          "y": 10,
+          "w": 34
+        },
+        "copy": {
+          "x": 10.5,
+          "y": 16.5,
+          "w": 82
+        },
+        "tags": {
+          "x": 9.5,
+          "y": 78.2,
+          "w": 82
+        },
+        "action": {
+          "x": 8.5,
+          "y": 90.6,
+          "w": 82
+        }
+      },
+      "target": "project:cloud-mirage-express"
     }
   ],
   "thoughts": [

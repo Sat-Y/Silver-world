@@ -109,6 +109,8 @@ button { color: inherit; }
 .studio-card-region:hover::before, .studio-card-region.is-dragging::before { opacity: 1; }
 .studio-card-region.is-dragging { cursor: grabbing; }
 .studio-card-id { color: #596164; font: 4cqw var(--mono); }
+.studio-card-image { position: absolute; left: 10%; top: 40%; width: 80%; height: 34%; overflow: hidden; pointer-events: none; }
+.studio-card-image img { display: block; width: 100%; height: 100%; object-fit: contain; }
 .studio-card-index { display: flex; align-items: end; gap: 4cqw; color: #596164; }
 .studio-card-index b { font: 600 21cqw var(--mono); }
 .studio-card-index i { font: 3cqw/1.3 var(--mono); font-style: normal; text-align: right; }

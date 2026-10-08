@@ -2,7 +2,7 @@
 window.SILVER_TRADING = {
   "capital": {
     "initial": 10000,
-    "current": 31536.24,
+    "current": 33636.28,
     "snapshots": [
       {
         "date": "2026-08-17",
@@ -139,6 +139,14 @@ window.SILVER_TRADING = {
         "pnlPercent": null,
         "journalId": "",
         "note": ""
+      },
+      {
+        "date": "2026-10-08",
+        "capital": 33636.28,
+        "pnl": 2100.04,
+        "pnlPercent": null,
+        "journalId": "",
+        "note": ""
       }
     ],
     "monthly": [],
@@ -146,7 +154,7 @@ window.SILVER_TRADING = {
       {
         "amount": 20000,
         "label": "START",
-        "status": "waiting"
+        "status": "reached"
       },
       {
         "amount": 50000,
@@ -232,6 +240,23 @@ window.SILVER_TRADING = {
     ]
   },
   "journals": [
+    {
+      "id": "journal-2026-10-08",
+      "date": "2026-10-08",
+      "title": "决策的再次验证",
+      "context": "今天市场跌到了3800点，市场低迷，依旧没有主线走出",
+      "conversations": [
+        {
+          "role": "silver",
+          "content": "我在国庆假期前，看到圣阳放量突破两根均线，于是我打进600股，\n今天在市场环境特别差的情况下，电池板块逆势上涨\n中间圣阳股份涨停后炸板，我卖出半仓，目前持有300股，浮盈1000多元\n同时我也看到电池板块中龙蟠科技持续走强，于是20.70打进200股，后续龙蟠涨停"
+        }
+      ],
+      "decision": "目前持仓\n圣阳股份    300股    成本17.34    收盘价21.36\n龙蟠科技    200股    成本20.70    收盘价20.94\n",
+      "execution": "",
+      "result": "",
+      "review": "",
+      "lesson": ""
+    },
     {
       "id": "journal-2026-09-25",
       "date": "2026-09-25",
