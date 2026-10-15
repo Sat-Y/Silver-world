@@ -726,7 +726,7 @@ window.SILVER_DATA = {
       "id": "OBS–P02",
       "index": "",
       "status": "财富卡",
-      "title": "33,636.28RNB",
+      "title": "27801.2RNB",
       "english": "CAPITAL RECORDS",
       "tags": [
         "财富卡",
