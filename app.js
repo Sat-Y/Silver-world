@@ -6,13 +6,13 @@
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
   const esc = value => String(value).replace(/[&<>'"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[char]));
   const sha256 = async value => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value)))].map(byte => byte.toString(16).padStart(2, "0")).join("");
-  const routeNames = { resume: "RESUME", projects: "PROJECT ARCHIVE", project: "PROJECT RECORD", lab: "EXPERIMENT LAB", journey: "FOOTPRINT ATLAS", changelog: "LIFE CHANGELOG", connect: "OPEN CHANNEL", fitness: "FITNESS PROTOCOL", trading: "CAPITAL CHANGE", report: "EXPORT REPORT" };
+  const routeNames = { resume: "RESUME", projects: "PROJECT ARCHIVE", project: "PROJECT RECORD", journey: "FOOTPRINT ATLAS", changelog: "LIFE CHANGELOG", connect: "OPEN CHANNEL", fitness: "FITNESS PROTOCOL", trading: "CAPITAL CHANGE", report: "EXPORT REPORT" };
   let currentRoute = "";
   Object.assign(routeNames, { games: "GAME ATLAS", game: "GAME STUDY", stars: "漫天繁星" });
 
   function parseRoute() {
     const params = new URLSearchParams(location.search);
-    const requested = params.get("view");
+    const requested = params.get("view") === "lab" ? "projects" : params.get("view");
     const view = routeNames[requested] ? requested : "resume";
     return { view, id: params.get("id"), type: params.get("type") };
   }
@@ -62,6 +62,12 @@
       </div>
       <button class="hero-card-trigger" type="button" data-card-trigger aria-expanded="false" aria-label="翻开${esc(display.title || "项目")}卡"><span>FLIP</span></button>
     </article>`;
+  }
+
+  // Page module numbers use the same source as the desktop directory.
+  function moduleCode(route) {
+    const number = document.querySelector(`.os-nav [data-route="${route}"] > span`)?.textContent.trim();
+    return number ? `${number} / ${routeNames[route]}` : routeNames[route];
   }
 
   function viewHeader(code, title, description) {
@@ -133,18 +139,9 @@
     </section>`;
   }
 
-  function renderLab() {
-    const experiments = data.lab;
-    return `<section class="page lab-page">${viewHeader("02 / EXPERIMENT LAB", "实验与原型", "记录正在验证的问题、快速原型和未进入正式项目档案的探索。")}
-      <div class="lab-status"><span class="mono"><i class="signal"></i>LAB CHANNEL ACTIVE</span><p>这里展示过程而不是包装完成度。后续内容将从 content.js 独立维护。</p></div>
-      <div class="lab-queue">${experiments.map((item, index) => `<article class="lab-entry"><span class="lab-index">0${index + 1}</span><div><small>${esc(item.status)} / ${esc(item.id)}</small><h2>${esc(item.title)}</h2><p>${esc(item.summary)}</p><blockquote><span>QUESTION</span>${esc(item.question)}</blockquote><div class="archive-tags">${item.stack.map(tag => `<span>${esc(tag)}</span>`).join("")}</div></div><span class="lab-log-state">CASE NOTE</span></article>`).join("")}</div>
-      <section class="lab-intake"><span class="mono">NEW EXPERIMENT TEMPLATE</span><div><strong>验证问题</strong><strong>原型方法</strong><strong>当前发现</strong><strong>下一步</strong></div></section>
-    </section>`;
-  }
-
   function renderProjects() {
-    return `<section class="page archive-page">${viewHeader("01 / PROJECT ARCHIVE", "项目档案", "不是作品清单，而是能力发生过的证据。选择一份记录，进入完整项目视图。")}
-      <div class="archive-toolbar"><div class="record-filter" role="group" aria-label="项目筛选"><button class="filter active" data-filter="all">全部记录</button><button class="filter" data-filter="game">游戏</button><button class="filter" data-filter="ai">AI 实验</button></div><span class="mono">${String(data.projects.length).padStart(2, "0")} RECORDS FOUND</span></div>
+    return `<section class="page archive-page">${viewHeader(moduleCode("projects"), "项目档案", "不是作品清单，而是能力发生过的证据。选择一份记录，进入完整项目视图。")}
+      <div class="archive-toolbar"><div class="record-filter" role="group" aria-label="项目筛选"><button class="filter active" data-filter="all">全部记录</button><button class="filter" data-filter="game">游戏</button><button class="filter" data-filter="ai">AI 项目</button><button class="filter" data-filter="prototype">实验与原型</button></div><span class="mono">${String(data.projects.length).padStart(2, "0")} RECORDS FOUND</span></div>
       <div class="archive-grid manga-panels">${data.projects.map(projectCard).join("")}</div>
     </section>`;
   }
@@ -156,7 +153,7 @@
       <a class="back-link route-link mono" href="?view=projects" data-route="projects">← BACK TO ARCHIVE</a>
       <header class="project-hero"><div><p class="section-code mono">${esc(project.id)} / ${esc(project.status)}</p><h1>${esc(project.title)}</h1><p class="project-english mono">${esc(project.english)}</p></div><div class="project-number">${esc(project.index)}</div></header>
       <div class="project-detail-grid">
-        <aside class="project-facts"><div><span>ROLE</span><strong>${esc(project.role)}</strong></div><div><span>CATEGORY</span><strong>${project.category === "game" ? "GAME SYSTEM" : "AI EXPERIMENT"}</strong></div><div><span>STATUS</span><strong>${esc(project.status)}</strong></div>${project.date ? `<div><span>DATE</span><strong>${esc(project.date)}</strong></div>` : ""}</aside>
+        <aside class="project-facts"><div><span>ROLE</span><strong>${esc(project.role)}</strong></div><div><span>CATEGORY</span><strong>${project.category === "game" ? "GAME SYSTEM" : project.category === "prototype" ? "EXPERIMENT / PROTOTYPE" : "AI PROJECT"}</strong></div><div><span>STATUS</span><strong>${esc(project.status)}</strong></div>${project.date ? `<div><span>DATE</span><strong>${esc(project.date)}</strong></div>` : ""}</aside>
         <div class="project-narrative">
           <section><span>00 / OVERVIEW</span><h2>${esc(project.summary)}</h2></section>
           ${project.demoVideo ? `<section class="project-demo"><span>DEMO / GAMEPLAY</span><h3>项目演示</h3><div class="project-video-frame"><video controls preload="metadata" playsinline aria-label="${esc(project.title)}项目演示视频"><source src="${esc(project.demoVideo)}" type="video/mp4">你的浏览器暂不支持视频播放。</video></div></section>` : ""}
@@ -464,7 +461,7 @@
   function renderJourney() {
     return `<section class="page journey-page">
       <section class="footprint-atlas">
-        <header class="map-toolbar"><div class="map-brand"><span class="mono">03 / FOOTPRINT ATLAS</span><strong>人生足迹</strong></div><div class="map-context"><span class="mono" id="map-level">WORLD / COUNTRY INDEX</span><strong id="map-location-name">LOADING MAP DATA</strong></div><button type="button" id="map-back" hidden>← 返回世界地图</button></header>
+        <header class="map-toolbar"><div class="map-brand"><span class="mono">${esc(moduleCode("journey"))}</span><strong>人生足迹</strong></div><div class="map-context"><span class="mono" id="map-level">WORLD / COUNTRY INDEX</span><strong id="map-location-name">LOADING MAP DATA</strong></div><button type="button" id="map-back" hidden>← 返回世界地图</button></header>
         <div class="map-layout"><div class="map-viewport"><div class="map-axis map-axis-x">180°W <span>0°</span> 180°E</div><div class="map-axis map-axis-y">90°N <span>0°</span> 90°S</div><div id="footprint-map-canvas" class="footprint-map-canvas" aria-live="polite"><div class="map-loading"><i></i><span>LOADING GEOGRAPHIC ARCHIVE</span></div></div></div><aside class="footprint-panel" id="footprint-panel" aria-label="足迹详情"><button class="footprint-panel-close" type="button" aria-label="关闭足迹详情">×</button><div class="footprint-panel-content"></div></aside></div>
         <footer class="map-legend"><span><i></i>暂未探索</span><span><i class="visit-low"></i>少量足迹</span><span><i class="visit-mid"></i>多次到访</span><span><i class="visit-high"></i>频繁记录</span><b>橙色深浅代表到访次数</b></footer>
       </section>
@@ -472,13 +469,13 @@
   }
 
   function renderChangelog() {
-    return `<section class="page changelog-page">${viewHeader("04 / LIFE CHANGELOG", `当前版本 <span>${esc(data.versions[0].version)}</span>`, "把人生阶段写成版本记录：新增了什么、修正了什么，以及下一步准备改变什么。")}
+    return `<section class="page changelog-page">${viewHeader(moduleCode("changelog"), `当前版本 <span>${esc(data.versions[0].version)}</span>`, "把人生阶段写成版本记录：新增了什么、修正了什么，以及下一步准备改变什么。")}
       <div class="release-layout"><aside><span class="mono">RELEASE CHANNEL</span><strong>PUBLIC<br>STABLE</strong><p>LAST UPDATED<br>${esc(data.profile.updatedAt)}</p></aside><div class="release-list">${data.versions.map((item, index) => `<article class="release${index === 0 ? " current" : ""}"><header><strong>${esc(item.version)}</strong><span>${esc(item.date)}</span><h2>${esc(item.title)}</h2><button aria-expanded="${index === 0}" data-release="${index}">${index === 0 ? "−" : "+"}</button></header><div class="release-changes"${index === 0 ? "" : " hidden"}>${item.changes.map(([type, text]) => `<p><span data-type="${esc(type)}">${esc(type)}</span>${esc(text)}</p>`).join("")}</div></article>`).join("")}<article class="release release-history"><header><strong>ARCHIVE</strong><span>LOCKED</span><h2>历史版本</h2><button type="button" aria-label="输入密码查找历史版本" data-history-lock>+</button></header></article></div></div>
     </section>`;
   }
 
   function renderConnect() {
-    return `<section class="page connect-page"><p class="section-code mono">05 / OPEN CHANNEL</p><div class="connect-hero"><h1>把疯狂想法<br>变成可运行的系统。</h1><p>如果你正在做 AI 游戏、独立产品或任何值得快速验证的创造，欢迎联系我。</p></div><div class="contact-panel"><span class="mono">PRIMARY CHANNEL</span><a href="mailto:${esc(data.profile.email)}">${esc(data.profile.email)}</a></div><div class="external-grid">${data.socials.map((item, index) => `<a href="${esc(item.href)}" target="_blank" rel="noreferrer"><span>0${index + 1}</span><strong>${esc(item.label)}</strong><i>↗</i></a>`).join("")}</div><footer class="view-footer"><span>SILVER.Z / PERSONAL OBSERVATORY</span><span>© ${new Date().getFullYear()}</span></footer></section>`;
+    return `<section class="page connect-page"><p class="section-code mono">${esc(moduleCode("connect"))}</p><div class="connect-hero"><h1>把疯狂想法<br>变成可运行的系统。</h1><p>如果你正在做 AI 游戏、独立产品或任何值得快速验证的创造，欢迎联系我。</p></div><div class="contact-panel"><span class="mono">PRIMARY CHANNEL</span><a href="mailto:${esc(data.profile.email)}">${esc(data.profile.email)}</a></div><div class="external-grid">${data.socials.map((item, index) => `<a href="${esc(item.href)}" target="_blank" rel="noreferrer"><span>0${index + 1}</span><strong>${esc(item.label)}</strong><i>↗</i></a>`).join("")}</div><footer class="view-footer"><span>SILVER.Z / PERSONAL OBSERVATORY</span><span>© ${new Date().getFullYear()}</span></footer></section>`;
   }
 
   function money(value) {
@@ -649,7 +646,7 @@
   let disposeCapabilities = () => {};
   function render(route) {
     disposeCapabilities();
-    const renderers = { resume: renderResume, projects: renderProjects, project: () => renderProject(route.id), lab: renderLab, journey: renderJourney, changelog: renderChangelog, connect: renderConnect, fitness: renderFitness, trading: renderTrading, report: () => renderReport(route) };
+    const renderers = { resume: renderResume, projects: renderProjects, project: () => renderProject(route.id), journey: renderJourney, changelog: renderChangelog, connect: renderConnect, fitness: renderFitness, trading: renderTrading, report: () => renderReport(route) };
     renderers.stars = () => '<silver-starfield></silver-starfield>';
     renderers.games = () => window.SILVER_GAME_ATLAS.render();
     renderers.game = () => window.SILVER_GAME_ATLAS.render(route.id || "missing");

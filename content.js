@@ -99,53 +99,12 @@ window.SILVER_DATA = {
     "温州大学二等奖学金",
     "中国智能机器人创意大赛一等奖"
   ],
-  "lab": [
-    {
-      "id": "LAB—02",
-      "title": "LeNet-5 手写数字识别",
-      "status": "COMPLETED",
-      "summary": "复刻经典 CNN，并通过 Flask 与 Canvas 做成可交互的推理和特征可视化应用。",
-      "question": "如何把模型训练、推理接口和浏览器交互连成完整链路？",
-      "stack": [
-        "PyTorch",
-        "Flask",
-        "HTML5 Canvas",
-        "MNIST"
-      ]
-    },
-    {
-      "id": "LAB—03",
-      "title": "车牌识别系统",
-      "status": "COMPLETED",
-      "summary": "实现图像预处理、车牌定位、字符分割与 SVM 识别流程，支持蓝、黄、绿车牌。",
-      "question": "传统视觉方法如何在复杂背景中稳定完成字符识别？",
-      "stack": [
-        "OpenCV",
-        "HOG",
-        "SVM",
-        "Python"
-      ]
-    },
-    {
-      "id": "LAB—04",
-      "title": "电子日记系统",
-      "status": "ARCHITECTURE",
-      "summary": "面向日记管理、分享、好友关系和消息中心的 Web 系统架构设计。",
-      "question": "如何组织带认证、社交关系与实时消息的完整 Web 应用？",
-      "stack": [
-        "Vue 3",
-        "Spring Boot",
-        "MySQL",
-        "Redis"
-      ]
-    }
-  ],
   "projects": [
     {
       "id": "OBS–P01",
       "slug": "interrogation-room-0",
       "category": "game",
-      "status": "开发中",
+      "status": "暂时搁置",
       "title": "0号审讯室",
       "english": "Interrogation Room #0",
       "summary": "心理博弈审讯模拟。玩家通过证物与对话策略，在嫌疑人的心理状态变化中寻找突破口。",
@@ -188,7 +147,7 @@ window.SILVER_DATA = {
       "id": "OBS–P03",
       "slug": "cloud-mirage-express",
       "category": "game",
-      "status": "暂停",
+      "status": "进行中",
       "title": "云端列车",
       "english": "Cloud Mirage Express",
       "summary": "像素风调酒模拟经营，以收入、成本和税务构成三层经济循环。",
@@ -208,7 +167,7 @@ window.SILVER_DATA = {
       "id": "OBS–P04",
       "slug": "casual-translation",
       "category": "ai",
-      "status": "本地 Alpha",
+      "status": "暂时搁置",
       "title": "雅喵 IELTS Pet",
       "english": "IELTS Pet Learning Companion",
       "summary": "把每日英语练习转化为宠物成长的 Windows 桌面学习应用。",
@@ -246,6 +205,66 @@ window.SILVER_DATA = {
       ],
       "demoVideo": "assets/first-game-making-experience-demo.mp4",
       "index": "05"
+    },
+    {
+      "id": "LAB—02",
+      "slug": "experiment-lab-02",
+      "category": "prototype",
+      "status": "COMPLETED",
+      "title": "LeNet-5 手写数字识别",
+      "english": "",
+      "summary": "复刻经典 CNN，并通过 Flask 与 Canvas 做成可交互的推理和特征可视化应用。",
+      "problem": "如何把模型训练、推理接口和浏览器交互连成完整链路？",
+      "system": "",
+      "outcome": "",
+      "role": "",
+      "evidence": [
+        "PyTorch",
+        "Flask",
+        "HTML5 Canvas",
+        "MNIST"
+      ],
+      "index": "06"
+    },
+    {
+      "id": "LAB—03",
+      "slug": "experiment-lab-03",
+      "category": "prototype",
+      "status": "COMPLETED",
+      "title": "车牌识别系统",
+      "english": "",
+      "summary": "实现图像预处理、车牌定位、字符分割与 SVM 识别流程，支持蓝、黄、绿车牌。",
+      "problem": "传统视觉方法如何在复杂背景中稳定完成字符识别？",
+      "system": "",
+      "outcome": "",
+      "role": "",
+      "evidence": [
+        "OpenCV",
+        "HOG",
+        "SVM",
+        "Python"
+      ],
+      "index": "07"
+    },
+    {
+      "id": "LAB—04",
+      "slug": "experiment-lab-04",
+      "category": "prototype",
+      "status": "ARCHITECTURE",
+      "title": "电子日记系统",
+      "english": "",
+      "summary": "面向日记管理、分享、好友关系和消息中心的 Web 系统架构设计。",
+      "problem": "如何组织带认证、社交关系与实时消息的完整 Web 应用？",
+      "system": "",
+      "outcome": "",
+      "role": "",
+      "evidence": [
+        "Vue 3",
+        "Spring Boot",
+        "MySQL",
+        "Redis"
+      ],
+      "index": "08"
     }
   ],
   "fitnessPhotos": [
@@ -611,6 +630,50 @@ window.SILVER_DATA = {
   ],
   "games": [
     {
+      "id": "game-a4899e53-5f69-411a-9ba7-50c299bfe0f5",
+      "title": "第五人格",
+      "format": "online",
+      "status": "已弃坑",
+      "hours": 200,
+      "startedAt": "2023-01-19",
+      "finishedAt": "2025-01-19",
+      "platform": "网易",
+      "genre": "非对称/微恐/鹅鸭杀移植"
+    },
+    {
+      "id": "game-6fca990a-45d6-4dd4-a26f-49d58dcb746d",
+      "title": "潜水员戴夫",
+      "format": "indie",
+      "status": "在玩",
+      "hours": 20,
+      "platform": "steam",
+      "startedAt": "2026-04-19",
+      "finishedAt": "2026-10-19",
+      "genre": "模拟经营/休闲养老"
+    },
+    {
+      "id": "game-30f70879-652b-4574-bac4-da518557fa77",
+      "title": "王者万象棋",
+      "format": "online",
+      "status": "在玩",
+      "hours": 100,
+      "genre": "自走棋/卡牌构筑",
+      "platform": "腾讯",
+      "startedAt": "2026-08-19",
+      "finishedAt": "2026-10-19"
+    },
+    {
+      "id": "game-bc766faf-bf05-4079-ab66-c478cc9df7b5",
+      "title": "永劫无间",
+      "format": "online",
+      "status": "已弃坑",
+      "hours": 200,
+      "platform": "网易",
+      "genre": "武侠吃鸡",
+      "startedAt": "2023-09-19",
+      "finishedAt": "2024-01-19"
+    },
+    {
       "id": "game-fb59d3a0-643b-4b27-9a5b-eebac61f65f6",
       "title": "三角洲行动",
       "format": "online",
@@ -636,7 +699,9 @@ window.SILVER_DATA = {
       "finishedAt": "2026-09-13",
       "startedAt": "2026-06-30",
       "hook": "自己的卡牌构筑过程，和看到自己的构筑无敌的爽感，还有有时候数值只差1的不甘",
-      "focus": "数值设计"
+      "focus": "数值设计",
+      "friction": "流失点：为了某一个构筑的牌形，但牌一直不来，还有就是路线刷的很差，伤害差一点的时候\n回流：突然又想玩了，或者有朋友叫我一起了",
+      "moment": "循环构筑，高爆发伤害，卡牌成型佩服自己的智慧"
     },
     {
       "id": "game-39c4d2e0-5195-4ee0-afbd-d9fe3fddcffa",

@@ -1992,3 +1992,5 @@ html[data-theme="dark"] { --bg: #151714; --surface: #1d201b; --surface-2: #25292
 
 .cap-deck-toolbar { justify-content: flex-start; gap: 14px; }
 .cap-deck-toolbar .cap-play { width: auto; height: 30px; padding: 0 12px; font: 11px var(--mono); }
+
+@media (max-width: 760px) { .mobile-tabs { grid-template-columns: repeat(3, 1fr); } }
