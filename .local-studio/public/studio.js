@@ -124,7 +124,7 @@ function homeCardPreview(card, index) {
   return `<div class="studio-card-stage"><div class="studio-card-face" data-home-card-preview="${index}">
     <div class="studio-card-region studio-card-id" data-card-region="id" data-card-index="${index}" style="${homeCardRegionStyle(card, "id")}"><span>${esc(card.id || "")}</span></div>
     <div class="studio-card-image">${card.image ? `<img src="/site/${esc(card.image)}" alt="卡牌图片">` : ""}</div>
-    <div class="studio-card-region studio-card-copy" data-card-region="copy" data-card-index="${index}" style="${homeCardRegionStyle(card, "copy")}"><small>${esc(card.status || "")}</small><strong>${esc(card.title || "未命名卡牌")}</strong><i>${esc(card.english || "")}</i></div>
+    <div class="studio-card-region studio-card-copy" data-card-region="copy" data-card-index="${index}" style="${homeCardRegionStyle(card, "copy")}"><small>${esc(card.status || "")}</small><strong>${esc(card.title || "未命名卡牌")}</strong><i>${esc(card.english || "")}</i><p class="studio-card-description">${esc(card.description || "")}</p></div>
     <div class="studio-card-region studio-card-tags" data-card-region="tags" data-card-index="${index}" style="${homeCardRegionStyle(card, "tags")}">${tags.map(tag => `<b>${esc(tag)}</b>`).join("")}</div>
     <div class="studio-card-region studio-card-action" data-card-region="action" data-card-index="${index}" style="${homeCardRegionStyle(card, "action")}"><span>${actionLabel}</span><b>→</b></div>
   </div><small>拖动卡片上的文字区域调整位置</small></div>`;
@@ -189,7 +189,7 @@ function renderResume() {
       ${field(["profile", "chapter", "title"], "当前章节标题")}
       ${field(["profile", "chapter", "summary"], "当前章节说明", { multiline: true })}
     </div>
-    ${sectionRule("首页卡牌", `${homeCards.length} / 5 张 · 拖动无需使用，按钮可调整顺序`, `<button class="button small" data-action="add-home-card" type="button"${homeCards.length >= 5 ? " disabled" : ""}>添加卡牌</button>`)}
+    ${sectionRule("首页卡牌", `${homeCards.length} 张 · 用于首页滚动区域，可调整顺序`, `<button class="button small" data-action="add-home-card" type="button">添加卡牌</button>`)}
     <div class="repeater home-card-editor">${homeCards.map((card, index) => {
       const p = ["homeCards", index];
       return `<article class="repeater-row"><header class="repeater-row-header"><strong>CARD ${String(index + 1).padStart(2, "0")} · ${esc(card.title || "未命名卡牌")}</strong><div class="row-actions"><button class="button small secondary" data-action="reset-home-card-layout" data-index="${index}" type="button">恢复布局</button><button class="button small secondary" data-action="move-home-card-up" data-index="${index}" type="button"${index === 0 ? " disabled" : ""}>上移</button><button class="button small secondary" data-action="move-home-card-down" data-index="${index}" type="button"${index === homeCards.length - 1 ? " disabled" : ""}>下移</button><button class="button small danger" data-action="remove-home-card" data-index="${index}" type="button">删除</button></div></header><div class="home-card-workspace">
@@ -201,6 +201,7 @@ function renderResume() {
         ${field([...p, "status"], "状态")}
         ${field([...p, "title"], "卡牌标题")}
         ${field([...p, "english"], "英文副标题")}
+        ${field([...p, "description"], "卡牌说明", { multiline: true })}
         ${field([...p, "tags", 0], "标签一")}
         ${field([...p, "tags", 1], "标签二")}
       </div></div></article>`;
@@ -495,7 +496,7 @@ function handleAction(button) {
   if (action === "select-project") { state.selectedProject = index; render(); refreshPreview(); return; }
   if (action === "add-home-card") return mutateAndRender(() => {
     state.data.homeCards ||= [];
-    if (state.data.homeCards.length >= 5) return;
+
     const used = new Set(state.data.homeCards.map(card => card.projectSlug));
     const project = (state.data.projects || []).find(item => !used.has(item.slug)) || (state.data.projects || [])[0] || {};
     state.data.homeCards.push({ target: project.slug ? `project:${project.slug}` : "projects", projectSlug: project.slug || "", id: project.id || "", index: project.index || String(state.data.homeCards.length + 1).padStart(2, "0"), status: project.status || "SELECTED", title: project.title || "未命名卡牌", english: project.english || "Untitled Project", tags: (project.evidence || []).slice(0, 2), layout: structuredClone(defaultHomeCardLayout) });

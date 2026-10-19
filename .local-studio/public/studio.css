@@ -205,3 +205,5 @@ button { color: inherit; }
 :root .game-editor-section .form-grid { margin-top: 16px; }
 :root .game-template-note { display: flex; justify-content: space-between; gap: 16px; margin: 0 0 22px; padding: 14px 16px; background: var(--surface-2); color: var(--muted); }
 :root .game-template-note strong { color: var(--text); }
+
+.studio-card-description { margin: 5cqw 0 0; font-size: 5.4cqw; line-height: 1.7; color: #515856; }

@@ -76,9 +76,10 @@
     const featuredProjects = homeCards.map(card => data.projects.find(project => project.slug === card.projectSlug)).filter(Boolean);
     return `<section class="page overview-page resume-page">
       <div class="resume-cover">
-      <div class="hero-scene" aria-hidden="true"><div class="hero-layer hero-layer-background"></div><svg class="hero-character-art" viewBox="0 0 1000 563" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><image href="assets/hero-character-transparent-v2.png" width="1000" height="563"/></svg><div class="hero-layer-vignette"></div></div>
+      <div class="hero-scene" aria-hidden="true"><video class="hero-background-video" autoplay muted loop playsinline preload="auto"><source src="assets/home-background.mp4" type="video/mp4"></video><div class="hero-layer-vignette"></div></div>
+      ${/* 首页项目卡片暂时隐藏，恢复时取消此处注释。
       <div class="hero-card-deck" aria-label="精选项目卡牌">${homeCards.map((card, index) => heroProjectCard(card, index, homeCards.length)).join("")}</div>
-      <div class="hero-grip-layer"><svg class="hero-grip-art" viewBox="0 0 1000 563" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><clipPath id="hero-grip-clip"><path d="M474 533 Q467 513 477 490 L497 467 Q509 462 512 432 L514 410 Q514 402 523 396 L565 365 Q570 362 577 365 L602 372 L623 384 Q630 391 619 396 Q610 395 598 389 L577 390 L548 407 L583 395 Q593 393 600 398 L617 405 Q626 412 623 425 Q621 430 616 425 L607 418 Q601 413 594 418 L563 432 L593 422 Q603 418 609 425 L616 437 Q618 445 611 449 L603 442 L574 455 L599 445 Q609 441 612 450 Q612 461 600 466 L580 479 Q572 487 568 500 Q559 514 540 519 L510 524 Z"/></clipPath></defs><image href="assets/hero-layer-character-v1.png" width="1000" height="563" clip-path="url(#hero-grip-clip)"/></svg></div>
+      */ ""}
       <div class="overview-grid" aria-hidden="true"></div>
       <div class="overview-identity">
         <p class="eyebrow"><i class="signal"></i>${esc(profile.availability)}</p>
@@ -116,7 +117,13 @@
       </aside>
       ${metricMarkup(profile.metrics)}
       <section class="resume-section resume-experience"><div class="module-label"><span>INTERNSHIP EXPERIENCE</span><i>01 RECORD</i></div><div class="experience-list">${data.experience.map(item => `<article class="experience-record"><div class="experience-time"><span>${esc(item.period)}</span><i>${esc(item.status)}</i></div><div class="experience-main"><p>${esc(item.company)}</p><h2>${esc(item.role)}</h2><p>${esc(item.summary)}</p><ul>${item.highlights.map(point => `<li>${esc(point)}</li>`).join("")}</ul></div></article>`).join("")}</div></section>
-      <section class="resume-section resume-capabilities"><div class="module-label"><span>CAPABILITY EVIDENCE</span><a class="route-link" href="?view=projects" data-route="projects">TRACE TO PROJECTS →</a></div><div class="resume-cap-grid">${data.capabilities.map(item => `<article><span>${esc(item.code)}</span><h3>${esc(item.title)}</h3><p>${esc(item.desc)}</p><small>${esc(item.proof)}</small></article>`).join("")}</div></section>
+      <section class="resume-section resume-capabilities"><div class="module-label"><span>SELECTED CARDS</span></div>
+        <div class="cap-deck-toolbar"><span aria-live="polite">自动滚动 · 点击翻牌并暂停</span><button type="button" class="cap-play" data-cap-play disabled>▶ 启动</button></div>
+        <div class="cap-carousel"><button class="cap-side-arrow" type="button" data-cap-step="-1" aria-label="上一张能力卡">←</button>
+        <div class="cap-deck" aria-label="能力卡片，可横向滚动">
+        ${homeCards.map(item => { const target = item.target || (item.projectSlug ? `project:${item.projectSlug}` : "projects"); const project = target.startsWith("project:") ? data.projects.find(project => project.slug === target.slice(8)) : null; const targetRoute = project ? "project" : (routeNames[target] ? target : "projects"); const targetHref = project ? `?view=project&id=${encodeURIComponent(project.slug)}` : `?view=${encodeURIComponent(targetRoute)}`; const region = key => { const fallback = { id: {x:26.5,y:5.8,w:42}, copy:{x:10,y:17,w:80}, tags:{x:10,y:78,w:80}, action:{x:10,y:91,w:80} }; const r = {...fallback[key], ...item.layout?.[key]}; return `left:${r.x}%;top:${r.y}%;width:${r.w}%`; }; return `<article class="cap-flip-card" data-cap-title="${esc(item.title)}"><div class="cap-flip-inner"><button type="button" class="cap-face cap-back" aria-expanded="false" aria-label="翻开：${esc(item.title)}"><span class="cap-back-code">${esc(item.id || "")}</span><span class="cap-back-hint">CLICK TO REVEAL ↗</span></button><div class="cap-face cap-front unified-card-front" aria-hidden="true" inert><span class="unified-id" style="${region("id")}">${esc(item.id || "")}</span><span class="unified-copy" style="${region("copy")}"><small>${esc(item.status || "")}</small><strong>${esc(item.title || "")}</strong><i>${esc(item.english || "")}</i><span>${esc(item.description || "")}</span></span>${item.image ? `<span class="hero-card-image"><img src="${esc(item.image)}" alt="" loading="lazy"></span>` : ""}<span class="unified-tags" style="${region("tags")}">${(item.tags || []).filter(Boolean).map(tag => `<span>${esc(tag)}</span>`).join("")}</span><div class="cap-return" style="${region("action")}"><a class="route-link cap-project-link" href="${targetHref}" data-route="${targetRoute}">${project ? esc(project.title) : "查看内容"} ↗</a></div></div></div></article>`; }).join("")}
+        </div><button class="cap-side-arrow" type="button" data-cap-step="1" aria-label="下一张能力卡">→</button></div>
+      </section>
       <section class="resume-section resume-education"><div class="module-label"><span>EDUCATION & TOOLKIT</span><i>VERIFIED PROFILE</i></div><div class="education-layout"><div class="education-primary"><span>EDUCATION</span><h2>${esc(data.education.school)}</h2><p>${esc(data.education.major)} · ${esc(data.education.degree)}</p><small>${esc(data.education.direction)}</small></div><div class="skill-ledger">${data.skillGroups.map(item => `<div><span>${esc(item.label)}</span><strong>${esc(item.value)}</strong></div>`).join("")}</div></div><div class="honor-strip"><span>SELECTED HONORS</span><p>${data.honors.map(item => `<i>${esc(item)}</i>`).join("")}</p></div></section>
       <div class="dashboard-bottom">
         <section class="recent-records"><div class="module-label"><span>FEATURED PROJECTS</span><a class="route-link" href="?view=projects" data-route="projects">VIEW ALL →</a></div>${featuredProjects.map(p => `<a class="mini-record route-link" href="?view=project&id=${encodeURIComponent(p.slug)}" data-route="project"><span>${esc(p.id)}</span><strong>${esc(p.title)}</strong><i>${esc(p.status)}</i><b>↗</b></a>`).join("")}</section>
@@ -573,7 +580,9 @@
       <section class="workout-section"><div class="section-intro"><h2>动作协议</h2><p>${esc(f.equipment)}</p></div><div class="workout-list">${Object.entries(f.workouts).map(([type, moves], i) => `<details ${i === 0 ? "open" : ""}><summary><span class="mono">${String(i + 1).padStart(2, "0")} / ${type}</span><strong>${f.week.find(x => x.type === type).day} · ${f.week.find(x => x.type === type).focus}</strong><i>+</i></summary><div class="move-list">${moves.map(([name, dose], moveIndex) => `<label><input type="checkbox" data-exercise="${type}-${moveIndex}"><span><b>${name}</b><small>${dose}</small></span></label>`).join("")}</div><p class="safety-note">${esc(f.workoutNotes[type])}</p></details>`).join("")}</div></section>
       <section class="principle-section"><div class="section-intro"><h2>训练原则</h2><p>${esc(f.trainingRules)}</p></div><div class="principle-layout"><article><span class="mono">RIR ≈ 2</span><h3>每组留下两次余力</h3><p>不要每组完全力竭。动作开始变形之前结束这一组；出现锐痛、关节痛或无法控制阻力时立即停止。</p></article><div class="progression-flow"><span>按各动作次数范围递进</span><i>先补齐次数</i><strong>连续两次全组达到上限</strong><i>再提高难度</i><b>固定哑铃调整变式 / 弹力带增加张力</b><small>${esc(f.progression)}</small></div></div></section>
       <section class="nutrition-section"><div class="section-intro"><h2>低成本饮食系统</h2><p>每日蛋白质约 90g。优先公司餐补，不喝牛奶，暂不购买蛋白粉、增肌粉、肌酸或补剂。</p></div><div class="meal-grid">${f.meals.map(meal => `<article><span class="mono">${meal.label}</span><h3>${meal.title}</h3><p>${meal.note}</p></article>`).join("")}</div><div class="vegetable-line"><span>优先蔬菜</span>${f.vegetables.map(x => `<b>${x}</b>`).join("")}</div></section>
+      ${/* 暂无体重计，暂时隐藏体重观测模块；保留代码方便恢复。
       <section class="weight-section"><div class="section-intro"><h2>体重观测与调节</h2><p>只依据 7 日平均调整饮食，不对单日波动作出反应。</p></div><div class="weight-console"><form id="weight-form"><label for="fitness-weight">录入今日体重</label><div><input id="fitness-weight" name="weight" type="number" min="40" max="100" step="0.1" required placeholder="55.0"><button type="submit">保存记录</button></div><small id="weight-feedback" aria-live="polite">数据仅保存在当前浏览器。</small></form><div data-weight-chart>${renderWeightChart(weights)}</div></div><div class="adjustment-logic"><article><span>&lt; 0.1kg / 周</span><strong>增加碳水</strong><p>晚餐加半碗至一碗米饭，或早餐增加低成本碳水。</p></article><article class="stable"><span>0.15–0.3kg / 周</span><strong>保持不变</strong><p>处于目标增速，继续当前训练与饮食结构。</p></article><article><span>&gt; 0.4–0.5kg / 周</span><strong>稍微减少</strong><p>长期超出范围时，减少额外碳水，不做激进调整。</p></article></div></section>
+      */ ""}
       <section class="future-section"><div class="section-intro"><h2>长期里程碑</h2><p>第一阶段确认体重、力量和外观同步改善，腰围没有明显失控，并且训练能长期坚持。</p></div><div class="milestone-line"><strong class="current">55<small>NOW</small></strong><i></i><strong>60<small>NEXT</small></strong><i></i><strong>65<small>LONG TERM</small></strong></div></section>
     </section>`;
   }
@@ -637,7 +646,9 @@
     } else $("[data-report-png]")?.addEventListener("click", downloadFitnessPng);
   }
 
+  let disposeCapabilities = () => {};
   function render(route) {
+    disposeCapabilities();
     const renderers = { resume: renderResume, projects: renderProjects, project: () => renderProject(route.id), lab: renderLab, journey: renderJourney, changelog: renderChangelog, connect: renderConnect, fitness: renderFitness, trading: renderTrading, report: () => renderReport(route) };
     renderers.stars = () => '<silver-starfield></silver-starfield>';
     renderers.games = () => window.SILVER_GAME_ATLAS.render();
@@ -657,6 +668,77 @@
 
   function bindDynamicEvents(route) {
     if (route.view === "resume") {
+      const deck = $(".cap-deck");
+      const originalCards = [...deck.children];
+      originalCards.forEach((card, index) => {
+        card.dataset.cardKey = String(index);
+        const copy = card.cloneNode(true);
+        copy.querySelector(".cap-back").tabIndex = -1;
+        copy.setAttribute("aria-hidden", "true");
+        deck.appendChild(copy);
+      });
+      const loopWidth = () => originalCards.length ? deck.children[originalCards.length].offsetLeft - deck.children[0].offsetLeft : 0;
+      const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+      const playButton = $("[data-cap-play]");
+      let explicitPlay = false;
+      let autoStopped = false, autoFrame = 0, previousTime = 0, visible = false, position = 0;
+      const stopAuto = () => { autoStopped = true; playButton.disabled = false; $(".cap-deck-toolbar > span").textContent = "已暂停 · 点击翻牌"; };
+      playButton.disabled = !reducedMotion.matches;
+      playButton.addEventListener("click", () => {
+        position = deck.scrollLeft;
+        previousTime = 0;
+        explicitPlay = true;
+        autoStopped = false;
+        playButton.disabled = true;
+        $(".cap-deck-toolbar > span").textContent = "自动滚动 · 点击翻牌并暂停";
+      });
+      const animateDeck = time => {
+        const elapsed = previousTime ? Math.min(time - previousTime, 50) : 0;
+        previousTime = time;
+        const max = deck.scrollWidth - deck.clientWidth;
+        if (!autoStopped && visible && !document.hidden && (!reducedMotion.matches || explicitPlay) && max > 0) {
+          position = (position + elapsed * .026) % loopWidth();
+          deck.scrollLeft = position;
+        } else position = deck.scrollLeft;
+        autoFrame = requestAnimationFrame(animateDeck);
+      };
+      const visibilityObserver = new IntersectionObserver(entries => { visible = entries[0].isIntersecting; });
+      visibilityObserver.observe(deck);
+      autoFrame = requestAnimationFrame(animateDeck);
+      deck.addEventListener("pointerdown", stopAuto);
+      deck.addEventListener("focusin", stopAuto);
+      const capabilityCards = $$(".cap-flip-card", deck);
+      const flipSingleCard = (card, open) => {
+        card.classList.toggle("is-flipped", open);
+        const back = $(".cap-back", card), front = $(".cap-front", card);
+        back.setAttribute("aria-expanded", String(open));
+        back.inert = open;
+        front.inert = !open;
+        front.setAttribute("aria-hidden", String(!open));
+        if (open) card.removeAttribute("aria-hidden");
+      };
+      const flipCard = (card, open) => capabilityCards.filter(other => other.dataset.cardKey === card.dataset.cardKey).forEach(other => flipSingleCard(other, open));
+      capabilityCards.forEach(card => {
+        $(".cap-back", card).addEventListener("click", () => {
+          stopAuto();
+          flipCard(card, true);
+          $(".cap-project-link", card).focus({ preventScroll: true });
+        });
+        const close = () => { flipCard(card, false); $(".cap-back", card).focus({ preventScroll: true }); };
+        $(".cap-front", card).addEventListener("click", event => {
+          if (!card.classList.contains("is-flipped") || event.target.closest("a")) return;
+          $(".cap-project-link", card).click();
+        });
+        card.addEventListener("keydown", event => { if (event.key === "Escape") close(); });
+      });
+      const controls = $$("[data-cap-step]");
+      const syncControls = () => controls.forEach(button => { button.disabled = Number(button.dataset.capStep) < 0 ? deck.scrollLeft <= 1 : deck.scrollLeft >= deck.scrollWidth - deck.clientWidth - 1; });
+      controls.forEach(button => button.addEventListener("click", () => { stopAuto(); deck.scrollBy({ left: Number(button.dataset.capStep) * (deck.querySelector(".cap-flip-card")?.offsetWidth + 28 || 300), behavior: reducedMotion.matches ? "instant" : "smooth" }); }));
+      deck.addEventListener("scroll", syncControls, { passive: true });
+      const deckObserver = new ResizeObserver(syncControls);
+      deckObserver.observe(deck);
+      disposeCapabilities = () => { deckObserver.disconnect(); visibilityObserver.disconnect(); cancelAnimationFrame(autoFrame); };
+      syncControls();
       const cover = $(".resume-cover");
       const cards = $$("[data-hero-card]", cover);
       const closeCards = () => cards.forEach(card => { card.classList.remove("is-flipped"); $("[data-card-trigger]", card)?.setAttribute("aria-expanded", "false"); });

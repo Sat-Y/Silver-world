@@ -11,3 +11,7 @@
 
 # Local verification artifacts.
 .artifacts/
+
+# Generated deployment files and build dependencies.
+dist/
+node_modules/

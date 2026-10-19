@@ -1771,6 +1771,7 @@ html[data-theme="dark"] { --bg: #151714; --surface: #1d201b; --surface-2: #25292
   transform: translateX(-50%);
   background: #eceeea;
 }
+.hero-background-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; pointer-events: none; }
 .hero-layer { position: absolute; inset: -18px; }
 .hero-layer-background { background: #eceeea url("assets/hero-layer-background-v1.png") center / cover no-repeat; }
 .hero-character-art, .hero-grip-art {
@@ -1781,20 +1782,26 @@ html[data-theme="dark"] { --bg: #151714; --surface: #1d201b; --surface-2: #25292
 .hero-grip-layer { position: absolute !important; z-index: 7 !important; inset: 0; pointer-events: none; }
 .hero-layer-vignette {
   position: absolute; z-index: 2; inset: 0;
-  background: linear-gradient(90deg, rgba(236,238,234,.12), transparent 58%);
+  background: linear-gradient(90deg, rgba(8,16,22,.82) 0%, rgba(8,16,22,.68) 38%, rgba(8,16,22,.22) 66%, rgba(8,16,22,.08) 100%);
 }
-.resume-cover > .overview-identity { z-index: 3; width: min(52%, 760px); color: #121618; }
+.resume-cover > .overview-identity { z-index: 3; width: min(52%, 760px); color: #f4f3ed; }
 .resume-cover .overview-identity h1 {
   font-size: clamp(104px, 13.5vw, 215px);
-  color: #121618;
-  text-shadow: 3px 3px 0 #eceeea, 5px 5px 0 #121618;
+  color: #f4f3ed;
+  text-shadow: 0 3px 24px rgba(0,0,0,.28);
   transform: translateX(-36px) skewX(-4deg);
 }
-.resume-cover .overview-role { background: #121618; color: #eceeea; }
-.resume-cover .overview-statement { max-width: 29ch; }
-.resume-cover .resume-text-link { color: #121618; }
-.resume-cover .os-button { border-color: #121618; background: #121618; color: #eceeea; }
-.resume-cover > .resume-scroll-cue { z-index: 5; color: #4e5557; }
+.resume-cover .overview-role { background: rgba(8,16,22,.72); color: #c7e5df; border: 1px solid rgba(199,229,223,.3); }
+.resume-cover .overview-statement { max-width: 29ch; color: #e4e9e7; text-shadow: 0 2px 12px rgba(0,0,0,.4); }
+.resume-cover .resume-text-link { color: #e4e9e7; text-shadow: 0 2px 8px rgba(0,0,0,.4); }
+.resume-cover .os-button { border-color: #d5e8e2; background: #d5e8e2; color: #142426; box-shadow: none; text-shadow: none; }
+.resume-cover > .resume-scroll-cue { z-index: 5; color: #e4e9e7; text-shadow: 0 2px 10px rgba(0,0,0,.5); }
+.resume-cover .overview-identity h1 span { color: #b8ded5; }
+.resume-cover .eyebrow { color: #c7d8d4; }
+.resume-cover .signal { background: #b8ded5; }
+.resume-cover .os-button:hover { background: #eef7f3; border-color: #eef7f3; box-shadow: none; }
+.resume-cover .resume-text-link:hover { color: #b8ded5; }
+.resume-cover a:focus-visible { outline: 2px solid #b8ded5; outline-offset: 5px; }
 
 .hero-card-deck {
   position: absolute !important;
@@ -1904,7 +1911,7 @@ html[data-theme="dark"] { --bg: #151714; --surface: #1d201b; --surface-2: #25292
   .resume-cover .resume-text-link { font-size: 8px; }
   .hero-layer-background { background-position: 58% center; }
   .hero-character-art, .hero-grip-art { inset: auto -12% 0; width: 124%; height: 64%; }
-  .hero-layer-vignette { background: linear-gradient(180deg, rgba(236,238,234,.18), transparent 55%); }
+  .hero-layer-vignette { background: linear-gradient(180deg, rgba(8,16,22,.84) 0%, rgba(8,16,22,.72) 48%, rgba(8,16,22,.22) 80%, rgba(8,16,22,.12) 100%); }
   .hero-card-deck { top: auto; left: 0; right: 0; bottom: 120px; width: 100%; height: 290px; transform: none; }
   .hero-project-card { width: clamp(116px, 32vw, 148px); }
   .hero-project-card { transform: translate(var(--mobile-card-x), var(--card-y)) rotate(var(--card-rot)); }
@@ -1917,3 +1924,71 @@ html[data-theme="dark"] { --bg: #151714; --surface: #1d201b; --surface-2: #25292
 @media (prefers-reduced-motion: reduce) {
   .hero-layer-background, .hero-layer-character, .hero-card-deck, .hero-project-card, .hero-card-rotor { transition: none; }
 }
+
+/* Capability cards: horizontal browsing and reversible reveals. */
+.cap-deck-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-top: 22px; color: var(--muted); font: 11px var(--mono); }
+.cap-deck-toolbar > div { display: flex; gap: 8px; }
+.cap-deck-toolbar button { width: 38px; height: 36px; border: 1px solid var(--line-strong); background: transparent; color: var(--text); cursor: pointer; font-size: 20px; }
+.cap-deck-toolbar button:disabled { opacity: .25; cursor: default; }
+.cap-deck { max-width: 760px; margin-inline: auto; display: flex; gap: 28px; overflow-x: hidden; padding: 24px 8px 28px; scrollbar-width: none; scrollbar-color: var(--muted) transparent; }
+.cap-flip-card { flex: 0 0 220px; width: 220px; aspect-ratio: 467 / 900; padding: 0; border: 0; background: transparent; color: #15191b; cursor: pointer; perspective: 1200px; text-align: left; font: inherit; -webkit-tap-highlight-color: transparent; }
+.cap-flip-inner { display: block; position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform .65s cubic-bezier(.2,.74,.22,1); }
+.cap-flip-card.is-flipped .cap-flip-inner { transform: rotateY(180deg); }
+.cap-face { position: absolute; inset: 0; display: flex; flex-direction: column; backface-visibility: hidden; -webkit-backface-visibility: hidden; filter: drop-shadow(0 8px 7px #00000015); }
+.cap-back { background: url("assets/project-card-back-v2.png") center / 100% 100% no-repeat; color: #eceeea; align-items: center; justify-content: space-between; padding: 12% 8%; }
+.cap-back-code, .cap-back-hint { font: 10px var(--mono); letter-spacing: .12em; background: #15191bd9; padding: 7px 10px; }
+.cap-front { transform: rotateY(180deg); background: #f3f2ed url("assets/project-card-front-v3-minimal.png") center / 100% 100% no-repeat; padding: 14% 12% 11%; }
+.cap-code { padding-left: 17%; color: #596164; font: 10px var(--mono); }
+.cap-title { margin-top: 23%; font-weight: 600; font-size: 19px; line-height: 1.4; }
+.cap-description { margin-top: 14px; font-size: 12px; line-height: 1.7; color: #515856; }
+.cap-proof { margin-top: auto; margin-bottom: 18%; border-top: 1px solid #b9bdb8; padding-top: 10px; font: 10px/1.6 var(--mono); color: #5b6461; }
+.cap-return { position: absolute; bottom: 7%; left: 12%; color: #eceeea; font: 10px var(--mono); }
+.cap-flip-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 5px; }
+@media (max-width: 760px) {
+  .cap-flip-card { flex-basis: 210px; width: 210px; }
+  .cap-deck { gap: 20px; }
+  .cap-title { font-size: 18px; }
+  .cap-description { font-size: 12px; }
+}
+@media (prefers-reduced-motion: reduce) { .cap-flip-inner { transition: none; } }
+
+/* Trim the white pixels outside the printed octagonal card border. */
+.cap-face { clip-path: polygon(7.5% 0, 92.5% 0, 100% 3.9%, 100% 96.1%, 92.5% 100%, 7.5% 100%, 0 96.1%, 0 3.9%); filter: none; }
+.cap-flip-card { filter: drop-shadow(0 8px 7px #00000015); }
+
+/* Keep navigation beside the card viewport. */
+.cap-carousel { display: grid; grid-template-columns: 48px minmax(0, 760px) 48px; align-items: center; justify-content: center; gap: 20px; }
+.cap-carousel .cap-deck { width: 100%; min-width: 0; margin: 0; }
+.cap-side-arrow { width: 48px; height: 48px; padding: 0; border: 1px solid var(--line-strong); background: transparent; color: var(--text); font-size: 24px; cursor: pointer; }
+.cap-side-arrow:hover:not(:disabled) { background: var(--surface); border-color: var(--text); }
+.cap-side-arrow:disabled { opacity: .25; cursor: default; }
+.cap-side-arrow:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+@media (max-width: 760px) {
+  .cap-carousel { grid-template-columns: 30px minmax(0, 1fr) 30px; gap: 6px; }
+  .cap-side-arrow { width: 30px; height: 38px; font-size: 19px; }
+}
+
+/* Separate flip controls from project navigation. */
+.cap-flip-card { margin: 0; }
+.cap-back { width: 100%; height: 100%; border: 0; font: inherit; cursor: pointer; }
+.cap-return { right: 12%; display: flex; align-items: center; gap: 8px; justify-content: space-between; }
+.cap-project-link { color: #eceeea; font: 10px/1.4 var(--mono); text-decoration: none; }
+.cap-project-link:hover { color: #70dbe5; }
+.cap-close { border: 0; background: none; color: #eceeea; cursor: pointer; font-size: 18px; padding: 2px 4px; }
+.cap-back:focus-visible, .cap-project-link:focus-visible, .cap-close:focus-visible { outline: 2px solid #27aaba; outline-offset: -3px; }
+
+.cap-front { cursor: pointer; }
+
+.unified-card-front { padding: 0; container-type: inline-size; }
+.unified-id, .unified-copy, .unified-tags { position: absolute; z-index: 2; }
+.unified-id { font: 4cqw var(--mono); color: #596164; }
+.unified-copy { display: flex; flex-direction: column; }
+.unified-copy small { color: #188392; font: 4cqw var(--mono); }
+.unified-copy strong { margin-top: 2cqw; font-size: 8.5cqw; line-height: 1.3; }
+.unified-copy i { margin-top: 2cqw; font: 3.4cqw/1.4 var(--mono); color: #596164; }
+.unified-copy > span { margin-top: 5cqw; font-size: 5.4cqw; line-height: 1.7; color: #515856; }
+.unified-tags { display: flex; flex-wrap: wrap; gap: 3px; font: 3.6cqw/1.5 var(--mono); color: #596164; }
+.unified-card-front .cap-return { bottom: auto; right: auto; }
+
+.cap-deck-toolbar { justify-content: flex-start; gap: 14px; }
+.cap-deck-toolbar .cap-play { width: auto; height: 30px; padding: 0 12px; font: 11px var(--mono); }

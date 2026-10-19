@@ -682,6 +682,48 @@ window.SILVER_DATA = {
   ],
   "homeCards": [
     {
+      "projectSlug": "the-final-resonance",
+      "id": "OBS–P03",
+      "index": "",
+      "status": "项目卡",
+      "title": "云端列车",
+      "english": "Cloud-mirage-express",
+      "tags": [
+        "AI故事剧情",
+        "休闲调酒放松"
+      ],
+      "layout": {
+        "id": {
+          "x": 26,
+          "y": 5.8,
+          "w": 42
+        },
+        "index": {
+          "x": 57.1,
+          "y": 10,
+          "w": 34
+        },
+        "copy": {
+          "x": 10.5,
+          "y": 16.5,
+          "w": 82
+        },
+        "tags": {
+          "x": 9.5,
+          "y": 78.2,
+          "w": 82
+        },
+        "action": {
+          "x": 8.5,
+          "y": 90.6,
+          "w": 82
+        }
+      },
+      "target": "project:cloud-mirage-express",
+      "image": "assets/uploads/1792383350661-b71895-2026-10-14-192620.png",
+      "description": "制作一款休闲经营游戏，带有丰富的角色故事"
+    },
+    {
       "projectSlug": "casual-translation",
       "id": "OBS–P01",
       "index": "",
@@ -719,7 +761,9 @@ window.SILVER_DATA = {
           "w": 82
         }
       },
-      "target": "project:casual-translation"
+      "target": "project:casual-translation",
+      "description": "原本打算做出来给自己学英语的",
+      "image": "assets/uploads/1792383689339-e87592-f742375457015f1ca201b2b7525db0e2_compress.jpg"
     },
     {
       "projectSlug": "interrogation-room-0",
@@ -763,44 +807,136 @@ window.SILVER_DATA = {
       "image": "assets/wealth-card-v1.png"
     },
     {
-      "projectSlug": "the-final-resonance",
-      "id": "OBS–P03",
-      "index": "",
-      "status": "项目卡",
-      "title": "云端列车",
-      "english": "Cloud-mirage-express",
+      "id": "CAP–01",
+      "title": "AI 玩法与叙事系统",
+      "status": "能力卡",
+      "english": "",
+      "description": "把模型能力转化成玩家可感知的规则、反馈和不确定性。",
       "tags": [
-        "AI故事剧情",
-        "休闲调酒放松"
+        "动态 Prompt / RAG / 多结局叙事"
       ],
+      "target": "project:the-final-resonance",
       "layout": {
         "id": {
-          "x": 26,
+          "x": 26.5,
           "y": 5.8,
           "w": 42
         },
-        "index": {
-          "x": 57.1,
-          "y": 10,
-          "w": 34
-        },
         "copy": {
-          "x": 10.5,
-          "y": 16.5,
-          "w": 82
+          "x": 10,
+          "y": 17,
+          "w": 80
         },
         "tags": {
-          "x": 9.5,
-          "y": 78.2,
-          "w": 82
+          "x": 10,
+          "y": 78,
+          "w": 80
         },
         "action": {
-          "x": 8.5,
+          "x": 10.3,
           "y": 90.6,
-          "w": 82
+          "w": 80
         }
-      },
-      "target": "project:cloud-mirage-express"
+      }
+    },
+    {
+      "id": "CAP–02",
+      "title": "游戏机制与系统设计",
+      "status": "能力卡",
+      "english": "",
+      "description": "从核心循环、状态变量到内容结构，建立可以解释和验证的玩法系统。",
+      "tags": [
+        "心理状态引擎 / 经济循环 / 数值框架"
+      ],
+      "target": "project:interrogation-room-0",
+      "layout": {
+        "id": {
+          "x": 26.5,
+          "y": 5.8,
+          "w": 42
+        },
+        "copy": {
+          "x": 10,
+          "y": 17,
+          "w": 80
+        },
+        "tags": {
+          "x": 10,
+          "y": 78,
+          "w": 80
+        },
+        "action": {
+          "x": 10,
+          "y": 90.6,
+          "w": 80
+        }
+      }
+    },
+    {
+      "id": "CAP–03",
+      "title": "快速原型实现",
+      "status": "能力卡",
+      "english": "",
+      "description": "不让策划停留在文档中，用可运行原型验证体验与技术风险。",
+      "tags": [
+        "Godot / GDScript / Python"
+      ],
+      "target": "project:first-game-making-experience",
+      "layout": {
+        "id": {
+          "x": 26.5,
+          "y": 5.8,
+          "w": 42
+        },
+        "copy": {
+          "x": 10,
+          "y": 17,
+          "w": 80
+        },
+        "tags": {
+          "x": 10,
+          "y": 78,
+          "w": 80
+        },
+        "action": {
+          "x": 9.5,
+          "y": 90.5,
+          "w": 80
+        }
+      }
+    },
+    {
+      "id": "CAP–04",
+      "title": "AI 产品实验",
+      "status": "能力卡",
+      "english": "",
+      "description": "从真实问题出发，用最小范围验证 API、工作流和交互方案。",
+      "tags": [
+        "工具原型 / API 容错 / 工作流设计"
+      ],
+      "target": "project:casual-translation",
+      "layout": {
+        "id": {
+          "x": 26.5,
+          "y": 5.8,
+          "w": 42
+        },
+        "copy": {
+          "x": 10,
+          "y": 17,
+          "w": 80
+        },
+        "tags": {
+          "x": 10,
+          "y": 78,
+          "w": 80
+        },
+        "action": {
+          "x": 10,
+          "y": 90.5,
+          "w": 80
+        }
+      }
     }
   ],
   "thoughts": [
