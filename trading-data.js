@@ -2,7 +2,7 @@
 window.SILVER_TRADING = {
   "capital": {
     "initial": 10000,
-    "current": 27801.2,
+    "current": 24939.72,
     "snapshots": [
       {
         "date": "2026-08-17",
@@ -155,6 +155,14 @@ window.SILVER_TRADING = {
         "pnlPercent": null,
         "journalId": "",
         "note": "这次赌狗心态失败了，选择退出市场"
+      },
+      {
+        "date": "2026-10-20",
+        "capital": 24939.72,
+        "pnl": -2861.48,
+        "pnlPercent": null,
+        "journalId": "",
+        "note": "再次失败，有点要到斩杀线了"
       }
     ],
     "monthly": [],
