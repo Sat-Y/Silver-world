@@ -55,7 +55,7 @@ window.SILVER_DATA = {
   },
   "experience": [
     {
-      "period": "2026.05 — 至今（预计2026.11结束）",
+      "period": "2026.05 — 2027.02",
       "company": "腾娱互动（腾讯子公司）",
       "role": "AI 游戏策划实习生",
       "status": "实习中",
@@ -101,26 +101,6 @@ window.SILVER_DATA = {
   ],
   "projects": [
     {
-      "id": "OBS–P01",
-      "slug": "interrogation-room-0",
-      "category": "game",
-      "status": "暂时搁置",
-      "title": "0号审讯室",
-      "english": "Interrogation Room #0",
-      "summary": "心理博弈审讯模拟。玩家通过证物与对话策略，在嫌疑人的心理状态变化中寻找突破口。",
-      "problem": "传统对话树很容易退化成寻找正确选项。我希望审讯不是背答案，而是观察心理变化、组合证物并承担施压策略的后果。",
-      "system": "用 mental health、stress level 和 suspicion 构成三维心理状态；证物标签与对话行为持续修改状态，再由状态决定角色反馈和可用策略。",
-      "outcome": "核心审讯循环已经可以运行，下一阶段将补充完整案件内容、失败反馈与更清晰的心理状态表现。",
-      "role": "玩法策划 / 独立开发",
-      "evidence": [
-        "三维心理状态引擎",
-        "证物标签影响对话树",
-        "Godot 4.5 / GDScript"
-      ],
-      "demoVideo": "assets/interrogation-room-0-demo.mp4",
-      "index": "01"
-    },
-    {
       "id": "OBS–P02",
       "slug": "the-final-resonance",
       "category": "game",
@@ -142,6 +122,26 @@ window.SILVER_DATA = {
       "showcaseCrop": true,
       "showcaseCaption": "运行界面 / AI 对话与人格演变记录",
       "index": "02"
+    },
+    {
+      "id": "OBS–P01",
+      "slug": "interrogation-room-0",
+      "category": "game",
+      "status": "暂时搁置",
+      "title": "0号审讯室",
+      "english": "Interrogation Room #0",
+      "summary": "心理博弈审讯模拟。玩家通过证物与对话策略，在嫌疑人的心理状态变化中寻找突破口。",
+      "problem": "传统对话树很容易退化成寻找正确选项。我希望审讯不是背答案，而是观察心理变化、组合证物并承担施压策略的后果。",
+      "system": "用 mental health、stress level 和 suspicion 构成三维心理状态；证物标签与对话行为持续修改状态，再由状态决定角色反馈和可用策略。",
+      "outcome": "核心审讯循环已经可以运行，下一阶段将补充完整案件内容、失败反馈与更清晰的心理状态表现。",
+      "role": "玩法策划 / 独立开发",
+      "evidence": [
+        "三维心理状态引擎",
+        "证物标签影响对话树",
+        "Godot 4.5 / GDScript"
+      ],
+      "demoVideo": "assets/interrogation-room-0-demo.mp4",
+      "index": "01"
     },
     {
       "id": "OBS–P03",
@@ -1045,5 +1045,6 @@ window.SILVER_DATA = {
       "excerpt": "就是真的要开始认真健身了，今天是2026.10.07，截至过年，为期2个多月",
       "body": "不过还是居家健身，计划年前完成了可以拍照炫耀装b的身材，我第n次这样计划，但这次是最后一次"
     }
-  ]
+  ],
+  "projectOrderManual": true
 };

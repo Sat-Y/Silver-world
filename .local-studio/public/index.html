@@ -4,7 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Silver Content Studio</title>
-  <link rel="stylesheet" href="studio.css?v=20261008-3">
+  <link rel="stylesheet" href="studio.css?v=20261107-4">
+  <link rel="stylesheet" href="white-theme.css?v=20261107-6">
+  <script>try { document.documentElement.dataset.studioTheme = localStorage.getItem('silver-studio-theme') === 'dark' ? 'dark' : 'light'; } catch { document.documentElement.dataset.studioTheme = 'light'; }</script>
 </head>
 <body>
   <div class="studio-shell">
@@ -27,6 +29,7 @@
       <header class="topbar">
         <div><span id="route-label">WORKSPACE / OVERVIEW</span><strong id="page-title">内容总览</strong></div>
         <div class="toolbar">
+          <button class="button secondary" id="theme-toggle" type="button" aria-pressed="false">关灯</button>
           <span class="save-state" id="save-state">已同步本地草稿</span>
           <button class="button secondary" id="preview-button" type="button">打开预览</button>
           <button class="button secondary" id="save-button" type="button">保存草稿</button>
@@ -45,6 +48,8 @@
   <input id="asset-input" type="file" accept="image/png,image/jpeg,image/webp,image/gif,video/mp4,video/webm" hidden>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="/site/game-atlas.js"></script>
-  <script src="studio.js?v=20261019-11"></script>
+  <script src="/site/assets/project-view.js?v=1"></script>
+  <script src="project-canvas.js?v=1"></script>
+  <script src="studio.js?v=20261107-6"></script>
 </body>
 </html>

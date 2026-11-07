@@ -8,7 +8,7 @@
   const sha256 = async value => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value)))].map(byte => byte.toString(16).padStart(2, "0")).join("");
   const routeNames = { resume: "RESUME", projects: "PROJECT ARCHIVE", project: "PROJECT RECORD", journey: "FOOTPRINT ATLAS", changelog: "LIFE CHANGELOG", connect: "OPEN CHANNEL", fitness: "FITNESS PROTOCOL", trading: "CAPITAL CHANGE", report: "EXPORT REPORT" };
   let currentRoute = "";
-  Object.assign(routeNames, { games: "GAME ATLAS", game: "GAME STUDY", stars: "漫天繁星" });
+  Object.assign(routeNames, { resume: "HOME", about: "ABOUT", games: "GAME ATLAS", game: "GAME STUDY", stars: "漫天繁星" });
 
   function parseRoute() {
     const params = new URLSearchParams(location.search);
@@ -17,51 +17,56 @@
     return { view, id: params.get("id"), type: params.get("type") };
   }
 
-  function metricMarkup(metrics) {
-    return `<div class="dashboard-metrics">${metrics.map(item => `<article class="dash-metric"><span>${esc(item.label)}</span><strong>${esc(item.value)}</strong><small>${esc(item.note)}</small></article>`).join("")}</div>`;
+  function featuredCover(project) {
+    const index = data.projects.findIndex(p => p.slug === project.slug);
+    const number = String(index + 1).padStart(2, '0');
+    return `<div class="featured-cover cover-tone-${index % 5}"><div class="featured-cover-top"><span>SILVER.Z / SELECTED WORK</span><span>NO. ${number}</span></div><div class="featured-cover-body"><span class="featured-cover-category">${project.category === 'ai' ? 'AI APPLICATION' : project.category === 'prototype' ? 'EXPERIMENT / PROTOTYPE' : 'GAME DESIGN'}</span><strong>${esc(project.title)}</strong><span class="featured-cover-rule"></span></div><div class="featured-cover-bottom"><span>${esc(project.evidence[0] || '独立创作')}</span><span aria-hidden="true">↗</span></div><span class="featured-cover-orbit" aria-hidden="true"></span></div>`;
   }
 
-  function projectCard(project) {
-    return `<a class="archive-card route-link" href="?view=project&id=${encodeURIComponent(project.slug)}" data-route="project">
-      <div class="archive-visual" data-index="${esc(project.index)}"><span>${esc(project.id)}</span><i>${esc(project.status)}</i></div>
-      <div class="archive-card-copy">
-        <div><h3>${esc(project.title)}</h3><p class="mono">${esc(project.english)}${project.date ? ` · ${esc(project.date)}` : ""}</p></div><span class="open-record">OPEN RECORD ↗</span>
-        <p>${esc(project.summary)}</p>
-        <div class="archive-tags">${project.evidence.map(item => `<span>${esc(item)}</span>`).join("")}</div>
-      </div>
-    </a>`;
+  function projectCard(project, options = {}) {
+    const media = options.uniform ? featuredCover(project) : project.showcaseImage
+      ? `<img src="${esc(project.showcaseImageWebp || project.showcaseImage)}" alt="${esc(project.title)}运行界面" loading="lazy" decoding="async">`
+      : project.demoVideo
+        ? `<video muted loop playsinline preload="metadata" aria-label="${esc(project.title)}演示"><source src="${esc(project.demoVideo)}#t=0.1" type="video/mp4"></video><span class="portfolio-video-label">▶ 项目演示</span>`
+        : featuredCover(project);
+    return `<a class="archive-card portfolio-work route-link" href="?view=project&id=${encodeURIComponent(project.slug)}${options.fromArchive ? '&from=projects' : ''}" data-route="project"><div class="portfolio-media media-${esc(project.category)}">${media}<span class="portfolio-open" aria-hidden="true">↗</span></div><div class="portfolio-work-meta"><div><h3>${esc(project.title)}</h3><p>${esc(project.summary)}</p></div><div class="portfolio-tags">${project.evidence.slice(0, 2).map(tag => `<span>${esc(tag)}</span>`).join('')}</div></div></a>`;
   }
 
-  function heroProjectCard(card, index, total) {
-    const project = data.projects.find(item => item.slug === card.projectSlug) || {};
-    const display = { ...project, ...card };
-    const tags = (card.tags || project.evidence || []).filter(Boolean).slice(0, 2);
-    const center = index - (total - 1) / 2;
-    const step = total > 3 ? 52 : 66;
-    const mobileStep = total > 3 ? 38 : 70;
-    const x = -50 + center * step;
-    const y = -47 + Math.abs(center) * 7;
-    const rotation = center * 8;
-    const mobileX = -50 + center * mobileStep;
-    const rawTarget = String(card.target || (display.projectSlug || display.slug ? `project:${display.projectSlug || display.slug}` : "projects"));
-    const isProjectTarget = rawTarget.startsWith("project:");
-    const targetRoute = isProjectTarget ? "project" : (routeNames[rawTarget] ? rawTarget : "projects");
-    const targetId = isProjectTarget ? rawTarget.slice(8) : "";
-    const targetHref = `?view=${encodeURIComponent(targetRoute)}${targetId ? `&id=${encodeURIComponent(targetId)}` : ""}`;
-    const actionLabel = isProjectTarget ? "OPEN CASE" : "OPEN PAGE";
-    const defaultLayout = { id: { x: 26.5, y: 5.8, w: 42 }, copy: { x: 10.1, y: 16.8, w: 82 }, tags: { x: 9, y: 78.1, w: 82 }, action: { x: 9, y: 91, w: 82 } };
-    const regionStyle = key => { const region = { ...defaultLayout[key], ...(card.layout?.[key] || {}) }; return `left:${region.x}%;top:${region.y}%;width:${region.w}%`; };
-    return `<article class="hero-project-card" data-hero-card style="--card-x:${x}%;--card-y:${y}%;--card-rot:${rotation}deg;--card-hover-y:${y - 6}%;--card-float-y:${y - 13}%;--card-hover-rot:${rotation * .72}deg;--card-float-rot:${rotation * .42}deg;--mobile-card-x:${mobileX}%;--card-z:${index + 1}">
-      <div class="hero-card-rotor">
-        <div class="hero-card-face hero-card-back" aria-hidden="true"><span class="hero-card-register top"></span><span class="hero-card-register bottom"></span><strong>SILVERZ</strong><i></i></div>
-        <a class="hero-card-face hero-card-front route-link" href="${targetHref}" data-route="${targetRoute}" aria-label="打开：${esc(display.title || "未命名卡牌")}">
-          <span class="hero-card-index mono" style="${regionStyle("id")}">${esc(display.id || "")}</span>
-          ${card.image ? `<span class="hero-card-image"><img src="${esc(card.image)}" alt="${esc(display.title || "卡牌图片")}" loading="lazy"></span>` : ""}
-          <span class="hero-card-copy" style="${regionStyle("copy")}"><small>${esc(display.status || "")}</small><strong>${esc(display.title || "未命名卡牌")}</strong><i>${esc(display.english || "")}</i></span><span class="hero-card-tags" style="${regionStyle("tags")}">${tags.map(tag => `<b>${esc(tag)}</b>`).join("")}</span><span class="hero-card-enter mono" style="${regionStyle("action")}">${actionLabel} <b>→</b></span>
-        </a>
-      </div>
-      <button class="hero-card-trigger" type="button" data-card-trigger aria-expanded="false" aria-label="翻开${esc(display.title || "项目")}卡"><span>FLIP</span></button>
-    </article>`;
+  function worldIcon(route) {
+    const paths = {
+      games: '<path d="M7.5 7h9a4 4 0 0 1 3.9 3.1l1.1 6a2.5 2.5 0 0 1-4.2 2.2L14.5 16h-5l-2.8 2.3a2.5 2.5 0 0 1-4.2-2.2l1.1-6A4 4 0 0 1 7.5 7Z"/><path d="M7 10v4m-2-2h4m6-1h.01m3 2h.01M12 7V4"/>',
+      journey: '<path d="m3 8 5-2 8 3 5-2v13l-5 2-8-3-5 2Z"/><path d="M8 11v8m8-5v8"/><path d="M16 6c0 3-4 6-4 6S8 9 8 6a4 4 0 0 1 8 0Z" fill="var(--world-icon-bg, #eceeeb)"/><circle cx="12" cy="6" r="1"/>',
+      trading: '<path d="M4 4v16h16M7 14l4-4 4 2 5-7m-5 0h5v5"/>',
+      fitness: '<rect x="4" y="6" width="4" height="12" rx="1.2"/><rect x="16" y="6" width="4" height="12" rx="1.2"/><path d="M8 10h8v4H8M2 10v4m20-4v4"/>',
+      stars: '<path d="m12 3 2.4 6.6L21 12l-6.6 2.4L12 21l-2.4-6.6L3 12l6.6-2.4ZM20 3v4m-2-2h4"/>',
+      changelog: '<path d="M8 5H5v16h14V5h-3M9 3h6v4H9ZM8 12h8m-8 4h5"/>'
+    };
+    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[route] || ''}</svg>`;
+  }
+
+  function renderHome() {
+    const projects = data.projectOrderManual ? [...data.projects] : [...data.projects].sort((a,b) => Number(Boolean(b.featuredOnHome)) - Number(Boolean(a.featuredOnHome)));
+    const capital = window.SILVER_TRADING?.capital;
+    const latest = [...(capital?.snapshots || [])].sort((a,b) => a.date.localeCompare(b.date)).at(-1);
+    const world = [
+      ['games', 'Game Atlas', '游戏图鉴', '游玩、观察与游戏设计拆解。', '◎'],
+      ['journey', 'Footprints', '人生足迹', '走过的地方，留下的故事。', '↗'],
+      ['stars', 'Starfield', '漫天繁星', '把零散的想法放进一片星空。', '✳'],
+      ['trading', 'Capital', '财富记录', latest ? `${latest.date} · ¥${Number(latest.capital).toLocaleString('zh-CN', {minimumFractionDigits:2})}` : '记录资金变化与交易复盘。', '↗'],
+      ['fitness', 'Fitness', '健身日志', '记录训练、体能与身体变化。', '↔'],
+      ['changelog', 'Changelog', '版本记录', '持续更新中的个人成长档案。', '↻']
+    ];
+    return `<div class="portfolio-home">
+      <section class="portfolio-hero video-hero" aria-labelledby="home-name"><video class="hero-pixel-video" autoplay muted loop playsinline preload="auto" aria-hidden="true" tabindex="-1"><source src="assets/home-background.mp4" type="video/mp4"></video><div class="hero-video-shade" aria-hidden="true"></div><div class="portfolio-hero-art signature-art"><button class="signature-replay" type="button" aria-label="重播 Silver.Z 签名动画"><svg class="silver-signature" viewBox="0 0 820 320" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Silver.Z 手写签名"><g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path class="signature-stroke" pathLength="1" style="--delay:0s;--duration:.85s" stroke-width="3.5" d="M244 88 C271 43 193 39 150 76 C107 114 133 132 177 144 C225 157 233 177 204 201 C169 230 97 228 101 201 C104 183 139 173 171 181 M111 223 C146 216 215 180 260 164"/><path class="signature-stroke" pathLength="1" style="--delay:.65s;--duration:1.2s" stroke-width="3" d="M260 164 C270 151 278 145 278 153 L263 184 C257 203 282 189 298 173 C329 141 357 81 343 69 C327 56 313 109 307 143 C301 178 296 204 322 186 L345 166 C350 157 355 154 355 160 L351 184 C351 199 365 191 380 174 L401 148 C392 175 412 183 432 163 C461 128 478 145 458 164 C446 175 427 176 431 187 C439 202 473 183 491 160 L498 146 L487 181 C505 151 519 139 527 148 C534 157 522 169 540 163"/><path class="signature-stroke" pathLength="1" style="--delay:1.75s;--duration:.18s" stroke-width="4" d="M285 129 L287 125 M555 185 L557 183"/><path class="signature-stroke" pathLength="1" style="--delay:1.9s;--duration:.65s" stroke-width="3.7" d="M586 108 C624 86 676 88 713 83 C688 107 626 172 582 204 C623 183 668 190 700 187 C721 185 733 178 741 170"/><path class="signature-stroke signature-flourish" pathLength="1" style="--delay:2.4s;--duration:.65s" stroke-width="1.8" d="M148 253 C271 221 492 222 693 218 C722 217 749 211 763 205"/></g></svg><span class="signature-hint">REPLAY SIGNATURE ↺</span></button></div><div class="portfolio-intro"><h1 id="home-name">Silver.Z</h1><p>${esc(data.profile.statement)}</p></div><a class="portfolio-scroll" href="#work">Explore my work ↓</a></section>
+      <section class="portfolio-section" id="work"><div class="portfolio-section-heading"><h2>/* Featured Work */</h2><a class="route-link portfolio-view-all" href="?view=projects" data-route="projects">View all ↗</a></div><div class="portfolio-grid">${projects.slice(0, 6).map(p => projectCard(p, {uniform:true})).join('')}</div></section>
+      <section class="portfolio-section" id="world"><h2>/* My World */</h2><div class="portfolio-world">${world.map(([route,title,cn,copy,icon])=>`<a class="route-link portfolio-world-item world-${route}" href="?view=${route}" data-route="${route}"><div class="world-symbol" aria-hidden="true">${worldIcon(route)}</div><div><small>${cn}</small><h3>${title}</h3><p>${esc(copy)}</p></div><span aria-hidden="true">↗</span></a>`).join('')}</div></section>
+      <footer class="portfolio-footer"><div class="portfolio-footer-callout"><p>Let’s create something</p><h2>worth playing.</h2><div class="portfolio-footer-actions"><a href="mailto:${esc(data.profile.email)}">Email Me ↗</a><a class="route-link" href="?view=about" data-route="about">About Me ↗</a></div></div><div class="portfolio-colophon"><span>Silver.Z<br>AI Game Planner / System Designer</span><span>${esc(data.education.school)} · ${esc(data.education.major)}<br>Based in Hangzhou, CN</span><a class="route-link" href="?view=changelog" data-route="changelog">${esc(data.versions[0].version)} · 持续更新</a></div></footer>
+    </div>`;
+  }
+
+  function renderAbout() {
+    const p = data.profile;
+    return `<article class="page portfolio-about"><header class="about-intro"><img src="assets/silver-avatar.jpg" alt="Silver.Z 手绘头像"><div><span>/* About Me */</span><h1>${esc(p.name)}<br><em>Silver.Z</em></h1><p>${esc(p.statement)}</p><a href="mailto:${esc(p.email)}">${esc(p.email)} ↗</a><a class="route-link" href="?view=report&type=resume" data-route="report">导出简历 ↓</a></div></header><section class="about-section"><h2>现在 / Now</h2><div><h3>${esc(p.chapter.title)}</h3><p>${esc(p.chapter.summary)}</p><p>${esc(p.quest.title)}</p></div></section><section class="about-section"><h2>经历 / Experience</h2><div>${data.experience.map(e=>`<article><small>${esc(e.period)} · ${esc(e.company)}</small><h3>${esc(e.role)}</h3><p>${esc(e.summary)}</p><ul>${e.highlights.map(h=>`<li>${esc(h)}</li>`).join('')}</ul></article>`).join('')}</div></section><section class="about-section"><h2>教育 / Education</h2><div><h3>${esc(data.education.school)}</h3><p>${esc(data.education.major)} · ${esc(data.education.degree)}</p><p>${esc(data.education.direction)}</p></div></section><section class="about-section"><h2>工具 / Toolkit</h2><div>${data.skillGroups.map(s=>`<p><small>${esc(s.label)}</small><br>${esc(s.value)}</p>`).join('')}</div></section><section class="about-section"><h2>荣誉 / Honors</h2><div>${data.honors.map(h=>`<p>${esc(h)}</p>`).join('')}</div></section></article>`;
   }
 
   // Page module numbers use the same source as the desktop directory.
@@ -74,97 +79,16 @@
     return `<header class="view-header"><div><p class="section-code mono">${esc(code)}</p><h1>${title}</h1></div><p>${esc(description)}</p></header>`;
   }
 
-  function renderResume() {
-    const { profile } = data;
-    const latest = data.versions[0];
-    const fallbackCards = [...data.projects.filter(project => project.featuredOnHome), ...data.projects.filter(project => !project.featuredOnHome)].slice(0, 3).map(project => ({ ...project, projectSlug: project.slug, tags: (project.evidence || []).slice(0, 2) }));
-    const homeCards = Array.isArray(data.homeCards) ? data.homeCards : fallbackCards;
-    const featuredProjects = homeCards.map(card => data.projects.find(project => project.slug === card.projectSlug)).filter(Boolean);
-    return `<section class="page overview-page resume-page">
-      <div class="resume-cover">
-      <div class="hero-scene" aria-hidden="true"><video class="hero-background-video" autoplay muted loop playsinline preload="auto"><source src="assets/home-background.mp4" type="video/mp4"></video><div class="hero-layer-vignette"></div></div>
-      ${/* 首页项目卡片暂时隐藏，恢复时取消此处注释。
-      <div class="hero-card-deck" aria-label="精选项目卡牌">${homeCards.map((card, index) => heroProjectCard(card, index, homeCards.length)).join("")}</div>
-      */ ""}
-      <div class="overview-grid" aria-hidden="true"></div>
-      <div class="overview-identity">
-        <p class="eyebrow"><i class="signal"></i>${esc(profile.availability)}</p>
-        <h1>SILVER<span>/</span>Z</h1>
-        <p class="overview-role mono">${esc(profile.role)}</p>
-        <p class="overview-statement">${esc(profile.statement)}</p>
-        <div class="resume-actions"><a class="os-button route-link" href="?view=projects" data-route="projects">VIEW SELECTED WORK <span>↘</span></a><a class="resume-text-link route-link" href="?view=connect" data-route="connect">CONTACT ME →</a><a class="resume-text-link route-link" href="?view=report&type=resume" data-route="report">EXPORT RESUME ↓</a></div>
-      </div>
-      <div class="cover-sculpture" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-      <a class="resume-scroll-cue" href="#resume-content" aria-label="向下滚动查看完整简历"><span>SCROLL TO RESUME</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v15M6.5 13.5 12 19l5.5-5.5"/></svg></a>
-      </div>
-      <div class="resume-document">
-      <section class="resume-document-profile" aria-label="个人简历信息">
-        <div class="manga-portrait-wrap">
-          <figure class="manga-portrait" aria-label="Silver.Z 手绘个人形象">
-            <img src="assets/silver-avatar.jpg" alt="Silver.Z 黑白手绘人物形象">
-            <b class="hand-note">Still<br>building.</b>
-          </figure>
-          <div class="portrait-id-card"><span>CHARACTER<br>FILE</span><div><strong>SILVER.Z</strong><i>主人公 / SYSTEM DESIGNER</i></div></div>
-        </div>
-        <div class="resume-profile-copy">
-          <span class="mono">PROFILE / 2026</span>
-          <h2>${esc(profile.name || "周瑜鸿")} <i>SILVER.Z</i></h2>
-          <p>${esc(profile.role)}</p>
-          <dl><div><dt>EDUCATION</dt><dd>${esc(data.education.school)} · ${esc(data.education.major)}</dd></div><div><dt>LOCATION</dt><dd>杭州 · 中国</dd></div><div><dt>PHONE</dt><dd><a href="tel:19858810407">19858810407</a></dd></div><div><dt>EMAIL</dt><dd><a href="mailto:${esc(profile.email)}">${esc(profile.email)}</a></dd></div></dl>
-        </div>
-      </section>
-      <aside class="current-chapter" id="resume-content">
-        <div class="module-label"><span>CURRENT CHAPTER</span><i>LIVE</i></div>
-        <p class="mono">${esc(profile.chapter.code)}</p>
-        <h2>${esc(profile.chapter.title)}</h2>
-        <p>${esc(profile.chapter.summary)}</p>
-        <dl>${profile.chapter.meta.map(([label, value]) => `<div><dt>${esc(label)}</dt><dd>${esc(value)}</dd></div>`).join("")}</dl>
-        <div class="overview-quest"><div><span>MAIN QUEST</span><i>${profile.quest.progress}%</i></div><strong>${esc(profile.quest.title)}</strong><b><span style="width:${profile.quest.progress}%"></span></b></div>
-      </aside>
-      ${metricMarkup(profile.metrics)}
-      <section class="resume-section resume-experience"><div class="module-label"><span>INTERNSHIP EXPERIENCE</span><i>01 RECORD</i></div><div class="experience-list">${data.experience.map(item => `<article class="experience-record"><div class="experience-time"><span>${esc(item.period)}</span><i>${esc(item.status)}</i></div><div class="experience-main"><p>${esc(item.company)}</p><h2>${esc(item.role)}</h2><p>${esc(item.summary)}</p><ul>${item.highlights.map(point => `<li>${esc(point)}</li>`).join("")}</ul></div></article>`).join("")}</div></section>
-      <section class="resume-section resume-capabilities"><div class="module-label"><span>SELECTED CARDS</span></div>
-        <div class="cap-deck-toolbar"><span aria-live="polite">自动滚动 · 点击翻牌并暂停</span><button type="button" class="cap-play" data-cap-play disabled>▶ 启动</button></div>
-        <div class="cap-carousel"><button class="cap-side-arrow" type="button" data-cap-step="-1" aria-label="上一张能力卡">←</button>
-        <div class="cap-deck" aria-label="能力卡片，可横向滚动">
-        ${homeCards.map(item => { const target = item.target || (item.projectSlug ? `project:${item.projectSlug}` : "projects"); const project = target.startsWith("project:") ? data.projects.find(project => project.slug === target.slice(8)) : null; const targetRoute = project ? "project" : (routeNames[target] ? target : "projects"); const targetHref = project ? `?view=project&id=${encodeURIComponent(project.slug)}` : `?view=${encodeURIComponent(targetRoute)}`; const region = key => { const fallback = { id: {x:26.5,y:5.8,w:42}, copy:{x:10,y:17,w:80}, tags:{x:10,y:78,w:80}, action:{x:10,y:91,w:80} }; const r = {...fallback[key], ...item.layout?.[key]}; return `left:${r.x}%;top:${r.y}%;width:${r.w}%`; }; return `<article class="cap-flip-card" data-cap-title="${esc(item.title)}"><div class="cap-flip-inner"><button type="button" class="cap-face cap-back" aria-expanded="false" aria-label="翻开：${esc(item.title)}"><span class="cap-back-code">${esc(item.id || "")}</span><span class="cap-back-hint">CLICK TO REVEAL ↗</span></button><div class="cap-face cap-front unified-card-front" aria-hidden="true" inert><span class="unified-id" style="${region("id")}">${esc(item.id || "")}</span><span class="unified-copy" style="${region("copy")}"><small>${esc(item.status || "")}</small><strong>${esc(item.title || "")}</strong><i>${esc(item.english || "")}</i><span>${esc(item.description || "")}</span></span>${item.image ? `<span class="hero-card-image"><img src="${esc(item.image)}" alt="" loading="lazy"></span>` : ""}<span class="unified-tags" style="${region("tags")}">${(item.tags || []).filter(Boolean).map(tag => `<span>${esc(tag)}</span>`).join("")}</span><div class="cap-return" style="${region("action")}"><a class="route-link cap-project-link" href="${targetHref}" data-route="${targetRoute}">${project ? esc(project.title) : "查看内容"} ↗</a></div></div></div></article>`; }).join("")}
-        </div><button class="cap-side-arrow" type="button" data-cap-step="1" aria-label="下一张能力卡">→</button></div>
-      </section>
-      <section class="resume-section resume-education"><div class="module-label"><span>EDUCATION & TOOLKIT</span><i>VERIFIED PROFILE</i></div><div class="education-layout"><div class="education-primary"><span>EDUCATION</span><h2>${esc(data.education.school)}</h2><p>${esc(data.education.major)} · ${esc(data.education.degree)}</p><small>${esc(data.education.direction)}</small></div><div class="skill-ledger">${data.skillGroups.map(item => `<div><span>${esc(item.label)}</span><strong>${esc(item.value)}</strong></div>`).join("")}</div></div><div class="honor-strip"><span>SELECTED HONORS</span><p>${data.honors.map(item => `<i>${esc(item)}</i>`).join("")}</p></div></section>
-      <div class="dashboard-bottom">
-        <section class="recent-records"><div class="module-label"><span>FEATURED PROJECTS</span><a class="route-link" href="?view=projects" data-route="projects">VIEW ALL →</a></div>${featuredProjects.map(p => `<a class="mini-record route-link" href="?view=project&id=${encodeURIComponent(p.slug)}" data-route="project"><span>${esc(p.id)}</span><strong>${esc(p.title)}</strong><i>${esc(p.status)}</i><b>↗</b></a>`).join("")}</section>
-        <section class="latest-update"><div class="module-label"><span>LATEST UPDATE</span><a class="route-link" href="?view=changelog" data-route="changelog">HISTORY →</a></div><strong>${esc(latest.version)}</strong><h3>${esc(latest.title)}</h3><p>${esc(latest.changes[0][1])}</p></section>
-      </div>
-      </div>
-    </section>`;
-  }
-
   function renderProjects() {
     return `<section class="page archive-page">${viewHeader(moduleCode("projects"), "项目档案", "不是作品清单，而是能力发生过的证据。选择一份记录，进入完整项目视图。")}
       <div class="archive-toolbar"><div class="record-filter" role="group" aria-label="项目筛选"><button class="filter active" data-filter="all">全部记录</button><button class="filter" data-filter="game">游戏</button><button class="filter" data-filter="ai">AI 项目</button><button class="filter" data-filter="prototype">实验与原型</button></div><span class="mono">${String(data.projects.length).padStart(2, "0")} RECORDS FOUND</span></div>
-      <div class="archive-grid manga-panels">${data.projects.map(projectCard).join("")}</div>
+      <div class="archive-grid manga-panels">${data.projects.map(p => projectCard(p, {fromArchive:true})).join("")}</div>
     </section>`;
   }
 
   function renderProject(id) {
     const project = data.projects.find(item => item.slug === id) || data.projects[0];
-    const next = data.projects[(data.projects.indexOf(project) + 1) % data.projects.length];
-    return `<article class="page project-page">
-      <a class="back-link route-link mono" href="?view=projects" data-route="projects">← BACK TO ARCHIVE</a>
-      <header class="project-hero"><div><p class="section-code mono">${esc(project.id)} / ${esc(project.status)}</p><h1>${esc(project.title)}</h1><p class="project-english mono">${esc(project.english)}</p></div><div class="project-number">${esc(project.index)}</div></header>
-      <div class="project-detail-grid">
-        <aside class="project-facts"><div><span>ROLE</span><strong>${esc(project.role)}</strong></div><div><span>CATEGORY</span><strong>${project.category === "game" ? "GAME SYSTEM" : project.category === "prototype" ? "EXPERIMENT / PROTOTYPE" : "AI PROJECT"}</strong></div><div><span>STATUS</span><strong>${esc(project.status)}</strong></div>${project.date ? `<div><span>DATE</span><strong>${esc(project.date)}</strong></div>` : ""}</aside>
-        <div class="project-narrative">
-          <section><span>00 / OVERVIEW</span><h2>${esc(project.summary)}</h2></section>
-          ${project.demoVideo ? `<section class="project-demo"><span>DEMO / GAMEPLAY</span><h3>项目演示</h3><div class="project-video-frame"><video controls preload="metadata" playsinline aria-label="${esc(project.title)}项目演示视频"><source src="${esc(project.demoVideo)}" type="video/mp4">你的浏览器暂不支持视频播放。</video></div></section>` : ""}
-          ${project.showcaseImage ? `<section class="project-showcase${project.showcaseCrop ? " project-showcase--crop" : ""}"><span>SHOWCASE / SCREENSHOT</span><h3>项目展示</h3><figure class="project-image-frame"><picture>${project.showcaseImageWebp ? `<source srcset="${esc(project.showcaseImageWebp)}" type="image/webp">` : ""}<img src="${esc(project.showcaseImage)}" alt="${esc(project.title)}项目运行界面" loading="lazy" decoding="async"></picture><figcaption>${esc(project.title)} / ${esc(project.showcaseCaption || "项目运行界面")}</figcaption></figure></section>` : ""}
-          <section><span>01 / PROBLEM</span><h3>这个项目要解决什么？</h3><p>${esc(project.problem)}</p></section>
-          <section><span>02 / SYSTEM</span><h3>我的系统方案</h3><p>${esc(project.system)}</p><ul>${project.evidence.map(item => `<li>${esc(item)}</li>`).join("")}</ul></section>
-          <section><span>03 / OUTCOME</span><h3>当前结果与下一步</h3><p>${esc(project.outcome)}</p></section>
-        </div>
-      </div>
-      <a class="next-record route-link" href="?view=project&id=${encodeURIComponent(next.slug)}" data-route="project"><span>NEXT RECORD</span><strong>${esc(next.title)}</strong><i>→</i></a>
-    </article>`;
+    return window.renderSilverProject(project, new URLSearchParams(location.search).get('from') === 'projects');
   }
 
   function renderCapabilities() {
@@ -532,10 +456,8 @@
           <header><div><h3>Equity Curve</h3><span class="mono">DATE → CAPITAL</span></div><div class="sts-range" role="group" aria-label="资金曲线时间范围">${["1M", "3M", "6M", "YTD", "ALL"].map((x, i) => `<button type="button"${i === 4 ? ' class="active"' : ""} disabled>${x}</button>`).join("")}</div></header>
           ${hasCapital ? equityChart(snapshots) : `<div class="sts-chart-empty"><div class="sts-empty-line" aria-hidden="true"></div><strong>等待第一条资金快照</strong><p>录入真实 CapitalSnapshot 后，资金曲线会在这里出现，并可从日期进入对应的资金变动记录。</p></div>`}
         </div>
-        <div class="sts-capital-secondary">
-          <section><header><h3>Monthly Performance</h3><span class="mono">2026 / VERIFIED SNAPSHOTS</span></header><div class="sts-months">${monthLabels.map((x, i) => `<div><span>${x}</span><strong>${percent(monthlyValues[i])}</strong></div>`).join("")}</div></section>
-          <section><header><h3>Capital Milestones</h3><span class="mono">LEVEL / LONG TERM</span></header><ol class="sts-milestones">${t.capital.milestones.map((item, i) => `<li><i>${String(i + 1).padStart(2, "0")}</i><div><strong>${money(item.amount)}</strong><span>${esc(item.label)}</span></div><small>${item.status === "reached" ? "REACHED" : "WAITING"}</small></li>`).join("")}</ol></section>
-        </div>
+        <silver-life-chart class="life-embedded"></silver-life-chart>
+
       </section>
 
       <section class="sts-chapter sts-journal" id="sts-journal">
@@ -646,7 +568,7 @@
   let disposeCapabilities = () => {};
   function render(route) {
     disposeCapabilities();
-    const renderers = { resume: renderResume, projects: renderProjects, project: () => renderProject(route.id), journey: renderJourney, changelog: renderChangelog, connect: renderConnect, fitness: renderFitness, trading: renderTrading, report: () => renderReport(route) };
+    const renderers = { resume: renderHome, about: renderAbout, projects: renderProjects, project: () => renderProject(route.id), journey: renderJourney, changelog: renderChangelog, connect: renderConnect, fitness: renderFitness, trading: renderTrading, report: () => renderReport(route) };
     renderers.stars = () => '<silver-starfield></silver-starfield>';
     renderers.games = () => window.SILVER_GAME_ATLAS.render();
     renderers.game = () => window.SILVER_GAME_ATLAS.render(route.id || "missing");
@@ -656,6 +578,13 @@
     document.title = `${routeNames[route.view]} — Silver OS`;
     $$("[data-route]").forEach(link => link.classList.toggle("active", link.dataset.route === route.view || (route.view === "project" && link.dataset.route === "projects")));
     bindDynamicEvents(route);
+    const previews = $$('.portfolio-media video');
+    if (previews.length && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const observer = new IntersectionObserver(entries => entries.forEach(({target,isIntersecting}) => { if (isIntersecting) target.play().catch(() => {}); else target.pause(); }), {threshold:.3});
+      previews.forEach(video => observer.observe(video));
+      const previousDispose = disposeCapabilities;
+      disposeCapabilities = () => { previousDispose(); observer.disconnect(); previews.forEach(video => video.pause()); };
+    }
     if (route.view === "games" || route.view === "game") {
       window.SILVER_GAME_ATLAS.bind();
       $$('[data-route="games"]').forEach(link => link.classList.add("active"));
@@ -664,84 +593,24 @@
   }
 
   function bindDynamicEvents(route) {
-    if (route.view === "resume") {
-      const deck = $(".cap-deck");
-      const originalCards = [...deck.children];
-      originalCards.forEach((card, index) => {
-        card.dataset.cardKey = String(index);
-        const copy = card.cloneNode(true);
-        copy.querySelector(".cap-back").tabIndex = -1;
-        copy.setAttribute("aria-hidden", "true");
-        deck.appendChild(copy);
-      });
-      const loopWidth = () => originalCards.length ? deck.children[originalCards.length].offsetLeft - deck.children[0].offsetLeft : 0;
-      const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
-      const playButton = $("[data-cap-play]");
-      let explicitPlay = false;
-      let autoStopped = false, autoFrame = 0, previousTime = 0, visible = false, position = 0;
-      const stopAuto = () => { autoStopped = true; playButton.disabled = false; $(".cap-deck-toolbar > span").textContent = "已暂停 · 点击翻牌"; };
-      playButton.disabled = !reducedMotion.matches;
-      playButton.addEventListener("click", () => {
-        position = deck.scrollLeft;
-        previousTime = 0;
-        explicitPlay = true;
-        autoStopped = false;
-        playButton.disabled = true;
-        $(".cap-deck-toolbar > span").textContent = "自动滚动 · 点击翻牌并暂停";
-      });
-      const animateDeck = time => {
-        const elapsed = previousTime ? Math.min(time - previousTime, 50) : 0;
-        previousTime = time;
-        const max = deck.scrollWidth - deck.clientWidth;
-        if (!autoStopped && visible && !document.hidden && (!reducedMotion.matches || explicitPlay) && max > 0) {
-          position = (position + elapsed * .026) % loopWidth();
-          deck.scrollLeft = position;
-        } else position = deck.scrollLeft;
-        autoFrame = requestAnimationFrame(animateDeck);
-      };
-      const visibilityObserver = new IntersectionObserver(entries => { visible = entries[0].isIntersecting; });
-      visibilityObserver.observe(deck);
-      autoFrame = requestAnimationFrame(animateDeck);
-      deck.addEventListener("pointerdown", stopAuto);
-      deck.addEventListener("focusin", stopAuto);
-      const capabilityCards = $$(".cap-flip-card", deck);
-      const flipSingleCard = (card, open) => {
-        card.classList.toggle("is-flipped", open);
-        const back = $(".cap-back", card), front = $(".cap-front", card);
-        back.setAttribute("aria-expanded", String(open));
-        back.inert = open;
-        front.inert = !open;
-        front.setAttribute("aria-hidden", String(!open));
-        if (open) card.removeAttribute("aria-hidden");
-      };
-      const flipCard = (card, open) => capabilityCards.filter(other => other.dataset.cardKey === card.dataset.cardKey).forEach(other => flipSingleCard(other, open));
-      capabilityCards.forEach(card => {
-        $(".cap-back", card).addEventListener("click", () => {
-          stopAuto();
-          flipCard(card, true);
-          $(".cap-project-link", card).focus({ preventScroll: true });
-        });
-        const close = () => { flipCard(card, false); $(".cap-back", card).focus({ preventScroll: true }); };
-        $(".cap-front", card).addEventListener("click", event => {
-          if (!card.classList.contains("is-flipped") || event.target.closest("a")) return;
-          $(".cap-project-link", card).click();
-        });
-        card.addEventListener("keydown", event => { if (event.key === "Escape") close(); });
-      });
-      const controls = $$("[data-cap-step]");
-      const syncControls = () => controls.forEach(button => { button.disabled = Number(button.dataset.capStep) < 0 ? deck.scrollLeft <= 1 : deck.scrollLeft >= deck.scrollWidth - deck.clientWidth - 1; });
-      controls.forEach(button => button.addEventListener("click", () => { stopAuto(); deck.scrollBy({ left: Number(button.dataset.capStep) * (deck.querySelector(".cap-flip-card")?.offsetWidth + 28 || 300), behavior: reducedMotion.matches ? "instant" : "smooth" }); }));
-      deck.addEventListener("scroll", syncControls, { passive: true });
-      const deckObserver = new ResizeObserver(syncControls);
-      deckObserver.observe(deck);
-      disposeCapabilities = () => { deckObserver.disconnect(); visibilityObserver.disconnect(); cancelAnimationFrame(autoFrame); };
-      syncControls();
-      const cover = $(".resume-cover");
-      const cards = $$("[data-hero-card]", cover);
-      const closeCards = () => cards.forEach(card => { card.classList.remove("is-flipped"); $("[data-card-trigger]", card)?.setAttribute("aria-expanded", "false"); });
-      cards.forEach(card => $("[data-card-trigger]", card)?.addEventListener("click", () => { const opening = !card.classList.contains("is-flipped"); card.classList.toggle("is-flipped", opening); $("[data-card-trigger]", card).setAttribute("aria-expanded", String(opening)); }));
-      cover?.addEventListener("keydown", event => { if (event.key === "Escape") closeCards(); });
+    if (route.view === 'resume') {
+      const video = $('.hero-pixel-video');
+      if (video) {
+        video.muted = true;
+        const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reduced) { video.removeAttribute('autoplay'); video.pause(); }
+        else {
+          const observer = new IntersectionObserver(entries => entries.forEach(e => e.isIntersecting ? video.play().catch(() => {}) : video.pause()), {threshold:.05});
+          observer.observe(video);
+          disposeCapabilities = () => { observer.disconnect(); video.pause(); };
+        }
+      }
     }
+    if (route.view === 'resume') $('.signature-replay')?.addEventListener('click', () => {
+      const svg = $('.silver-signature');
+      const fresh = svg.cloneNode(true);
+      svg.replaceWith(fresh);
+    });
     if (route.view === "projects") $$(".filter").forEach(button => button.addEventListener("click", () => {
       $$(".filter").forEach(item => item.classList.remove("active"));
       button.classList.add("active");
@@ -813,15 +682,17 @@
   function closeDrawer() { $("#mobile-drawer").hidden = true; $("#mobile-menu").setAttribute("aria-expanded", "false"); $("#mobile-more").setAttribute("aria-expanded", "false"); document.body.classList.remove("drawer-open"); closeDesktopNav(); }
 
   function navigate(url) {
-    if (url === `${location.pathname}${location.search}`) { closeDrawer(); return; }
-    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const transition = $("#route-transition");
     const target = new URL(url, location.href);
-    const targetRoute = new URLSearchParams(target.search).get("view") || "resume";
-    $("#transition-copy").textContent = `OPENING ${routeNames[targetRoute] || "MODULE"}...`;
     closeDrawer();
-    if (!reduced) transition.classList.add("active");
-    setTimeout(() => { history.pushState({}, "", `${target.pathname}${target.search}`); currentRoute = target.search; render(parseRoute()); scrollTo({ top: 0, behavior: "instant" }); $("#view").focus({ preventScroll: true }); requestAnimationFrame(() => transition.classList.remove("active")); }, reduced ? 0 : 180);
+    const samePage = target.search === location.search;
+    if (target.href !== location.href) history.pushState({}, "", `${target.pathname}${target.search}${target.hash}`);
+    if (!samePage) { currentRoute = target.search; render(parseRoute()); }
+    requestAnimationFrame(() => {
+      const anchor = target.hash && document.getElementById(decodeURIComponent(target.hash.slice(1)));
+      if (anchor) anchor.scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block:'start'});
+      else scrollTo({top:0, behavior:'instant'});
+      if (!samePage) $("#view").focus({preventScroll:true});
+    });
   }
 
   function bindRoutes(root = document) {
@@ -835,10 +706,20 @@
   $("#desktop-nav-backdrop").addEventListener("click", closeDesktopNav);
   $("#mobile-menu").addEventListener("click", () => { const drawer = $("#mobile-drawer"); drawer.hidden = !drawer.hidden; const open = !drawer.hidden; $("#mobile-menu").setAttribute("aria-expanded", String(open)); document.body.classList.toggle("drawer-open", open); });
   $("#mobile-more").addEventListener("click", () => { const drawer = $("#mobile-drawer"); drawer.hidden = !drawer.hidden; const open = !drawer.hidden; $("#mobile-more").setAttribute("aria-expanded", String(open)); document.body.classList.toggle("drawer-open", open); });
-  addEventListener("popstate", () => { render(parseRoute()); scrollTo(0, 0); });
+  addEventListener("popstate", () => { render(parseRoute()); requestAnimationFrame(() => { const anchor = location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1))); if (anchor) anchor.scrollIntoView(); else scrollTo(0, 0); }); });
   addEventListener("keydown", event => { if (event.key === "Escape" && document.body.classList.contains("desktop-nav-open")) { closeDesktopNav(); $("#desktop-nav-toggle").focus(); } });
   bindRoutes();
+  const initialRoute = parseRoute();
+  if (initialRoute.view === 'resume') {
+    // Opening or refreshing home starts at the cover; in-page navigation still uses anchors.
+    history.scrollRestoration = 'manual';
+    if (location.hash) history.replaceState(history.state, '', location.pathname + location.search);
+    const showCover = () => scrollTo({top:0, behavior:'instant'});
+    requestAnimationFrame(showCover);
+    addEventListener('load', showCover, {once:true});
+  }
   currentRoute = location.search;
-  render(parseRoute());
+  render(initialRoute);
+  if (initialRoute.view !== 'resume' && location.hash) requestAnimationFrame(() => document.getElementById(decodeURIComponent(location.hash.slice(1)))?.scrollIntoView());
 
 })();

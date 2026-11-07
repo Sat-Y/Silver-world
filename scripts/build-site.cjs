@@ -4,8 +4,8 @@ const crypto = require('node:crypto');
 const sharp = require('sharp');
 const root = path.resolve(__dirname, '..');
 const output = path.join(root, 'dist');
-const entries = ['index.html', 'SilverZ_Portfolio.html', 'starfield-preview.html', 'app.js', 'content.js', 'fitness-data.js', 'trading-data.js', 'game-atlas.js', 'starfield.js', 'styles.css'];
-const assetPattern = /assets\/[^\s"'`<>\\)]+\.(?:png|jpe?g|webp|svg|mp4|webm|js|gif)/gi;
+const entries = ['index.html', 'SilverZ_Portfolio.html', 'starfield-preview.html', 'app.js', 'content.js', 'fitness-data.js', 'trading-data.js', 'game-atlas.js', 'starfield.js', 'styles.css', 'portfolio.css'];
+const assetPattern = /assets\/[^\s"'`<>\\)]+\.(?:png|jpe?g|webp|svg|mp4|webm|js|gif|glb)/gi;
 (async () => {
   // Only this fixed generated directory is cleared; source assets remain untouched.
   if (path.dirname(output) !== root || path.basename(output) !== 'dist') throw Error('Invalid build directory');

@@ -7,6 +7,8 @@ const state = {
   mapCountries: [],
   section: "dashboard",
   selectedProject: 0,
+  snapshotsOpen: false,
+  footprintsOpen: false,
   selectedGame: 0,
   selectedThought: 0,
   selectedProvince: "",
@@ -102,34 +104,6 @@ function sectionRule(title, note, action = "") {
   return `<div class="section-rule"><div><h2>${esc(title)}</h2><span>${esc(note)}</span></div>${action}</div>`;
 }
 
-const defaultHomeCardLayout = {
-  id: { x: 26.5, y: 5.8, w: 42 },
-  copy: { x: 10.1, y: 16.8, w: 82 },
-  tags: { x: 9, y: 78.1, w: 82 },
-  action: { x: 9, y: 91, w: 82 }
-};
-
-function homeCardRegion(card, key) {
-  return { ...defaultHomeCardLayout[key], ...(card.layout?.[key] || {}) };
-}
-
-function homeCardRegionStyle(card, key) {
-  const region = homeCardRegion(card, key);
-  return `left:${region.x}%;top:${region.y}%;width:${region.w}%`;
-}
-
-function homeCardPreview(card, index) {
-  const tags = (card.tags || []).filter(Boolean).slice(0, 2);
-  const actionLabel = String(card.target || "").startsWith("project:") || (!card.target && card.projectSlug) ? "OPEN CASE" : "OPEN PAGE";
-  return `<div class="studio-card-stage"><div class="studio-card-face" data-home-card-preview="${index}">
-    <div class="studio-card-region studio-card-id" data-card-region="id" data-card-index="${index}" style="${homeCardRegionStyle(card, "id")}"><span>${esc(card.id || "")}</span></div>
-    <div class="studio-card-image">${card.image ? `<img src="/site/${esc(card.image)}" alt="卡牌图片">` : ""}</div>
-    <div class="studio-card-region studio-card-copy" data-card-region="copy" data-card-index="${index}" style="${homeCardRegionStyle(card, "copy")}"><small>${esc(card.status || "")}</small><strong>${esc(card.title || "未命名卡牌")}</strong><i>${esc(card.english || "")}</i><p class="studio-card-description">${esc(card.description || "")}</p></div>
-    <div class="studio-card-region studio-card-tags" data-card-region="tags" data-card-index="${index}" style="${homeCardRegionStyle(card, "tags")}">${tags.map(tag => `<b>${esc(tag)}</b>`).join("")}</div>
-    <div class="studio-card-region studio-card-action" data-card-region="action" data-card-index="${index}" style="${homeCardRegionStyle(card, "action")}"><span>${actionLabel}</span><b>→</b></div>
-  </div><small>拖动卡片上的文字区域调整位置</small></div>`;
-}
-
 function textList(path, label, addAction, removeAction) {
   const list = getAt(path) || [];
   return `${sectionRule(label, `${list.length} 条`, `<button class="button small" data-action="${addAction}" type="button">添加一条</button>`)}<div class="text-list">${list.map((item, index) => `<div class="text-list-row"><input data-path="${pathAttr([...path, index])}" value="${esc(item)}"><button class="icon-button" data-action="${removeAction}" data-index="${index}" type="button" aria-label="删除">×</button></div>`).join("") || `<div class="empty">尚无内容，点击“添加一条”开始记录。</div>`}</div>`;
@@ -163,20 +137,6 @@ function renderDashboard() {
 function renderResume() {
   const experiences = state.data.experience || [];
   const skills = state.data.skillGroups || [];
-  const homeCards = state.data.homeCards || [];
-  const projectOptions = (state.data.projects || []).map(project => ({ value: project.slug || "", label: `${project.title || "未命名项目"} · ${project.slug || "NO SLUG"}` }));
-  const cardTargetOptions = [
-    { value: "resume", label: "页面 · 首页 / 简历" },
-    { value: "projects", label: "页面 · 项目档案" },
-    { value: "trading", label: "页面 · 财富 / 资金变动" },
-    { value: "stars", label: "页面 · 漫天繁星" },
-    { value: "games", label: "页面 · 游戏图鉴" },
-    { value: "journey", label: "页面 · 人生足迹" },
-    { value: "changelog", label: "页面 · 成长日志" },
-    { value: "fitness", label: "页面 · 健身记录" },
-    { value: "connect", label: "页面 · 联系我" },
-    ...projectOptions.map(item => ({ value: `project:${item.value}`, label: `项目 · ${item.label}` }))
-  ];
   return `${heading("简历编辑", "更新首页身份、教育和实习经历。文字修改会自动保存到本地草稿。")}
     ${sectionRule("身份与首页", "PROFILE")}
     <div class="form-grid">
@@ -189,23 +149,6 @@ function renderResume() {
       ${field(["profile", "chapter", "title"], "当前章节标题")}
       ${field(["profile", "chapter", "summary"], "当前章节说明", { multiline: true })}
     </div>
-    ${sectionRule("首页卡牌", `${homeCards.length} 张 · 用于首页滚动区域，可调整顺序`, `<button class="button small" data-action="add-home-card" type="button">添加卡牌</button>`)}
-    <div class="repeater home-card-editor">${homeCards.map((card, index) => {
-      const p = ["homeCards", index];
-      return `<article class="repeater-row"><header class="repeater-row-header"><strong>CARD ${String(index + 1).padStart(2, "0")} · ${esc(card.title || "未命名卡牌")}</strong><div class="row-actions"><button class="button small secondary" data-action="reset-home-card-layout" data-index="${index}" type="button">恢复布局</button><button class="button small secondary" data-action="move-home-card-up" data-index="${index}" type="button"${index === 0 ? " disabled" : ""}>上移</button><button class="button small secondary" data-action="move-home-card-down" data-index="${index}" type="button"${index === homeCards.length - 1 ? " disabled" : ""}>下移</button><button class="button small danger" data-action="remove-home-card" data-index="${index}" type="button">删除</button></div></header><div class="home-card-workspace">
-        ${homeCardPreview(card, index)}
-        <div class="form-grid">
-        ${field([...p, "target"], "点击后跳转", { select: cardTargetOptions, help: "可选择网站栏目或具体项目详情；首页会按此设置跳转。" })}
-        ${field([...p, "id"], "卡牌档案 ID")}
-        ${assetField([...p, "image"], "卡牌图片（中间留白区域，清空路径可移除）")}
-        ${field([...p, "status"], "状态")}
-        ${field([...p, "title"], "卡牌标题")}
-        ${field([...p, "english"], "英文副标题")}
-        ${field([...p, "description"], "卡牌说明", { multiline: true })}
-        ${field([...p, "tags", 0], "标签一")}
-        ${field([...p, "tags", 1], "标签二")}
-      </div></div></article>`;
-    }).join("") || `<div class="empty">首页暂时没有卡牌。点击“添加卡牌”创建第一张。</div>`}</div>
     ${sectionRule("教育经历", "EDUCATION")}
     <div class="form-grid">
       ${field(["education", "school"], "学校")}${field(["education", "major"], "专业")}
@@ -226,11 +169,11 @@ function renderProjects() {
   const projects = state.data.projects || [];
   state.selectedProject = Math.min(state.selectedProject, Math.max(0, projects.length - 1));
   const project = projects[state.selectedProject];
-  const list = `<div class="record-list">${projects.map((item, index) => `<button class="record-item${index === state.selectedProject ? " is-active" : ""}" data-action="select-project" data-index="${index}" type="button"><strong>${esc(item.title || "未命名项目")}</strong><small>${esc(item.status || "NO STATUS")} · ${esc(item.slug || "NO SLUG")}</small></button>`).join("")}</div>`;
+  const list = '<div class="record-list project-sort-list"><p class="sort-help">拖动 ⋮⋮ 调整前端顺序<br>首页最多展示前 6 个公开项目</p>' + projects.map((item,index) => `<div class="project-sort-row" data-project-index="${index}"><span class="project-drag-handle" draggable="true" title="拖动调整排序" aria-hidden="true">⋮⋮</span><button class="record-item${index === state.selectedProject ? " is-active" : ""}" data-action="select-project" data-index="${index}" type="button"><strong>${esc(item.title || "未命名项目")}</strong><small>${esc(item.status || "")}</small></button></div>`).join('') + '</div>';
   if (!project) return `${heading("项目档案", "添加第一个项目，建立可以直接展示在网站中的完整项目记录。", `<button class="button primary" data-action="add-project" type="button">新建项目</button>`)}<div class="empty">目前没有项目。</div>`;
   const p = ["projects", state.selectedProject];
   return `${heading("项目档案", "统一管理项目、实验与原型；通过项目分类设置归属。项目 ID 与 slug 应保持唯一。", `<button class="button primary" data-action="add-project" type="button">新建项目</button>`)}
-    <div class="split-editor">${list}<article class="record-editor"><header class="record-editor-header"><div><h2>${esc(project.title || "未命名项目")}</h2><p>${esc(project.english || "尚未填写英文名称")}</p></div><button class="button small danger" data-action="remove-project" type="button">删除项目</button></header>
+    <div class="project-visual-workspace">${list}<div class="project-visual-main"><div class="visual-hint">点击页面文字直接修改 · 自动保存本地草稿</div><iframe id="project-canvas" title="可编辑项目详情"></iframe><details class="project-settings"><summary>项目设置与素材管理</summary><article class="record-editor"><header class="record-editor-header"><div><h2>${esc(project.title || "未命名项目")}</h2><p>${esc(project.english || "尚未填写英文名称")}</p></div><button class="button small danger" data-action="remove-project" type="button">删除项目</button></header>
       <div class="form-grid">
         ${visibility([...p, "_visibility"])}${field([...p, "status"], "项目状态")}
         ${field([...p, "title"], "中文名称")}${field([...p, "english"], "英文名称")}
@@ -259,9 +202,7 @@ function renderTrading() {
     <div class="trading-sync-note"><div><strong>WORKBENCH → TRADING-DATA.JS</strong><p>保存草稿只更新本地工作台；点击“导出公开内容”后，前端会读取这批已确认数据。</p></div><span>${String(snapshotRows.length).padStart(2, "0")} SNAPSHOTS · ${String(journals.length).padStart(2, "0")} RECORDS</span></div>
     ${sectionRule("Capital / 资金", `${snapshotRows.length} 条资金快照`, `<button class="button small" data-action="add-snapshot" type="button">添加资金快照</button>`)}
     <div class="form-grid trading-capital-base">${field(["trading", "capital", "initial"], "初始资金", { type: "number", help: "未知时留空，不会显示为 0。" })}${field(["trading", "capital", "current"], "当前资金", { type: "number", help: "通常与最新一条资金快照一致。" })}</div>
-    <div class="table-editor"><div class="table-editor-head"><span>日期</span><span>资金</span><span>当日盈亏</span><span>收益率 %</span><span>关联记录 ID</span><span>备注</span><span></span></div>${snapshotRows.map((item, index) => { const p = ["trading", "capital", "snapshots", index]; return `<div class="table-editor-row">${field([...p, "date"], "日期", { type: "date" })}${field([...p, "capital"], "资金", { type: "number" })}${field([...p, "pnl"], "当日盈亏", { type: "number" })}${field([...p, "pnlPercent"], "收益率 %", { type: "number" })}${field([...p, "journalId"], "记录 ID")}${field([...p, "note"], "备注")}<button class="icon-button" data-action="remove-snapshot" data-index="${index}" type="button" aria-label="删除资金快照">×</button></div>`; }).join("") || `<div class="empty compact">添加第一条真实资金记录后，前端才会生成资金曲线。</div>`}</div>
-    ${sectionRule("Capital Milestones / 资金里程碑", `${capital.milestones.length} 个阶段`, `<button class="button small" data-action="add-milestone" type="button">添加里程碑</button>`)}
-    <div class="repeater compact-repeater">${capital.milestones.map((item, index) => { const p = ["trading", "capital", "milestones", index]; return `<article class="repeater-row"><div class="form-grid milestone-grid">${field([...p, "amount"], "目标金额", { type: "number" })}${field([...p, "label"], "阶段标签")}${field([...p, "status"], "状态", { select: [{ value: "waiting", label: "等待达成" }, { value: "reached", label: "已经达成" }] })}<button class="button small danger" data-action="remove-milestone" data-index="${index}" type="button">删除</button></div></article>`; }).join("")}</div>
+    <details id="capital-snapshots" class="snapshot-collapse" ${state.snapshotsOpen ? "open" : ""}><summary>资金快照明细 · ${snapshotRows.length} 条 <span>点击展开 / 收起</span></summary><div class="table-editor"><div class="table-editor-head"><span>日期</span><span>资金</span><span>当日盈亏</span><span>收益率 %</span><span>关联记录 ID</span><span>备注</span><span></span></div>${snapshotRows.map((item, index) => { const p = ["trading", "capital", "snapshots", index]; return `<div class="table-editor-row">${field([...p, "date"], "日期", { type: "date" })}${field([...p, "capital"], "资金", { type: "number" })}${field([...p, "pnl"], "当日盈亏", { type: "number" })}${field([...p, "pnlPercent"], "收益率 %", { type: "number" })}${field([...p, "journalId"], "记录 ID")}${field([...p, "note"], "备注")}<button class="icon-button" data-action="remove-snapshot" data-index="${index}" type="button" aria-label="删除资金快照">×</button></div>`; }).join("") || `<div class="empty compact">添加第一条真实资金记录后，前端才会生成资金曲线。</div>`}</div></details>
     ${sectionRule("Records / 资金变动记录", `${journals.length} 天`, `<button class="button small" data-action="add-journal" type="button">新建记录</button>`)}
     <div class="split-editor">${journalList}${journal ? `<article class="record-editor"><header class="record-editor-header"><div><h2>${esc(journal.date || "新资金变动记录")}</h2><p>${esc(journal.title || journal.id)}</p></div><button class="button small danger" data-action="remove-journal" type="button">删除记录</button></header><div class="form-grid">${visibility(["trading", "journals", state.selectedJournal, "_visibility"])}${field(["trading", "journals", state.selectedJournal, "id"], "记录 ID", { help: "用于和资金快照的 journalId 建立关联。" })}${field(["trading", "journals", state.selectedJournal, "date"], "交易日期", { type: "date" })}${field(["trading", "journals", state.selectedJournal, "title"], "记录标题")}${field(["trading", "journals", state.selectedJournal, "context"], "Context / 市场背景", { multiline: true })}</div>
       ${sectionRule("Conversation / 关键对话", `${(journal.conversations || []).length} 段`, `<button class="button small" data-action="add-conversation" type="button">添加对话</button>`)}<div class="conversation-editor">${(journal.conversations || []).map((entry, index) => { const p = ["trading", "journals", state.selectedJournal, "conversations", index]; return `<div class="conversation-row">${field([...p, "role"], "角色", { select: [{ value: "silver", label: "Silver / 我的判断" }, { value: "ai", label: "AI / 分析回应" }] })}${field([...p, "content"], "对话内容", { multiline: true })}<button class="icon-button" data-action="remove-conversation" data-index="${index}" type="button" aria-label="删除对话">×</button></div>`; }).join("") || `<div class="empty compact">从你的判断开始，保留对话中真正改变决策的部分。</div>`}</div>
@@ -290,7 +231,7 @@ function renderFootprints() {
   const linkedPosts = feed.map((item, index) => ({ item, index })).filter(entry => entry.item.country === "China" && entry.item.province === state.selectedProvince);
   return `${heading("人生足迹", "所有旅行和生活记录都进入同一个全球足迹库；国家与省份页面只是对这些记录进行筛选。")}
     ${sectionRule("全球足迹记录", `${feed.length} 条动态`, `<button class="button small" data-action="add-country-post" type="button">添加旅行经历</button>`)}
-    <div class="repeater">${feed.map((item, index) => footprintPost(["footprints", "records", index], item, index, "remove-country-post")).join("") || `<div class="empty">尚无全球足迹记录。</div>`}</div>
+    <details id="global-footprints" class="snapshot-collapse" ${state.footprintsOpen ? "open" : ""}><summary>旅行经历明细 · ${feed.length} 条 <span>点击展开 / 收起</span></summary><div class="repeater">${feed.map((item, index) => footprintPost(["footprints", "records", index], item, index, "remove-country-post")).join("") || `<div class="empty">尚无全球足迹记录。</div>`}</div></details>
     ${sectionRule("省份档案", `${names.length} 个省份`, `<button class="button small" data-action="add-province" type="button">添加省份</button>`)}
     <div class="split-editor"><div class="record-list">${names.map(name => `<button class="record-item${name === state.selectedProvince ? " is-active" : ""}" data-action="select-province" data-name="${esc(name)}" type="button"><strong>${esc(name)}</strong><small>${esc(provinces[name].status || "NO STATUS")}</small></button>`).join("") || `<div class="empty">暂无省份档案</div>`}</div>
       ${province ? `<article class="record-editor"><header class="record-editor-header"><div><h2>${esc(state.selectedProvince)}</h2><p>省份信息与关联动态</p></div><button class="button small danger" data-action="remove-province" type="button">删除省份</button></header><div class="form-grid">
@@ -341,6 +282,11 @@ function render() {
   renderers.games = renderGames;
   renderers.stars = renderThoughts;
   $("#editor").innerHTML = renderers[state.section]();
+  if (state.section === "projects") mountProjectCanvas();
+  const footprints = $("#global-footprints");
+  if (footprints) footprints.addEventListener("toggle", () => { if (footprints.isConnected) state.footprintsOpen = footprints.open; });
+  const snapshots = $("#capital-snapshots");
+  if (snapshots) snapshots.addEventListener("toggle", () => { if (snapshots.isConnected) state.snapshotsOpen = snapshots.open; });
 }
 
 function markDirty() {
@@ -493,18 +439,17 @@ function handleAction(button) {
     if (confirm("删除这款游戏及其拆解笔记？已保存的内容可从本地备份恢复。")) return mutateAndRender(() => state.data.games.splice(state.selectedGame, 1));
     return;
   }
+  if (action === "move-project-up" || action === "move-project-down") {
+    const target = index + (action === "move-project-up" ? -1 : 1);
+    const projects = state.data.projects;
+    if (target < 0 || target >= projects.length) return;
+    const selected = projects[state.selectedProject];
+    projects.splice(target, 0, projects.splice(index, 1)[0]);
+    state.selectedProject = projects.indexOf(selected);
+    state.data.projectOrderManual = true;
+    markDirty(); render(); refreshPreview(); return;
+  }
   if (action === "select-project") { state.selectedProject = index; render(); refreshPreview(); return; }
-  if (action === "add-home-card") return mutateAndRender(() => {
-    state.data.homeCards ||= [];
-
-    const used = new Set(state.data.homeCards.map(card => card.projectSlug));
-    const project = (state.data.projects || []).find(item => !used.has(item.slug)) || (state.data.projects || [])[0] || {};
-    state.data.homeCards.push({ target: project.slug ? `project:${project.slug}` : "projects", projectSlug: project.slug || "", id: project.id || "", index: project.index || String(state.data.homeCards.length + 1).padStart(2, "0"), status: project.status || "SELECTED", title: project.title || "未命名卡牌", english: project.english || "Untitled Project", tags: (project.evidence || []).slice(0, 2), layout: structuredClone(defaultHomeCardLayout) });
-  });
-  if (action === "remove-home-card") return mutateAndRender(() => { if (confirm("确定从首页删除这张卡牌吗？项目档案本身不会被删除。")) state.data.homeCards.splice(index, 1); });
-  if (action === "move-home-card-up" && index > 0) return mutateAndRender(() => { const [card] = state.data.homeCards.splice(index, 1); state.data.homeCards.splice(index - 1, 0, card); });
-  if (action === "move-home-card-down" && index < state.data.homeCards.length - 1) return mutateAndRender(() => { const [card] = state.data.homeCards.splice(index, 1); state.data.homeCards.splice(index + 1, 0, card); });
-  if (action === "reset-home-card-layout") return mutateAndRender(() => { state.data.homeCards[index].layout = structuredClone(defaultHomeCardLayout); });
   if (action === "add-project") return mutateAndRender(() => {
     state.data.projects ||= [];
     state.data.projects.push({ _visibility: "draft", id: `OBS-P${String(state.data.projects.length + 1).padStart(2, "0")}`, slug: `new-project-${Date.now()}`, category: "game", status: "草稿", title: "未命名项目", english: "Untitled Project", summary: "", problem: "", system: "", outcome: "", role: "", evidence: [], index: String(state.data.projects.length + 1).padStart(2, "0") });
@@ -521,16 +466,14 @@ function handleAction(button) {
   if (action === "remove-skill") return mutateAndRender(() => state.data.skillGroups.splice(index, 1));
   if (action === "add-honor") return mutateAndRender(() => (state.data.honors ||= []).push(""));
   if (action === "remove-honor") return mutateAndRender(() => state.data.honors.splice(index, 1));
-  if (action === "add-snapshot") return mutateAndRender(() => state.data.trading.capital.snapshots.push({ date: "", capital: null, pnl: null, pnlPercent: null, journalId: "", note: "" }));
+  if (action === "add-snapshot") return mutateAndRender(() => { state.snapshotsOpen = true; state.data.trading.capital.snapshots.push({ date: "", capital: null, pnl: null, pnlPercent: null, journalId: "", note: "" }); });
   if (action === "remove-snapshot") return mutateAndRender(() => state.data.trading.capital.snapshots.splice(index, 1));
-  if (action === "add-milestone") return mutateAndRender(() => state.data.trading.capital.milestones.push({ amount: null, label: "NEXT", status: "waiting" }));
-  if (action === "remove-milestone") return mutateAndRender(() => state.data.trading.capital.milestones.splice(index, 1));
   if (action === "select-journal") { state.selectedJournal = index; render(); return; }
   if (action === "add-journal") return mutateAndRender(() => { state.data.trading.journals.unshift({ _visibility: "draft", id: `journal-${new Date().toISOString().slice(0, 10)}`, date: new Date().toISOString().slice(0, 10), title: "资金变动记录", context: "", conversations: [], decision: "", execution: "", result: "", review: "", lesson: "" }); state.selectedJournal = 0; });
   if (action === "remove-journal") return mutateAndRender(() => { if (confirm("确定删除这条资金变动记录吗？本地备份仍可恢复。")) state.data.trading.journals.splice(state.selectedJournal, 1); });
   if (action === "add-conversation") return mutateAndRender(() => (state.data.trading.journals[state.selectedJournal].conversations ||= []).push({ role: "silver", content: "" }));
   if (action === "remove-conversation") return mutateAndRender(() => state.data.trading.journals[state.selectedJournal].conversations.splice(index, 1));
-  if (action === "add-country-post") return mutateAndRender(() => (state.data.footprints.records ||= []).push({ _visibility: "draft", name: "Silver.Z", country: "China", countryLabel: "中国", province: "", place: "", date: "", text: "", image: { src: "", caption: "" } }));
+  if (action === "add-country-post") return mutateAndRender(() => (state.footprintsOpen = true, (state.data.footprints.records ||= []).push({ _visibility: "draft", name: "Silver.Z", country: "China", countryLabel: "中国", province: "", place: "", date: "", text: "", image: { src: "", caption: "" } })));
   if (action === "add-province-post") return mutateAndRender(() => (state.data.footprints.records ||= []).push({ _visibility: "draft", name: "Silver.Z", country: "China", countryLabel: "中国", province: state.selectedProvince, place: "", date: "", text: "", image: { src: "", caption: "" } }));
   if (action === "remove-country-post") return mutateAndRender(() => state.data.footprints.records.splice(index, 1));
   if (action === "select-province") { state.selectedProvince = button.dataset.name; render(); return; }
@@ -590,16 +533,6 @@ $("#editor").addEventListener("input", event => {
   const path = JSON.parse(decodeURIComponent(encoded));
   const value = event.target.type === "number" ? (event.target.value === "" ? null : Number(event.target.value)) : event.target.value;
   setAt(path, value);
-  if (path[0] === "homeCards") {
-    const preview = `[data-home-card-preview="${path[1]}"]`;
-    const fields = { id: ".studio-card-id span", status: ".studio-card-copy small", title: ".studio-card-copy strong", english: ".studio-card-copy i" };
-    if (path[2] === "image") $(".studio-card-image", $(preview)).innerHTML = value ? `<img src="/site/${esc(value)}" alt="卡牌图片">` : "";
-    if (fields[path[2]]) $(fields[path[2]], $(preview)).textContent = value || "";
-    if (path[2] === "tags") {
-      const tags = (state.data.homeCards[path[1]].tags || []).filter(Boolean).slice(0, 2);
-      $(".studio-card-tags", $(preview)).innerHTML = tags.map(tag => `<b>${esc(tag)}</b>`).join("");
-    }
-  }
   if (path[0] === "games" && path[2] === "title") {
     const title = value.trim() || "未命名游戏";
     const listTitle = $('.record-item.is-active strong');
@@ -613,38 +546,6 @@ $("#editor").addEventListener("input", event => {
 $("#editor").addEventListener("change", event => {
   if (event.target.matches("select[data-path]")) render();
 });
-
-let activeCardDrag = null;
-$("#editor").addEventListener("pointerdown", event => {
-  const region = event.target.closest("[data-card-region]");
-  if (!region) return;
-  const card = region.closest("[data-home-card-preview]");
-  const rect = card.getBoundingClientRect();
-  const regionRect = region.getBoundingClientRect();
-  activeCardDrag = { region, card, rect, index: Number(region.dataset.cardIndex), key: region.dataset.cardRegion, offsetX: event.clientX - regionRect.left, offsetY: event.clientY - regionRect.top };
-  region.setPointerCapture(event.pointerId);
-  region.classList.add("is-dragging");
-  event.preventDefault();
-});
-$("#editor").addEventListener("pointermove", event => {
-  if (!activeCardDrag) return;
-  const { region, rect, index, key, offsetX, offsetY } = activeCardDrag;
-  const x = Math.max(0, Math.min(100 - region.offsetWidth / rect.width * 100, (event.clientX - rect.left - offsetX) / rect.width * 100));
-  const y = Math.max(0, Math.min(96, (event.clientY - rect.top - offsetY) / rect.height * 100));
-  state.data.homeCards[index].layout ||= {};
-  state.data.homeCards[index].layout[key] = { ...homeCardRegion(state.data.homeCards[index], key), x: Number(x.toFixed(1)), y: Number(y.toFixed(1)) };
-  region.style.left = `${x}%`;
-  region.style.top = `${y}%`;
-});
-function finishCardDrag() {
-  if (!activeCardDrag) return;
-  activeCardDrag.region.classList.remove("is-dragging");
-  activeCardDrag = null;
-  markDirty();
-  refreshPreview();
-}
-$("#editor").addEventListener("pointerup", finishCardDrag);
-$("#editor").addEventListener("pointercancel", finishCardDrag);
 
 $("#editor").addEventListener("click", event => {
   const upload = event.target.closest("[data-upload-path]");
@@ -672,3 +573,67 @@ window.addEventListener("beforeunload", event => { if (state.dirty) { event.prev
     $("#editor").innerHTML = `<div class="empty"><strong>无法读取内容数据</strong><p>${esc(error.message)}</p></div>`;
   }
 })();
+
+let projectDrag = null;
+function clearProjectDrop() {
+  $$('.project-sort-row').forEach(row => row.classList.remove('drop-before', 'drop-after', 'is-dragging'));
+}
+$('#editor').addEventListener('dragstart', event => {
+  const handle = event.target.closest('.project-drag-handle');
+  if (!handle) return;
+  const row = handle.closest('.project-sort-row');
+  projectDrag = { index: Number(row.dataset.projectIndex), target: null, after: false };
+  event.dataTransfer.effectAllowed = 'move';
+  event.dataTransfer.setData('text/plain', String(projectDrag.index));
+  event.dataTransfer.setDragImage(row, 30, 25);
+  row.classList.add('is-dragging');
+});
+$('#editor').addEventListener('dragover', event => {
+  if (!projectDrag) return;
+  const row = event.target.closest('.project-sort-row');
+  if (!row) return;
+  event.preventDefault();
+  event.dataTransfer.dropEffect = 'move';
+  const bounds = row.getBoundingClientRect();
+  projectDrag.target = Number(row.dataset.projectIndex);
+  projectDrag.after = event.clientY > bounds.top + bounds.height / 2;
+  $$('.project-sort-row').forEach(item => item.classList.remove('drop-before', 'drop-after'));
+  row.classList.add(projectDrag.after ? 'drop-after' : 'drop-before');
+  const list = row.closest('.project-sort-list');
+  const rect = list.getBoundingClientRect();
+  if (event.clientY < rect.top + 45) list.scrollTop -= 14;
+  if (event.clientY > rect.bottom - 45) list.scrollTop += 14;
+});
+$('#editor').addEventListener('drop', event => {
+  if (!projectDrag || !event.target.closest('.project-sort-row')) return;
+  event.preventDefault();
+  const { index, target, after } = projectDrag;
+  projectDrag = null;
+  clearProjectDrop();
+  if (target === null) return;
+  let destination = target + (after ? 1 : 0);
+  if (index < destination) destination--;
+  if (destination === index) return;
+  const projects = state.data.projects;
+  const selected = projects[state.selectedProject];
+  projects.splice(destination, 0, projects.splice(index, 1)[0]);
+  state.selectedProject = projects.indexOf(selected);
+  state.data.projectOrderManual = true;
+  markDirty(); render(); refreshPreview();
+});
+$('#editor').addEventListener('dragend', () => { projectDrag = null; clearProjectDrop(); });
+
+function updateStudioThemeButton() {
+  const dark = document.documentElement.dataset.studioTheme === 'dark';
+  const button = $('#theme-toggle');
+  button.textContent = dark ? '☀ 开灯' : '☾ 关灯';
+  button.setAttribute('aria-pressed', String(dark));
+  button.setAttribute('aria-label', dark ? '开灯，切换日间样式' : '关灯，切换夜间样式');
+}
+$('#theme-toggle').addEventListener('click', () => {
+  const theme = document.documentElement.dataset.studioTheme === 'dark' ? 'light' : 'dark';
+  document.documentElement.dataset.studioTheme = theme;
+  try { localStorage.setItem('silver-studio-theme', theme); } catch { /* Theme remains usable without storage. */ }
+  updateStudioThemeButton();
+});
+updateStudioThemeButton();

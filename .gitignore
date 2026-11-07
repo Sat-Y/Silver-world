@@ -15,3 +15,11 @@
 # Generated deployment files and build dependencies.
 dist/
 node_modules/
+
+# Blender recovery copies; keep the editable .blend source itself.
+*.blend1
+*.blend2
+
+# Additional local workbench source files.
+!.local-studio/public/white-theme.css
+!.local-studio/public/project-canvas.js

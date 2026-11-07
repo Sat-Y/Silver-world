@@ -1,7 +1,13 @@
 {
   "name": "silver-os",
   "private": true,
-  "scripts": { "build": "node scripts/build-site.cjs" },
-  "engines": { "node": ">=22" },
-  "devDependencies": { "sharp": "0.35.5" }
+  "scripts": {
+    "build": "node scripts/build-site.cjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "sharp": "0.35.5"
+  }
 }

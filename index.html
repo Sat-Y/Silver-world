@@ -11,9 +11,15 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css?v=20261019-12">
-  <script>document.documentElement.dataset.theme=localStorage.getItem('silver-manga-theme')||'light';</script>
+  <link rel="stylesheet" href="portfolio.css?v=20261107-25">
+  <script>document.documentElement.dataset.theme='light';</script>
 </head>
 <body class="os-body">
+  <header class="portfolio-nav">
+    <a class="portfolio-brand route-link" href="?view=resume" data-route="resume">Silver.Z <span>AI Game Planner</span></a>
+    <nav aria-label="主要导航"><a class="route-link" href="?view=resume#work" data-route="resume">Work</a><a class="route-link" href="?view=resume#world" data-route="resume">My World</a><a class="route-link" href="?view=about" data-route="about">About</a></nav>
+    <a class="portfolio-contact route-link" href="?view=connect" data-route="connect">联系我 ↗</a>
+  </header>
   <a class="skip-link" href="#view">跳至当前页面</a>
   <div class="grain" aria-hidden="true"></div>
   <button class="desktop-nav-toggle" id="desktop-nav-toggle" type="button" aria-expanded="false" aria-controls="desktop-sidebar">
@@ -97,6 +103,8 @@
   <script src="trading-data.js"></script>
   <script src="game-atlas.js"></script>
   <script src="starfield.js?v=20261008-4"></script>
-  <script src="app.js?v=20261019-12"></script>
+  <script src="assets/life-chart.js?v=11"></script>
+  <script src="assets/project-view.js?v=1"></script>
+  <script src="app.js?v=20261107-28"></script>
 </body>
 </html>
