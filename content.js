@@ -101,27 +101,25 @@ window.SILVER_DATA = {
   ],
   "projects": [
     {
-      "id": "OBS–P02",
-      "slug": "the-final-resonance",
+      "id": "OBS–P03",
+      "slug": "cloud-mirage-express",
       "category": "game",
-      "status": "可运行 Demo",
-      "title": "最终共鸣",
-      "english": "The Final Resonance",
-      "summary": "AI 驱动的心理惊悚叙事游戏。角色在动态 Prompt 控制下经历四阶段人格演变。",
-      "problem": "生成式角色很容易只有随机对话，没有可感知的剧情推进。项目需要让模型变化成为叙事机制，而不是聊天装饰。",
-      "system": "通过四阶段动态 Prompt、人格状态追踪和 RAG 镜像模仿控制角色演变，再将玩家行为映射到 16 种人格结局。",
-      "outcome": "完成可运行 Demo 与主要系统验证，证明 AI 角色变化可以被组织成有方向的游戏体验。",
-      "role": "系统设计 / 开发",
+      "status": "进行中",
+      "title": "云端列车",
+      "english": "Cloud Mirage Express",
+      "summary": "像素风调酒模拟经营，以收入、成本和税务构成三层经济循环。",
+      "problem": "模拟经营需要让每次调酒、定价和采购都进入同一经济循环，同时保持内容可以被快速扩充。",
+      "system": "以 CSV 管理配方与商品数据，结合 Godot Resource 承载运行状态，构成收入、成本和税务三层反馈。",
+      "outcome": "完成主要经营框架后暂停开发，保留为数据驱动架构与协作开发的验证记录。",
+      "role": "系统策划 / 协作开发",
       "evidence": [
-        "RAG 镜像模仿",
-        "16 种 MBTI 结局",
-        "AI人设框定"
+        "CSV 数据驱动",
+        "Resource 混合架构",
+        "经济循环设计"
       ],
-      "showcaseImage": "assets/the-final-resonance.jpg",
-      "showcaseImageWebp": "assets/the-final-resonance.webp",
-      "showcaseCrop": true,
-      "showcaseCaption": "运行界面 / AI 对话与人格演变记录",
-      "index": "02"
+      "demoVideo": "assets/uploads/1794049672407-10146f-2026-11-07-190627.mp4",
+      "index": "03",
+      "coverImage": "assets/home-background.mp4"
     },
     {
       "id": "OBS–P01",
@@ -141,27 +139,30 @@ window.SILVER_DATA = {
         "Godot 4.5 / GDScript"
       ],
       "demoVideo": "assets/interrogation-room-0-demo.mp4",
-      "index": "01"
+      "index": "01",
+      "coverImage": "assets/interrogation-room-0-demo.mp4"
     },
     {
-      "id": "OBS–P03",
-      "slug": "cloud-mirage-express",
-      "category": "game",
-      "status": "进行中",
-      "title": "云端列车",
-      "english": "Cloud Mirage Express",
-      "summary": "像素风调酒模拟经营，以收入、成本和税务构成三层经济循环。",
-      "problem": "模拟经营需要让每次调酒、定价和采购都进入同一经济循环，同时保持内容可以被快速扩充。",
-      "system": "以 CSV 管理配方与商品数据，结合 Godot Resource 承载运行状态，构成收入、成本和税务三层反馈。",
-      "outcome": "完成主要经营框架后暂停开发，保留为数据驱动架构与协作开发的验证记录。",
-      "role": "系统策划 / 协作开发",
+      "id": "OBS-P09",
+      "slug": "new-project-1794050316186",
+      "category": "prototype",
+      "status": "可运行原型",
+      "title": "小白桌宠",
+      "english": "Xiaobai Desktop Pet",
+      "summary": "一款将角色陪伴与信息提醒结合的 Windows 桌宠",
+      "problem": "工作时，行情、工具额度和电脑运行状态分散在不同窗口，反复查看容易打断注意力。项目希望用一个常驻桌面的角色承载轻量互动与必要提醒，让信息在需要时出现，也让打字和工作间隙获得即时、有趣的反馈。",
+      "system": "以 C# / Windows Forms 实现透明置顶窗口与托盘入口，将键盘响应、点击反馈、待机动画和信息播报拆分为独立模块。角色随左右手按键切换敲击姿势，记录每日敲击次数，并通过压扁回弹与连续点击表情增强互动；使用 AI 生成角色素材，结合局部动画表现眨眼与发梢变化。Node.js 适配器读取行情和工具额度，后台采样 CPU 与内存占用，通过消息队列、阈值去重和恢复条件组织气泡与表情提醒。键盘交互只处理动作与计数，不保存输入文字或按键序列。",
+      "outcome": "已完成可在 Windows 本地运行的桌宠原型，支持键盘联动、每日敲击计数、点击表情、拖动与休息、数据面板、气泡播报及高负载提醒。迭代中重点处理了动画切换闪烁、连续点击命中、提醒重复触发和高 DPI 文字清晰度，并为交互规则与提醒阈值编写回归检查。项目验证了角色表现与实用信息提醒可以共用一套轻量桌面交互；后续仍需完善数据源稳定性、多显示器 DPI 适配与安装分发。",
+      "role": "产品设计 / 交互设计 / 独立开发",
       "evidence": [
-        "CSV 数据驱动",
-        "Resource 混合架构",
-        "经济循环设计"
+        "键盘联动与表情反馈",
+        "气泡消息队列与阈值提醒",
+        "C# / Windows Forms / Node.js",
+        "AI 角色素材与局部动画"
       ],
-      "demoVideo": "assets/cloud-mirage-express-demo.mp4",
-      "index": "03"
+      "index": "09",
+      "demoVideo": "assets/uploads/1794050356533-28a00f-2026-11-06-203614.mp4",
+      "coverImage": "assets/uploads/1794050973424-b159be-2026-11-07-192832.mp4"
     },
     {
       "id": "OBS–P04",
@@ -183,7 +184,8 @@ window.SILVER_DATA = {
       "featuredOnHome": true,
       "index": "04",
       "date": "",
-      "showcaseImage": "assets/uploads/1786780857448-760a13-2026-08-02-193900.png"
+      "showcaseImage": "assets/uploads/1786780857448-760a13-2026-08-02-193900.png",
+      "coverImage": "assets/uploads/1786780857448-760a13-2026-08-02-193900.png"
     },
     {
       "id": "OBS–P05",
@@ -204,7 +206,31 @@ window.SILVER_DATA = {
         "游戏制作入门"
       ],
       "demoVideo": "assets/first-game-making-experience-demo.mp4",
-      "index": "05"
+      "index": "05",
+      "coverImage": "assets/first-game-making-experience-demo.mp4"
+    },
+    {
+      "id": "OBS–P02",
+      "slug": "the-final-resonance",
+      "category": "game",
+      "status": "可运行 Demo",
+      "title": "最终共鸣",
+      "english": "The Final Resonance",
+      "summary": "AI 驱动的心理惊悚叙事游戏。角色在动态 Prompt 控制下经历四阶段人格演变。",
+      "problem": "生成式角色很容易只有随机对话，没有可感知的剧情推进。项目需要让模型变化成为叙事机制，而不是聊天装饰。",
+      "system": "通过四阶段动态 Prompt、人格状态追踪和 RAG 镜像模仿控制角色演变，再将玩家行为映射到 16 种人格结局。",
+      "outcome": "完成可运行 Demo 与主要系统验证，证明 AI 角色变化可以被组织成有方向的游戏体验。",
+      "role": "系统设计 / 开发",
+      "evidence": [
+        "RAG 镜像模仿",
+        "16 种 MBTI 结局",
+        "AI人设框定"
+      ],
+      "showcaseImage": "assets/the-final-resonance.jpg",
+      "showcaseImageWebp": "assets/the-final-resonance.webp",
+      "showcaseCrop": true,
+      "showcaseCaption": "运行界面 / AI 对话与人格演变记录",
+      "index": "02"
     },
     {
       "id": "LAB—02",

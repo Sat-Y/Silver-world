@@ -24,10 +24,14 @@
   }
 
   function projectCard(project, options = {}) {
-    const media = options.uniform ? featuredCover(project) : project.showcaseImage
+    const media = project.coverImage
+      ? /\.(mp4|webm)(?:[?#]|$)/i.test(project.coverImage)
+        ? `<video muted loop playsinline preload="metadata" aria-label="${esc(project.title)}视频封面"><source src="${esc(project.coverImage)}${project.coverImage.includes('#') ? '' : '#t=0.1'}" type="${/\.webm(?:[?#]|$)/i.test(project.coverImage) ? 'video/webm' : 'video/mp4'}"></video>`
+        : `<img src="${esc(project.coverImage)}" alt="${esc(project.title)}封面" loading="lazy" decoding="async">`
+      : options.uniform ? featuredCover(project) : project.showcaseImage
       ? `<img src="${esc(project.showcaseImageWebp || project.showcaseImage)}" alt="${esc(project.title)}运行界面" loading="lazy" decoding="async">`
       : project.demoVideo
-        ? `<video muted loop playsinline preload="metadata" aria-label="${esc(project.title)}演示"><source src="${esc(project.demoVideo)}#t=0.1" type="video/mp4"></video><span class="portfolio-video-label">▶ 项目演示</span>`
+        ? `<video muted loop playsinline preload="metadata"${project.demoPoster ? ` poster="${esc(project.demoPoster)}"` : ""} aria-label="${esc(project.title)}演示"><source src="${esc(project.demoVideo)}#t=0.1" type="video/mp4"></video><span class="portfolio-video-label">▶ 项目演示</span>`
         : featuredCover(project);
     return `<a class="archive-card portfolio-work route-link" href="?view=project&id=${encodeURIComponent(project.slug)}${options.fromArchive ? '&from=projects' : ''}" data-route="project"><div class="portfolio-media media-${esc(project.category)}">${media}<span class="portfolio-open" aria-hidden="true">↗</span></div><div class="portfolio-work-meta"><div><h3>${esc(project.title)}</h3><p>${esc(project.summary)}</p></div><div class="portfolio-tags">${project.evidence.slice(0, 2).map(tag => `<span>${esc(tag)}</span>`).join('')}</div></div></a>`;
   }

@@ -33,11 +33,25 @@ html[data-theme="light"] body.os-body {--bg:#fafafa;--surface:#f0f0f0;--surface-
 .portfolio-section {padding:90px 0 45px;scroll-margin-top:-90px}
 .portfolio-section>h2 {text-align:center;color:#a5a5a5;font-size:clamp(28px,2.7vw,46px);font-weight:500;letter-spacing:-.055em;margin:0 0 70px;line-height:1.2}
 .portfolio-grid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:52px 12px}
+/* Give the homepage work gallery room to breathe on wide displays. */
+.portfolio-home #work {box-sizing:border-box;width:100%;max-width:calc(50% + 760px);margin-inline:auto;padding:clamp(72px,7vw,128px) clamp(4px,1.75vw,32px) 72px}
+.portfolio-home #world {box-sizing:border-box;width:100%;max-width:calc(50% + 760px);margin-inline:auto;padding-inline:clamp(4px,1.75vw,32px)}
+.portfolio-home #work .portfolio-grid {gap:72px clamp(24px,3vw,48px)}
+.portfolio-home #work .portfolio-work-meta {grid-template-columns:1fr;gap:14px;margin-top:24px;padding-inline:4px}
+.portfolio-home #work .portfolio-work p {max-width:56ch;line-height:1.85}
+.portfolio-home #work .portfolio-tags {gap:8px}
+@media(max-width:760px){
+ .portfolio-home #work {padding:64px 8px 40px}
+ .portfolio-home #world {padding-inline:8px}
+ .portfolio-home #work .portfolio-grid {gap:44px}
+ .portfolio-home #work .portfolio-work-meta {margin-top:18px;gap:12px}
+}
 .portfolio-work.archive-card {display:block;min-width:0;min-height:0;margin:0;padding:0;border:0;background:none;box-shadow:none;transform:none;text-decoration:none;color:inherit}
 .portfolio-work.archive-card:hover {transform:none;box-shadow:none;background:none}
 .portfolio-work[hidden] {display:none!important}
 .portfolio-media {aspect-ratio:16/9;position:relative;overflow:hidden;border-radius:5px;background:#e8e8e8}
 .portfolio-media>img,.portfolio-media>video {display:block;width:100%;height:100%;object-fit:cover;transition:transform .65s cubic-bezier(.2,.7,.2,1)}
+.portfolio-media>video {object-fit:contain}
 .portfolio-media.media-ai {background:#e9e6df}
 .portfolio-media.media-ai>img {object-fit:contain;padding:24px}
 .portfolio-work:hover .portfolio-media>img,.portfolio-work:focus-visible .portfolio-media>img {transform:scale(1.035)}

@@ -184,6 +184,8 @@ function renderProjects() {
         ${field([...p, "problem"], "问题与目标", { multiline: true })}
         ${field([...p, "system"], "系统方案", { multiline: true })}
         ${field([...p, "outcome"], "结果与复盘", { multiline: true })}
+        ${assetField([...p, "coverImage"], "封面")}
+        <p class="field-help full">用于首页精选和项目列表卡面，支持横向图片或 MP4 / WebM 视频；视频进入视野后静音循环播放，留空时使用默认卡面。展示图片用于项目详情。</p>
         ${assetField([...p, "showcaseImage"], "展示图片")}${assetField([...p, "demoVideo"], "演示视频")}
       </div>
       ${textList([...p, "evidence"], "能力证据", "add-evidence", "remove-evidence")}
@@ -506,6 +508,7 @@ function handleAction(button) {
 
 async function uploadAsset(file, path) {
   if (!file) return;
+  if (path?.[path.length - 1] === "coverImage" && !/\.(png|jpe?g|webp|gif|mp4|webm)$/i.test(file.name)) return toast("封面请选择 PNG、JPG、WebP、GIF 图片或 MP4、WebM 视频。", true);
   if (file.size > 80 * 1024 * 1024) return toast("单个文件不能超过 80MB；较大的视频请先压缩。", true);
   toast("正在复制素材…");
   const data = await new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = reject; reader.readAsDataURL(file); });
@@ -549,7 +552,11 @@ $("#editor").addEventListener("change", event => {
 
 $("#editor").addEventListener("click", event => {
   const upload = event.target.closest("[data-upload-path]");
-  if (upload) { state.uploadPath = JSON.parse(decodeURIComponent(upload.dataset.uploadPath)); $("#asset-input").click(); return; }
+  if (upload) {
+    state.uploadPath = JSON.parse(decodeURIComponent(upload.dataset.uploadPath));
+    $("#asset-input").accept = "image/png,image/jpeg,image/webp,image/gif,video/mp4,video/webm";
+    $("#asset-input").click(); return;
+  }
   const action = event.target.closest("[data-action]");
   if (action) handleAction(action);
 });
