@@ -1032,6 +1032,14 @@ window.SILVER_DATA = {
   ],
   "thoughts": [
     {
+      "id": "67cf07ed-dbe6-4e3c-805b-c6940da58697",
+      "title": "test",
+      "category": "随想",
+      "date": "2026-11-19",
+      "excerpt": "",
+      "body": "11111"
+    },
+    {
       "id": "e762db04-a265-45c6-9a60-7f07ac1be5f3",
       "title": "重拾英语",
       "category": "博学自身",

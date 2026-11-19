@@ -2,7 +2,7 @@
 window.SILVER_TRADING = {
   "capital": {
     "initial": 10000,
-    "current": 23097.06,
+    "current": 30657.95,
     "snapshots": [
       {
         "date": "2026-08-17",
@@ -171,6 +171,22 @@ window.SILVER_TRADING = {
         "pnlPercent": null,
         "journalId": "",
         "note": "重新开始"
+      },
+      {
+        "date": "2026-11-18",
+        "capital": 30857.95,
+        "pnl": null,
+        "pnlPercent": null,
+        "journalId": "",
+        "note": ""
+      },
+      {
+        "date": "2026-11-19",
+        "capital": 30657.95,
+        "pnl": null,
+        "pnlPercent": null,
+        "journalId": "",
+        "note": ""
       }
     ],
     "monthly": [],
