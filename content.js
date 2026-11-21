@@ -104,22 +104,26 @@ window.SILVER_DATA = {
       "id": "OBS–P03",
       "slug": "cloud-mirage-express",
       "category": "game",
-      "status": "进行中",
+      "status": "已弃坑",
       "title": "云端列车",
       "english": "Cloud Mirage Express",
-      "summary": "像素风调酒模拟经营，以收入、成本和税务构成三层经济循环。",
-      "problem": "模拟经营需要让每次调酒、定价和采购都进入同一经济循环，同时保持内容可以被快速扩充。",
-      "system": "以 CSV 管理配方与商品数据，结合 Godot Resource 承载运行状态，构成收入、成本和税务三层反馈。",
-      "outcome": "完成主要经营框架后暂停开发，保留为数据驱动架构与协作开发的验证记录。",
+      "summary": "云端列车像素风调酒模拟经营，玩法循环建立，但趣味点未实现",
+      "problem": "玩家通过npc的故事调出不同种类的酒，根据符合程度给予报酬\n学习潜水员戴夫，把材料的采购也制作成了小游戏，里面还有抓娃娃，调酒等玩法——所以交互的卡点出现\n然后通过一定的资金解锁新的探索路线，看新的风景——所以我认为美术也很重要\n个人想要设计的核心趣味点是在故事情节上，但很老是在纠结美术和交互导致项目卡顿，主要还是我内驱力不够",
+      "system": "了解到了想法到实现的过程问题很多，这次我就发现了\n1.2026.11当前的ai对于2d画面的制作并不强，这是一个更考验ai审美的方向\n2.不是以玩法作为趣味点的游戏难度较大，需要把其他地方做成高审美高品质",
+      "outcome": "当前完成了基础循环，但其实没有趣味点，暂时弃坑",
       "role": "系统策划 / 协作开发",
       "evidence": [
-        "CSV 数据驱动",
-        "Resource 混合架构",
+        "调酒交互设计尝试",
+        "对自己策划能力的锻炼",
         "经济循环设计"
       ],
       "demoVideo": "assets/uploads/1794049672407-10146f-2026-11-07-190627.mp4",
       "index": "03",
-      "coverImage": "assets/home-background.mp4"
+      "coverImage": "assets/home-background.mp4",
+      "problemTitle": "初始想法和策划",
+      "systemTitle": "我的收获",
+      "outcomeTitle": "当前结果",
+      "date": "2026.3.5首启2026.10.14再启"
     },
     {
       "id": "OBS–P01",
@@ -129,9 +133,9 @@ window.SILVER_DATA = {
       "title": "0号审讯室",
       "english": "Interrogation Room #0",
       "summary": "心理博弈审讯模拟。玩家通过证物与对话策略，在嫌疑人的心理状态变化中寻找突破口。",
-      "problem": "传统对话树很容易退化成寻找正确选项。我希望审讯不是背答案，而是观察心理变化、组合证物并承担施压策略的后果。",
-      "system": "用 mental health、stress level 和 suspicion 构成三维心理状态；证物标签与对话行为持续修改状态，再由状态决定角色反馈和可用策略。",
-      "outcome": "核心审讯循环已经可以运行，下一阶段将补充完整案件内容、失败反馈与更清晰的心理状态表现。",
+      "problem": "我希望审讯不是背答案，而是观察心理变化、组合证物并承担施压策略的后果。\n关于案件是由ai生成的，然后嫌疑人的对话也是有ai操控，当时用的是2025年的deepseek的api，可以实现基本的对话\n然后玩家在画布上组线索线，得到最终结果，在由ai对答案看推理是否正确",
+      "system": "用 mental health、stress level 和 suspicion 构成三维心理状态；证物标签与对话行为持续修改状态，再由状态决定角色反馈和可用策略。\n实现下来发现是可行的，流程进行了验证，但给的案件难度不高，且有许多东西还需要完善",
+      "outcome": "核心审讯循环已经可以运行，下一阶段将补充完整案件内容、失败反馈与更清晰的心理状态表现\n后续找到了实习所以暂时搁置",
       "role": "玩法策划 / 独立开发",
       "evidence": [
         "三维心理状态引擎",
@@ -140,7 +144,11 @@ window.SILVER_DATA = {
       ],
       "demoVideo": "assets/interrogation-room-0-demo.mp4",
       "index": "01",
-      "coverImage": "assets/interrogation-room-0-demo.mp4"
+      "coverImage": "assets/interrogation-room-0-demo.mp4",
+      "problemTitle": "初始想法和策划",
+      "systemTitle": "我的收获",
+      "outcomeTitle": "当前结果",
+      "date": "2026.3.6"
     },
     {
       "id": "OBS-P09",
@@ -150,9 +158,9 @@ window.SILVER_DATA = {
       "title": "小白桌宠",
       "english": "Xiaobai Desktop Pet",
       "summary": "一款将角色陪伴与信息提醒结合的 Windows 桌宠",
-      "problem": "工作时，行情、工具额度和电脑运行状态分散在不同窗口，反复查看容易打断注意力。项目希望用一个常驻桌面的角色承载轻量互动与必要提醒，让信息在需要时出现，也让打字和工作间隙获得即时、有趣的反馈。",
+      "problem": "主要是起到一个助手作用，里面包含了我需要的内容，也连接着我的个人网站，我可以直接通过桌宠进行个人网站内容的编辑和同步远端，同时也连接着我个人网站的资金情况和一些随心记",
       "system": "以 C# / Windows Forms 实现透明置顶窗口与托盘入口，将键盘响应、点击反馈、待机动画和信息播报拆分为独立模块。角色随左右手按键切换敲击姿势，记录每日敲击次数，并通过压扁回弹与连续点击表情增强互动；使用 AI 生成角色素材，结合局部动画表现眨眼与发梢变化。Node.js 适配器读取行情和工具额度，后台采样 CPU 与内存占用，通过消息队列、阈值去重和恢复条件组织气泡与表情提醒。键盘交互只处理动作与计数，不保存输入文字或按键序列。",
-      "outcome": "已完成可在 Windows 本地运行的桌宠原型，支持键盘联动、每日敲击计数、点击表情、拖动与休息、数据面板、气泡播报及高负载提醒。迭代中重点处理了动画切换闪烁、连续点击命中、提醒重复触发和高 DPI 文字清晰度，并为交互规则与提醒阈值编写回归检查。项目验证了角色表现与实用信息提醒可以共用一套轻量桌面交互；后续仍需完善数据源稳定性、多显示器 DPI 适配与安装分发。",
+      "outcome": "已完成可在 Windows 本地运行的桌宠原型，支持键盘联动、每日敲击计数、点击表情、拖动与休息、数据面板、气泡播报及高负载提醒。迭代中重点处理了动画切换闪烁、连续点击命中、提醒重复触发和高 DPI 文字清晰度，并为交互规则与提醒阈值编写回归检查。项目验证了角色表现与实用信息提醒可以共用一套轻量桌面交互；后续仍需完善数据源稳定性、多显示器 DPI 适配与安装分发。\n正常运行和使用，下一步就是等待我使用过程中的新需求",
       "role": "产品设计 / 交互设计 / 独立开发",
       "evidence": [
         "键盘联动与表情反馈",
@@ -162,7 +170,9 @@ window.SILVER_DATA = {
       ],
       "index": "09",
       "demoVideo": "assets/uploads/1794050356533-28a00f-2026-11-06-203614.mp4",
-      "coverImage": "assets/uploads/1794050973424-b159be-2026-11-07-192832.mp4"
+      "coverImage": "assets/uploads/1794050973424-b159be-2026-11-07-192832.mp4",
+      "outcomeTitle": "当前结果与下一步",
+      "date": "2026.11.1"
     },
     {
       "id": "OBS–P04",
@@ -174,7 +184,7 @@ window.SILVER_DATA = {
       "summary": "把每日英语练习转化为宠物成长的 Windows 桌面学习应用。",
       "problem": "雅思等长期学习目标反馈周期很长，用户很难从每天几分钟的练习中感受到进步。项目要解决的不是增加课程数量，而是让短期行动持续产生可见反馈，让用户愿意第二天继续学习。",
       "system": "以“短学习任务—即时反馈—宠物或空间成长—累计进步”为核心循环。React 与 TypeScript 构建交互层，Tauri v2 和 Rust 承载 Windows 桌面能力，SQLite 保存宠物、库存、生词与复习状态；DeepSeek 生成场景对话，规则系统控制交易、奖励和资产。",
-      "outcome": "已完成透明置顶桌宠、像素房间、AI 场景对话、超市购买、背包与喂食、生词收藏和剪贴板取词等基础能力。当前技术原型约完成 60%，正在建设每日任务、学习奖励、成长可视化和口语反馈的本地 Alpha 核心闭环。",
+      "outcome": "已完成透明置顶桌宠、像素房间、AI 场景对话、超市购买、背包与喂食、生词收藏和剪贴板取词等基础能力。当前技术原型约完成 60%，正在建设每日任务、学习奖励、成长可视化和口语反馈的本地 Alpha 核心闭环。\n又弃坑了，omg，很难坚持的我",
       "role": "产品设计 / 系统设计 / 独立开发",
       "evidence": [
         "React 19 / TypeScript / Tauri v2",
@@ -183,7 +193,7 @@ window.SILVER_DATA = {
       ],
       "featuredOnHome": true,
       "index": "04",
-      "date": "",
+      "date": "2026.7.20",
       "showcaseImage": "assets/uploads/1786780857448-760a13-2026-08-02-193900.png",
       "coverImage": "assets/uploads/1786780857448-760a13-2026-08-02-193900.png"
     },
@@ -196,7 +206,7 @@ window.SILVER_DATA = {
       "english": "First Steps in Game Making",
       "date": "2025.09.11",
       "summary": "自学 Godot 引擎期间完成的入门练习，记录从理解引擎基础到第一次真正开始制作游戏的过程。",
-      "problem": "如何把对游戏制作的兴趣转化为可以运行、可以操作的实际内容，而不只是停留在想法和策划文档中。",
+      "problem": "学习godot引擎，然后实现横板战斗，很显然这次尝试我收获很多",
       "system": "从 Godot 的场景、节点和脚本等基础概念开始，通过边学习边制作的方式建立对游戏运行结构与基础交互的理解。",
       "outcome": "完成早期可运行练习，建立了继续自学 Godot 与独立制作游戏的起点。",
       "role": "个人学习 / 独立练习",
@@ -207,7 +217,10 @@ window.SILVER_DATA = {
       ],
       "demoVideo": "assets/first-game-making-experience-demo.mp4",
       "index": "05",
-      "coverImage": "assets/first-game-making-experience-demo.mp4"
+      "coverImage": "assets/first-game-making-experience-demo.mp4",
+      "problemTitle": "初始想法和策划",
+      "systemTitle": "我的收获",
+      "outcomeTitle": "当前结果"
     },
     {
       "id": "OBS–P02",
@@ -230,7 +243,8 @@ window.SILVER_DATA = {
       "showcaseImageWebp": "assets/the-final-resonance.webp",
       "showcaseCrop": true,
       "showcaseCaption": "运行界面 / AI 对话与人格演变记录",
-      "index": "02"
+      "index": "02",
+      "date": "2025.10.1"
     },
     {
       "id": "LAB—02",
@@ -240,9 +254,9 @@ window.SILVER_DATA = {
       "title": "LeNet-5 手写数字识别",
       "english": "",
       "summary": "复刻经典 CNN，并通过 Flask 与 Canvas 做成可交互的推理和特征可视化应用。",
-      "problem": "如何把模型训练、推理接口和浏览器交互连成完整链路？",
-      "system": "",
-      "outcome": "",
+      "problem": "解决课设，哈哈哈哈哈，是一个学校的深度学习项目，主要是负责了解学习深度学习",
+      "system": "\n",
+      "outcome": "完成了课设",
       "role": "",
       "evidence": [
         "PyTorch",
@@ -259,10 +273,10 @@ window.SILVER_DATA = {
       "status": "COMPLETED",
       "title": "车牌识别系统",
       "english": "",
-      "summary": "实现图像预处理、车牌定位、字符分割与 SVM 识别流程，支持蓝、黄、绿车牌。",
-      "problem": "传统视觉方法如何在复杂背景中稳定完成字符识别？",
-      "system": "",
-      "outcome": "",
+      "summary": "课设实现图像预处理、车牌定位、字符分割与 SVM 识别流程，支持蓝、黄、绿车牌。",
+      "problem": "传统视觉方法如何在复杂背景中稳定完成字符识别，后续对比了cnn和svm的区别，深度学习和机械学习在图像识别上的对比",
+      "system": "进一步学习了深度学习，了解了cnn的图像识别，也了解了机械学习和svm的运行\n了解了自监督学习和无监督学习",
+      "outcome": "成功完成了课设",
       "role": "",
       "evidence": [
         "OpenCV",
@@ -270,19 +284,21 @@ window.SILVER_DATA = {
         "SVM",
         "Python"
       ],
-      "index": "07"
+      "index": "07",
+      "systemTitle": "我的收获",
+      "outcomeTitle": "当前结果"
     },
     {
       "id": "LAB—04",
       "slug": "experiment-lab-04",
       "category": "prototype",
       "status": "ARCHITECTURE",
-      "title": "电子日记系统",
+      "title": "SilverZ的个人网站",
       "english": "",
-      "summary": "面向日记管理、分享、好友关系和消息中心的 Web 系统架构设计。",
-      "problem": "如何组织带认证、社交关系与实时消息的完整 Web 应用？",
-      "system": "",
-      "outcome": "",
+      "summary": "前端和客户端的双平台设计，一个负责编辑，一个负责效果展示",
+      "problem": "需要有一个更好的记录我的人生的地方，于是我想到了个人网站",
+      "system": "github仓库充当远端服务器，然后使用netlify链接github仓库进行前端的实现，然后制作桌宠作为工作台，写脚本同步git仓库用来实现本地和远端的同步",
+      "outcome": "使用的非常满意",
       "role": "",
       "evidence": [
         "Vue 3",
@@ -290,7 +306,9 @@ window.SILVER_DATA = {
         "MySQL",
         "Redis"
       ],
-      "index": "08"
+      "index": "08",
+      "outcomeTitle": "当前结果",
+      "date": "2024.11.6目前也在持续更新"
     }
   ],
   "fitnessPhotos": [

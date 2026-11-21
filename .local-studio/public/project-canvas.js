@@ -41,7 +41,11 @@ function mountProjectCanvas() {
     const sections = [...doc.querySelectorAll('.project-narrative > section')];
     for (const [prefix, key, label] of [['01 /','problem','问题与目标'],['02 /','system','系统方案'],['03 /','outcome','结果与复盘']]) {
       const section = sections.find(n => n.querySelector('span')?.textContent.startsWith(prefix));
-      if (section) { section.dataset.editSection = key; bind(`[data-edit-section="${key}"] > p`,key,label); }
+      if (section) {
+        section.dataset.editSection = key;
+        bind(`[data-edit-section="${key}"] > h3`, key + "Title", label + "标题");
+        bind(`[data-edit-section="${key}"] > p`, key, label);
+      }
     }
     doc.querySelectorAll('.project-narrative li').forEach((node,index) => {
       node.dataset.evidence = index; bind(`[data-evidence="${index}"]`,'evidence','能力证据',index);

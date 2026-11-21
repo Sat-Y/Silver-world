@@ -181,8 +181,11 @@ function renderProjects() {
         ${field([...p, "date"], "项目日期")}${field([...p, "role"], "个人职责")}
         ${field([...p, "category"], "项目分类", { select: [{ value: "game", label: "游戏" }, { value: "ai", label: "AI 项目" }, { value: "prototype", label: "实验与原型" }] })}${field([...p, "index"], "展示序号")}
         ${field([...p, "summary"], "项目摘要", { multiline: true })}
+        ${field([...p, "problemTitle"], "问题与目标标题")}
         ${field([...p, "problem"], "问题与目标", { multiline: true })}
+        ${field([...p, "systemTitle"], "系统方案标题")}
         ${field([...p, "system"], "系统方案", { multiline: true })}
+        ${field([...p, "outcomeTitle"], "结果与复盘标题")}
         ${field([...p, "outcome"], "结果与复盘", { multiline: true })}
         ${assetField([...p, "coverImage"], "封面")}
         <p class="field-help full">用于首页精选和项目列表卡面，支持横向图片或 MP4 / WebM 视频；视频进入视野后静音循环播放，留空时使用默认卡面。展示图片用于项目详情。</p>

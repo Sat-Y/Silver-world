@@ -1215,6 +1215,20 @@ body[data-view="report"] .os-view { padding: 0; }
 /* Journey */
 .journey-page { max-width: none; height: calc(100svh - 70px); min-height: 0; padding: 0; overflow: hidden; }
 .footprint-atlas { height: 100%; display: grid; grid-template-rows: 78px minmax(0, 1fr) 58px; background: var(--surface-2); }
+.footprint-atlas {
+  --atlas-water: #e9f2f3;
+  --atlas-land: #f4efdf;
+  --atlas-ink: #c47760;
+  --atlas-border: #92988a;
+  --atlas-grid: rgb(72 115 122 / 8%);
+}
+[data-theme="dark"] .footprint-atlas {
+  --atlas-water: #192b34;
+  --atlas-land: #354348;
+  --atlas-ink: #e6a38a;
+  --atlas-border: #667c80;
+  --atlas-grid: rgb(166 205 211 / 7%);
+}
 .map-toolbar { min-height: 78px; padding: 15px 18px; display: flex; align-items: center; justify-content: space-between; gap: 24px; border-bottom: 3px solid var(--text); }
 .map-toolbar > div { display: flex; flex-direction: column; gap: 5px; }
 .map-toolbar .map-context { margin-left: auto; text-align: right; }
@@ -1223,19 +1237,16 @@ body[data-view="report"] .os-view { padding: 0; }
 .map-toolbar button { min-height: 42px; padding: 0 14px; border: 2px solid var(--text); background: var(--bg); color: var(--text); box-shadow: 2px 2px 0 var(--text); cursor: pointer; font: 700 10px var(--mono); }
 .map-toolbar button:active { transform: translate(2px, 2px); box-shadow: none; }
 .map-layout { min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr); position: relative; overflow: hidden; scrollbar-width: none; }
-.map-viewport { min-width: 0; min-height: 0; padding: 28px 34px 32px; position: relative; overflow: hidden; scrollbar-width: none; background-color: var(--bg); background-image: linear-gradient(color-mix(in srgb, var(--text) 9%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--text) 9%, transparent) 1px, transparent 1px); background-size: 42px 42px; }
+.map-viewport { min-width: 0; min-height: 0; padding: 28px 34px 32px; position: relative; overflow: hidden; scrollbar-width: none; background-color: var(--atlas-water); background-image: linear-gradient(var(--atlas-grid) 1px, transparent 1px), linear-gradient(90deg, var(--atlas-grid) 1px, transparent 1px); background-size: 42px 42px; }
 .map-layout::-webkit-scrollbar, .map-viewport::-webkit-scrollbar, .footprint-map-canvas::-webkit-scrollbar { display: none; }
 .footprint-map-canvas { width: 100%; height: 100%; min-height: 0; display: grid; place-items: center; transition: opacity .22s ease, transform .45s cubic-bezier(.16, 1, .3, 1); }
 .footprint-map-canvas.is-switching { opacity: 0; transform: scale(.965); }
 .footprint-svg { width: 100%; height: 100%; max-height: 560px; overflow: visible; outline: none; }
-.map-region { fill: color-mix(in srgb, var(--surface) 91%, var(--text)); stroke: color-mix(in srgb, var(--text) 68%, transparent); stroke-width: .75; vector-effect: non-scaling-stroke; cursor: pointer; transition: fill .18s ease, opacity .18s ease, stroke-width .18s ease, filter .18s ease; outline: none; }
-.map-region:hover, .map-region:focus-visible { fill: color-mix(in srgb, var(--surface) 78%, var(--text)); stroke-width: 1.8; }
-.map-region.is-explored { fill: color-mix(in srgb, var(--accent) var(--visit-strength), var(--surface)); stroke-width: 1.5; }
-.map-region.is-explored:hover, .map-region.is-explored:focus-visible { fill: var(--accent); filter: saturate(1.08); }
-[data-theme="dark"] .map-region { fill: color-mix(in srgb, var(--surface) 84%, var(--text)); stroke: color-mix(in srgb, var(--text) 58%, transparent); }
-[data-theme="dark"] .map-region:hover, [data-theme="dark"] .map-region:focus-visible { fill: color-mix(in srgb, var(--surface) 68%, var(--text)); }
-[data-theme="dark"] .map-region.is-explored { fill: color-mix(in srgb, var(--accent) var(--visit-strength), var(--surface)); }
-.footprint-world { filter: drop-shadow(3px 5px 0 color-mix(in srgb, var(--text) 18%, transparent)); }
+.map-region { fill: var(--atlas-land); stroke: var(--atlas-border); stroke-width: .75; vector-effect: non-scaling-stroke; cursor: pointer; transition: fill .18s ease, opacity .18s ease, stroke-width .18s ease, filter .18s ease; outline: none; }
+.map-region:hover, .map-region:focus-visible { fill: color-mix(in srgb, var(--atlas-land) 80%, var(--atlas-ink)); stroke-width: 1.8; }
+.map-region.is-explored { fill: color-mix(in srgb, var(--atlas-ink) var(--visit-strength), var(--atlas-land)); stroke-width: 1.5; }
+.map-region.is-explored:hover, .map-region.is-explored:focus-visible { fill: var(--atlas-ink); filter: saturate(1.08); }
+.footprint-world { filter: drop-shadow(0 2px 2px rgb(17 51 54 / 12%)); }
 .footprint-china { max-width: 820px; }
 .province-labels { pointer-events: none; }
 .province-labels text { fill: var(--text); paint-order: stroke; stroke: var(--bg); stroke-width: 2.5px; font: 700 8px var(--sans); text-anchor: middle; dominant-baseline: central; }
@@ -1285,10 +1296,10 @@ body[data-view="report"] .os-view { padding: 0; }
 .footprint-feed-empty { padding: 40px 24px; color: var(--muted); font-size: 12px; text-align: center; }
 .map-legend { width: 100%; max-width: none; min-height: 58px; margin: 0; padding: 12px 18px; display: flex; align-items: center; gap: 24px; border-top: 0; font: 8px var(--mono); color: var(--muted); }
 .map-legend span { display: flex; align-items: center; gap: 8px; }
-.map-legend i { width: 13px; height: 13px; border: 1px solid var(--text); background: var(--surface); }
-.map-legend i.visit-low { background: color-mix(in srgb, var(--accent) 46%, var(--surface)); }
-.map-legend i.visit-mid { background: color-mix(in srgb, var(--accent) 66%, var(--surface)); }
-.map-legend i.visit-high { background: color-mix(in srgb, var(--accent) 86%, var(--surface)); }
+.map-legend i { width: 13px; height: 13px; border: 1px solid var(--atlas-border); background: var(--atlas-land); }
+.map-legend i.visit-low { background: color-mix(in srgb, var(--atlas-ink) 46%, var(--atlas-land)); }
+.map-legend i.visit-mid { background: color-mix(in srgb, var(--atlas-ink) 66%, var(--atlas-land)); }
+.map-legend i.visit-high { background: color-mix(in srgb, var(--atlas-ink) 86%, var(--atlas-land)); }
 .map-legend b { margin-left: auto; color: var(--faint); font-weight: 500; }
 .map-loading, .map-error { display: grid; place-items: center; gap: 16px; color: var(--faint); font: 8px var(--mono); }
 .map-loading i { width: 44px; height: 44px; border: 2px solid var(--line-strong); border-top-color: var(--accent); animation: map-loading 1s linear infinite; }
